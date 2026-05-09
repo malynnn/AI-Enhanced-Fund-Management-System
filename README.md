@@ -1,0 +1,2 @@
+# Finance-System_Capstone-1
+The Financial System manages funds, accounts, transactions, budgeting, and financial reports while maintaining an immutable audit trail for transparency and compliance.
