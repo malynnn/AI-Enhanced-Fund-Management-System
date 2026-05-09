@@ -1,65 +1,99 @@
-import Image from "next/image";
+export default function FinancialDashboard() {
+  const duesHistory = [
+    { date: 'Apr 2026', amount: '₱500', status: 'PAID', method: 'Salary Deduction' },
+    { date: 'Mar 2026', amount: '₱500', status: 'PAID', method: 'Salary Deduction' },
+    { date: 'Feb 2026', amount: '₱500', status: 'PAID', method: 'Salary Deduction' },
+    { date: 'Jan 2026', amount: '₱500', status: 'PAID', method: 'Online Transfer' },
+    { date: 'Dec 2025', amount: '₱500', status: 'PAID', method: 'Salary Deduction' },
+    { date: 'Nov 2025', amount: '₱500', status: 'PAID', method: 'Salary Deduction' },
+    { date: 'Oct 2025', amount: '₱500', status: 'PAID', method: 'Online Transfer' },
+    { date: 'Sep 2025', amount: '₱500', status: 'PAID', method: 'Online Transfer' },
+    { date: 'Aug 2025', amount: '₱500', status: 'PAID', method: 'Salary Deduction' },
+  ];
 
-export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="p-10 max-w-7xl mx-auto">
+      <h1 className="text-4xl font-extrabold tracking-tight mb-8 text-gray-900">Financial Summary</h1>
+
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        
+        {/* Left Card: My Dues History */}
+        <div className="xl:col-span-2 bg-white rounded-2xl shadow-sm p-8 border border-gray-100">
+          <h2 className="text-2xl font-bold mb-6 text-gray-900">My Dues History</h2>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left">
+              <thead className="bg-[#eef2f6] text-gray-700 font-semibold rounded-lg">
+                <tr>
+                  <th className="px-4 py-3 rounded-l-lg">Date</th>
+                  <th className="px-4 py-3">Amount</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3 rounded-r-lg">Method</th>
+                </tr>
+              </thead>
+              <tbody>
+                {duesHistory.map((row, idx) => (
+                  <tr key={idx} className="border-b border-gray-100 last:border-0">
+                    <td className="px-4 py-4 text-gray-600 font-medium">{row.date}</td>
+                    <td className="px-4 py-4 font-bold text-gray-900">{row.amount}</td>
+                    <td className="px-4 py-4 font-bold text-green-700">{row.status}</td>
+                    <td className="px-4 py-4 text-gray-600">{row.method}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Right Column */}
+        <div className="space-y-6">
+          
+          {/* Top Right Card: Loan Status */}
+          <div className="bg-white rounded-2xl shadow-sm p-8 border border-gray-100">
+            <h2 className="text-2xl font-bold mb-6 text-gray-900">My Loan Status</h2>
+            <div className="space-y-4 text-sm">
+              <div className="flex justify-between border-b border-gray-100 pb-3">
+                <span className="font-semibold text-gray-900">Loan ID</span>
+                <span className="text-gray-600">LN-2025-071</span>
+              </div>
+              <div className="flex justify-between border-b border-gray-100 pb-3">
+                <span className="font-semibold text-gray-900">Loan Type</span>
+                <span className="text-gray-600">Regular Loan</span>
+              </div>
+              <div className="flex justify-between border-b border-gray-100 pb-3">
+                <span className="font-semibold text-gray-900">Original Amount</span>
+                <span className="text-gray-600">₱30,000</span>
+              </div>
+              <div className="flex justify-between border-b border-gray-100 pb-3">
+                <span className="font-semibold text-gray-900">Remaining Balance</span>
+                <span className="font-bold text-red-700">₱22,100</span>
+              </div>
+              <div className="flex justify-between border-b border-gray-100 pb-3">
+                <span className="font-semibold text-gray-900">Monthly Payment</span>
+                <span className="text-gray-600">₱2,900</span>
+              </div>
+              <div className="flex justify-between border-b border-gray-100 pb-3">
+                <span className="font-semibold text-gray-900">Next Due Date</span>
+                <span className="text-gray-600">May 12, 2026</span>
+              </div>
+              <div className="flex justify-between pt-2">
+                <span className="font-semibold text-gray-900">Status</span>
+                <span className="font-bold text-green-700">CURRENT</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Right Card: Alert Banner */}
+          <div className="bg-[#edf3ff] border border-blue-100 rounded-2xl p-5 flex gap-4 text-sm text-blue-900 shadow-sm">
+            <div className="flex-shrink-0 pt-0.5">
+              <div className="w-5 h-5 rounded-full border-2 border-blue-600 flex items-center justify-center font-bold text-blue-600 text-xs">i</div>
+            </div>
+            <p className="leading-relaxed font-medium">
+              You have view-only access to your personal financial records. For inquiries or concerns about your account, please contact the Treasurer directly.
+            </p>
+          </div>
+
         </div>
-      </main>
+      </div>
     </div>
   );
 }
