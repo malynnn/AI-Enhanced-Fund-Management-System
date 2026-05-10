@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  role      String   @default("USER") // USER, ADMIN, TREASURER, PRESIDENT
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  auditLogs      FSAuditLog[]
+  reportSignoffs ReportSignoff[]
+}
+
+model FSAuditLog {
+  id             String   @id @default(uuid())
+  user_id        String?
+  action_type    String   // POST, PUT, DELETE
+  table_name     String
+  record_id      String
+  old_value_json Json?
+  new_value_json Json?
+  ip_address     String?
+  timestamp      DateTime @default(now())
+
+  user User? @relation(fields: [user_id], references: [id])
+
+  @@map("fs_audit_log")
+}
+
+model ReportSignoff {
+  id             String   @id @default(uuid())
+  report_id      String
+  user_id        String
+  role           String   // e.g., TREASURER, PRESIDENT
+  digital_sig    String
+  signed_at      DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id])
+
+  @@map("report_signoffs")
+}
