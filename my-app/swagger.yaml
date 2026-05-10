@@ -1,0 +1,32 @@
+openapi: 3.0.0
+info:
+  title: Financial System API
+  version: 1.0.0
+
+tags:
+  - name: Disbursement
+  - name: Audit
+
+paths:
+  /disburse:
+    post:
+      tags:
+        - Disbursement
+      summary: "Process a new disbursement"  # ITO ANG KAILANGAN MO
+      responses:
+        '200':
+          description: OK
+
+  /audit-logs:
+    get:
+      tags:
+        - Audit
+      summary: "Returns pet inventories by status" # PARA MAGING KATULAD NG PETSTORE
+      responses:
+        '200':
+          description: OK
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/student-f2a/Backend/1.0.0
+    
