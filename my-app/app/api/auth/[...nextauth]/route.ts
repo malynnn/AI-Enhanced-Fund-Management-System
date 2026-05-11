@@ -15,7 +15,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
-          // 1. Authenticate with Membership System (MS)
+          // 1. Authenticate with the Membership System (MS) backend
           const msLoginRes = await fetch(`${process.env.NEXT_PUBLIC_MS_API_URL}/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -25,10 +25,13 @@ export const authOptions: NextAuthOptions = {
             }),
           });
 
-          if (!msLoginRes.ok) throw new Error("Invalid Employee ID or Password");
+          if (!msLoginRes.ok) {
+            throw new Error("Invalid Employee ID or password.");
+          }
+
           const { token } = await msLoginRes.json();
 
-          // 2. Validate via MS /auth/me endpoint
+          // 2. Validate token and get the user's raw MS profile
           const msUserRes = await fetch(`${process.env.NEXT_PUBLIC_MS_API_URL}/auth/me`, {
             method: 'GET',
             headers: { 
@@ -37,26 +40,37 @@ export const authOptions: NextAuthOptions = {
             },
           });
 
-          if (!msUserRes.ok) throw new Error("Failed to validate MS token");
+          if (!msUserRes.ok) {
+            throw new Error("Failed to validate MS token.");
+          }
+
           const msUser = await msUserRes.json();
 
-          // 3. Implement FS Role Mapper
+          // ==========================================
+          // 3. IMPLEMENT FS ROLE MAPPER
+          // ==========================================
           let fsRole = null;
           const originalRole = msUser.role?.toLowerCase() || '';
 
-          if (originalRole.includes('admin')) {
-            fsRole = 'Officer/Admin'; // Maps to full access
-          } else if (originalRole.includes('treasurer') || originalRole.includes('finance')) {
-            fsRole = 'Treasurer'; // Maps to view+post
-          } else if (originalRole.includes('auditor')) {
-            fsRole = 'Auditor'; // Maps to read-only
+          // Admin = Full Access
+          if (originalRole.includes('admin') || originalRole.includes('officer')) {
+            fsRole = 'Admin'; 
+          } 
+          // Treasurer = View + Post transactions
+          else if (originalRole.includes('treasurer') || originalRole.includes('finance')) {
+            fsRole = 'Treasurer';
+          } 
+          // Internal Auditor = Read-only
+          else if (originalRole.includes('auditor')) {
+            fsRole = 'Internal Auditor';
           }
 
-          // 4. Reject requests from MS roles not mapped to FS roles
+          // 4. Reject requests from MS roles not mapped to FS roles (403 Forbidden logic)
           if (!fsRole) {
-            throw new Error("403 Forbidden: MS Role not authorized for Finance System");
+            throw new Error("403 Forbidden: Your MS Role is not authorized for the Finance System.");
           }
 
+          // Return the mapped user so it saves to the secure session
           return {
             id: msUser.id,
             name: msUser.name || msUser.username,
@@ -71,6 +85,7 @@ export const authOptions: NextAuthOptions = {
     })
   ],
   callbacks: {
+    // Inject the mapped role and token into the JWT
     async jwt({ token, user }) {
       if (user) {
         token.role = (user as any).role;
@@ -78,6 +93,7 @@ export const authOptions: NextAuthOptions = {
       }
       return token;
     },
+    // Expose the mapped role to the frontend session
     async session({ session, token }) {
       if (session.user) {
         (session.user as any).role = token.role;
@@ -87,9 +103,11 @@ export const authOptions: NextAuthOptions = {
     }
   },
   pages: {
-    signIn: '/login', // Points to our custom UI
+    signIn: '/login', // Ties back to your frontend UI
   },
-  session: { strategy: "jwt" },
+  session: {
+    strategy: "jwt",
+  },
 };
 
 const handler = NextAuth(authOptions);
