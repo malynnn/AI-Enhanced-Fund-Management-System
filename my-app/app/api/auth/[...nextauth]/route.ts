@@ -7,59 +7,66 @@ export const authOptions: NextAuthOptions = {
       name: "MS Account",
       credentials: {
         username: { label: "Employee ID", type: "text" },
-        password: { label: "Password", type: "password" },
-        otp: { label: "Verification Code", type: "text" } // Added OTP field
+        password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        if (!credentials?.username || !credentials?.password || !credentials?.otp) {
-          throw new Error("Missing credentials or verification code");
+        if (!credentials?.username || !credentials?.password) {
+          throw new Error("Missing credentials");
         }
 
-        // ==========================================
-        // ⚠️ DEVELOPMENT MOCK LOGIN (With 2FA bypass)
-        // ==========================================
-        const magicPassword = credentials.password.toLowerCase();
-        
-        // Mocking 2FA logic: For dev purposes, accept '1234' as the correct 4-digit code
-        if (credentials.otp !== "1234") {
-          throw new Error("Invalid verification code.");
-        }
-
-        let mockRole = "";
-        if (magicPassword === "admin") mockRole = "Superadmin";
-        else if (magicPassword === "treasurer") mockRole = "Treasurer";
-        else if (magicPassword === "auditor") mockRole = "Auditor";
-        else if (magicPassword === "user") mockRole = "User";
-        else throw new Error("Invalid credentials");
-
-        return {
-          id: "dev-mock-id",
-          name: credentials.username,
-          role: mockRole,
-          accessToken: "mock-jwt-token-12345"
-        };
-
-        // ==========================================
-        // 🛑 REAL BACKEND CODE (COMMENTED OUT) 🛑
-        // ==========================================
-        /*
         try {
-          // Send all 3 pieces of data to the backend endpoint
-          const msLoginRes = await fetch(`${process.env.NEXT_PUBLIC_MS_API_URL}/auth/verify-login`, {
+          // 1. Authenticate with Membership System (MS)
+          const msLoginRes = await fetch(`${process.env.NEXT_PUBLIC_MS_API_URL}/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               username: credentials.username,
               password: credentials.password,
-              otp: credentials.otp // Backend validates this code before returning JWT
             }),
           });
 
-          if (!msLoginRes.ok) throw new Error("Invalid credentials or verification code");
+          if (!msLoginRes.ok) throw new Error("Invalid Employee ID or Password");
           const { token } = await msLoginRes.json();
 
-          // ... (rest of the /auth/me mapping logic stays the exact same)
-        */
+          // 2. Validate via MS /auth/me endpoint
+          const msUserRes = await fetch(`${process.env.NEXT_PUBLIC_MS_API_URL}/auth/me`, {
+            method: 'GET',
+            headers: { 
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+          });
+
+          if (!msUserRes.ok) throw new Error("Failed to validate MS token");
+          const msUser = await msUserRes.json();
+
+          // 3. Implement FS Role Mapper
+          let fsRole = null;
+          const originalRole = msUser.role?.toLowerCase() || '';
+
+          if (originalRole.includes('admin')) {
+            fsRole = 'Officer/Admin'; // Maps to full access
+          } else if (originalRole.includes('treasurer') || originalRole.includes('finance')) {
+            fsRole = 'Treasurer'; // Maps to view+post
+          } else if (originalRole.includes('auditor')) {
+            fsRole = 'Auditor'; // Maps to read-only
+          }
+
+          // 4. Reject requests from MS roles not mapped to FS roles
+          if (!fsRole) {
+            throw new Error("403 Forbidden: MS Role not authorized for Finance System");
+          }
+
+          return {
+            id: msUser.id,
+            name: msUser.name || msUser.username,
+            role: fsRole,
+            accessToken: token 
+          };
+
+        } catch (error: any) {
+          throw new Error(error.message || "Authentication failed");
+        }
       }
     })
   ],
@@ -79,7 +86,9 @@ export const authOptions: NextAuthOptions = {
       return session;
     }
   },
-  pages: { signIn: '/login' },
+  pages: {
+    signIn: '/login', // Points to our custom UI
+  },
   session: { strategy: "jwt" },
 };
 
