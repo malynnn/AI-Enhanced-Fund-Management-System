@@ -1,49 +1,96 @@
-import NextAuth from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
-const handler = NextAuth({
+export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
-      name: "Mock MS SSO (Local Dev)",
+      name: "MS Account",
       credentials: {
-        username: { label: "Email (Type 'super', 'admin', or 'user')", type: "text", placeholder: "admin@pup.edu.ph" },
-        password: { label: "Password (Type anything)", type: "password" }
+        username: { label: "Employee ID", type: "text" },
+        password: { label: "Password", type: "password" }
       },
-// Inside app/api/auth/[...nextauth]/route.ts
       async authorize(credentials) {
-        if (!credentials?.username) return null;
+        if (!credentials?.username || !credentials?.password) {
+          throw new Error("Missing credentials");
+        }
 
-        let assignedRole = "User"; 
-        const email = credentials.username.toLowerCase();
-        
-        // Expanded role assignment based on the backlog task
-        if (email.includes("super")) assignedRole = "Superadmin";
-        else if (email.includes("admin")) assignedRole = "Officer/Admin";
-        else if (email.includes("treasurer")) assignedRole = "Treasurer";
-        else if (email.includes("auditor")) assignedRole = "Auditor";
+        try {
+          // 1. Authenticate with Membership System (MS)
+          const msLoginRes = await fetch(`${process.env.NEXT_PUBLIC_MS_API_URL}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              username: credentials.username,
+              password: credentials.password,
+            }),
+          });
 
-        return { 
-          id: "1", 
-          name: assignedRole, 
-          email: credentials.username,
-          role: assignedRole 
-        } as any;
+          if (!msLoginRes.ok) throw new Error("Invalid Employee ID or Password");
+          const { token } = await msLoginRes.json();
+
+          // 2. Validate via MS /auth/me endpoint
+          const msUserRes = await fetch(`${process.env.NEXT_PUBLIC_MS_API_URL}/auth/me`, {
+            method: 'GET',
+            headers: { 
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+          });
+
+          if (!msUserRes.ok) throw new Error("Failed to validate MS token");
+          const msUser = await msUserRes.json();
+
+          // 3. Implement FS Role Mapper
+          let fsRole = null;
+          const originalRole = msUser.role?.toLowerCase() || '';
+
+          if (originalRole.includes('admin')) {
+            fsRole = 'Officer/Admin'; // Maps to full access
+          } else if (originalRole.includes('treasurer') || originalRole.includes('finance')) {
+            fsRole = 'Treasurer'; // Maps to view+post
+          } else if (originalRole.includes('auditor')) {
+            fsRole = 'Auditor'; // Maps to read-only
+          }
+
+          // 4. Reject requests from MS roles not mapped to FS roles
+          if (!fsRole) {
+            throw new Error("403 Forbidden: MS Role not authorized for Finance System");
+          }
+
+          return {
+            id: msUser.id,
+            name: msUser.name || msUser.username,
+            role: fsRole,
+            accessToken: token 
+          };
+
+        } catch (error: any) {
+          throw new Error(error.message || "Authentication failed");
+        }
       }
     })
   ],
   callbacks: {
-    // 1. Put the role into the JWT Token
     async jwt({ token, user }) {
-      if (user) token.role = (user as any).role;
+      if (user) {
+        token.role = (user as any).role;
+        token.accessToken = (user as any).accessToken;
+      }
       return token;
     },
-    // 2. Expose the role to the frontend session
     async session({ session, token }) {
-      if (session?.user) (session.user as any).role = token.role;
+      if (session.user) {
+        (session.user as any).role = token.role;
+        (session as any).accessToken = token.accessToken;
+      }
       return session;
     }
   },
+  pages: {
+    signIn: '/login', // Points to our custom UI
+  },
   session: { strategy: "jwt" },
-});
+};
 
+const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };

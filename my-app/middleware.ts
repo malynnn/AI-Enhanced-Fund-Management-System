@@ -1,4 +1,3 @@
-// my-app/middleware.ts
 import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
 
@@ -8,23 +7,44 @@ export default withAuth(
     const role = token?.role as string | undefined;
     const path = req.nextUrl.pathname;
 
-    // If an Officer, Treasurer, Auditor, or Superadmin lands on the root User dashboard ("/"),
-    // instantly redirect them to the Monitoring Hub instead.
-    if (path === "/" && role && ['Officer/Admin', 'Treasurer', 'Auditor', 'Superadmin'].includes(role)) {
+    // 1. Redirect logged-in users away from the login page
+    if (path === "/login" && token) {
+        return NextResponse.redirect(new URL("/", req.url));
+    }
+
+    // 2. Original Logic: Redirect Finance Officers from the root User Dashboard to the Finance Hub
+    if (path === "/" && role && ['Officer/Admin', 'Superadmin', 'Treasurer', 'Auditor'].includes(role)) {
       return NextResponse.redirect(new URL("/finance/dashboard", req.url));
     }
   },
   {
     callbacks: {
-      // This ensures the middleware only runs if the user actually has a token
-      authorized: ({ token }) => !!token,
+      authorized: ({ req, token }) => {
+        const path = req.nextUrl.pathname;
+        
+        // Anyone can visit the login page
+        if (path === "/login") return true;
+        
+        // Everything else requires a token
+        return !!token;
+      },
+    },
+    pages: {
+      signIn: "/login",
     },
   }
 );
 
+// Ensure middleware runs on the login page and all protected routes
 export const config = {
   matcher: [
-    /* Ignore API routes, Next.js internal files, and images so they don't get blocked */
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    "/",
+    "/login",
+    "/finance/:path*",
+    "/dashboard",
+    "/notifications",
+    "/events",
+    "/membership",
+    "/loans",
   ],
-}
+};
