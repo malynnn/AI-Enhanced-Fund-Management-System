@@ -42,6 +42,7 @@ export const authOptions: NextAuthOptions = {
     })
   ],
   callbacks: {
+    // Inject the mapped role and token into the JWT
     async jwt({ token, user }) {
       if (user) {
         token.role = (user as any).role;
@@ -49,6 +50,7 @@ export const authOptions: NextAuthOptions = {
       }
       return token;
     },
+    // Expose the mapped role to the frontend session
     async session({ session, token }) {
       if (session.user) {
         (session.user as any).role = token.role;
