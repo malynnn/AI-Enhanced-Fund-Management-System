@@ -1,17 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { AlertCircle, Loader2 } from "lucide-react";
+import { signIn, getSession } from "next-auth/react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { AlertCircle, Loader2, CheckCircle2 } from "lucide-react";
 import Image from "next/image"; 
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const errorUrl = searchParams.get("error");
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [detectedRole, setDetectedRole] = useState<string | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,11 +29,23 @@ export default function LoginPage() {
     });
 
     if (res?.error) {
-      setErrorMessage(res.error === "CredentialsSignin" ? "Invalid Employee ID or password." : res.error);
+      setErrorMessage("Invalid credentials.");
       setIsLoading(false);
     } else {
-      router.push("/finance/dashboard");
-      router.refresh();
+      const session = await getSession();
+      const userRole = (session?.user as any)?.role || "User";
+      
+      setDetectedRole(userRole);
+
+      setTimeout(() => {
+        // If they are a standard user, go to root dashboard. Otherwise, go to finance hub.
+        if (userRole === "User") {
+          router.push("/");
+        } else {
+          router.push("/finance/dashboard");
+        }
+        router.refresh();
+      }, 1500);
     }
   };
 
@@ -48,65 +64,74 @@ export default function LoginPage() {
         />
       </div>
 
-      {/* RIGHT COLUMN: Login Form */}
+      {/* RIGHT COLUMN: Login Form Area */}
       <div className="w-full lg:w-1/2 bg-[#021124] flex items-center justify-center p-8">
-        <div className="bg-[#f8f9fa] w-full max-w-md rounded-md p-10 lg:p-12 shadow-2xl">
+        <div className="bg-[#f8f9fa] w-full max-w-md rounded-md p-10 lg:p-12 shadow-xl">
           
           <h2 className="text-[2.5rem] leading-none font-bold text-black mb-8 tracking-tight">
             Log In
           </h2>
 
-          {errorMessage && (
-            <div className="mb-6 bg-red-100 text-red-700 p-3 rounded flex items-start gap-2 text-sm font-bold border border-red-200">
+          {/* Error Display */}
+          {(errorMessage || errorUrl) && (
+            <div className="mb-6 bg-red-100 text-red-700 p-3 rounded flex items-start gap-2 text-sm font-bold">
               <AlertCircle size={18} className="shrink-0 mt-0.5" />
-              <p>{errorMessage}</p>
+              <p>{errorMessage || "Authentication failed."}</p>
+            </div>
+          )}
+
+          {/* Role Success Display */}
+          {detectedRole && (
+            <div className="mb-6 bg-green-100 text-green-800 p-4 rounded flex items-center gap-3 text-sm font-bold border border-green-200">
+              <CheckCircle2 size={24} className="text-green-600 shrink-0" />
+              <div>
+                <p>Authentication Successful!</p>
+                <p className="font-medium text-green-700 mt-0.5">Logging you in as: <span className="font-black uppercase">{detectedRole}</span></p>
+              </div>
             </div>
           )}
 
           <form onSubmit={handleLogin} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Employee ID</label>
+              <label className="block text-sm text-gray-700 mb-1.5">Employee ID / Email</label>
               <input
                 type="text"
                 required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full p-3 bg-white border border-gray-200 rounded text-sm focus:ring-2 focus:ring-[#021124] outline-none transition-all"
-                placeholder="Enter your Employee ID here"
+                disabled={!!detectedRole}
+                className="w-full p-3 bg-white border border-gray-200 rounded text-sm focus:ring-2 focus:ring-[#021124] outline-none transition-all disabled:opacity-50"
+                placeholder="e.g. admin@pup.edu.ph"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+              <label className="block text-sm text-gray-700 mb-1.5">Password</label>
               <input
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-3 bg-white border border-gray-200 rounded text-sm focus:ring-2 focus:ring-[#021124] outline-none transition-all"
-                placeholder="Enter your password here"
+                disabled={!!detectedRole}
+                className="w-full p-3 bg-white border border-gray-200 rounded text-sm focus:ring-2 focus:ring-[#021124] outline-none transition-all disabled:opacity-50"
+                placeholder="Enter any password"
               />
-            </div>
-
-            <div className="flex justify-end pt-1">
-              <a href="#" className="text-sm font-bold text-[#021124] hover:underline">
-                Forgot Password?
-              </a>
             </div>
 
             <button
               type="submit"
-              disabled={isLoading}
-              className="w-full bg-[#021124] text-white p-3.5 mt-2 rounded font-semibold text-sm hover:bg-black transition-all active:scale-[0.99] flex justify-center items-center gap-2 disabled:opacity-70"
+              disabled={isLoading || !!detectedRole}
+              className="w-full bg-[#021124] text-white p-3.5 mt-4 rounded font-semibold text-sm hover:bg-black transition-all active:scale-[0.99] flex justify-center items-center gap-2 disabled:opacity-70"
             >
-              {isLoading ? <><Loader2 size={18} className="animate-spin" /> Verifying...</> : "Login"}
+              {isLoading && !detectedRole ? (
+                <><Loader2 size={18} className="animate-spin" /> Verifying...</>
+              ) : detectedRole ? (
+                "Redirecting..."
+              ) : (
+                "Login"
+              )}
             </button>
           </form>
-
-          <div className="mt-6 text-center text-sm text-black">
-            <span className="font-medium">Don't have an account? </span>
-            <a href="#" className="font-bold text-[#021124] hover:underline">Sign up</a>
-          </div>
 
         </div>
       </div>

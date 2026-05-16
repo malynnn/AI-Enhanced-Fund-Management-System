@@ -4,9 +4,9 @@ import CredentialsProvider from "next-auth/providers/credentials";
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
-      name: "MS Account",
+      name: "Mock Account",
       credentials: {
-        username: { label: "Employee ID", type: "text" },
+        username: { label: "Email / Employee ID", type: "text" },
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
@@ -14,59 +14,30 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Missing credentials");
         }
 
-        try {
-          // 1. Authenticate with Membership System (MS)
-          const msLoginRes = await fetch(`${process.env.NEXT_PUBLIC_MS_API_URL}/auth/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              username: credentials.username,
-              password: credentials.password,
-            }),
-          });
+        const inputId = credentials.username.toLowerCase();
+        let mockRole = "User"; // Default role
 
-          if (!msLoginRes.ok) throw new Error("Invalid Employee ID or Password");
-          const { token } = await msLoginRes.json();
-
-          // 2. Validate via MS /auth/me endpoint
-          const msUserRes = await fetch(`${process.env.NEXT_PUBLIC_MS_API_URL}/auth/me`, {
-            method: 'GET',
-            headers: { 
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            },
-          });
-
-          if (!msUserRes.ok) throw new Error("Failed to validate MS token");
-          const msUser = await msUserRes.json();
-
-          // 3. Implement FS Role Mapper
-          let fsRole = null;
-          const originalRole = msUser.role?.toLowerCase() || '';
-
-          if (originalRole.includes('admin')) {
-            fsRole = 'Officer/Admin'; // Maps to full access
-          } else if (originalRole.includes('treasurer') || originalRole.includes('finance')) {
-            fsRole = 'Treasurer'; // Maps to view+post
-          } else if (originalRole.includes('auditor')) {
-            fsRole = 'Auditor'; // Maps to read-only
-          }
-
-          // 4. Reject requests from MS roles not mapped to FS roles
-          if (!fsRole) {
-            throw new Error("403 Forbidden: MS Role not authorized for Finance System");
-          }
-
-          return {
-            id: msUser.id,
-            name: msUser.name || msUser.username,
-            role: fsRole,
-            accessToken: token 
-          };
-
-        } catch (error: any) {
-          throw new Error(error.message || "Authentication failed");
+        // Mock Role Mapper based on the username/email typed
+        if (inputId.includes("superadmin")) {
+          mockRole = "Superadmin";
+        } else if (inputId.includes("admin")) {
+          mockRole = "Officer/Admin"; // Matches your Sidebar's role array perfectly
+        } else if (inputId.includes("treasurer")) {
+          mockRole = "Treasurer";
+        } else if (inputId.includes("auditor")) {
+          mockRole = "Auditor";
+        } else if (inputId.includes("user")) {
+          mockRole = "User";
         }
+
+        // Return a fake user session
+        return {
+          id: `mock-id-${Math.floor(Math.random() * 1000)}`,
+          name: credentials.username.split('@')[0].toUpperCase(), // Uses part of the email as the name
+          email: credentials.username,
+          role: mockRole,
+          accessToken: "mock-jwt-token-12345"
+        };
       }
     })
   ],
@@ -87,9 +58,11 @@ export const authOptions: NextAuthOptions = {
     }
   },
   pages: {
-    signIn: '/login', // Points to our custom UI
+    signIn: '/login', 
   },
-  session: { strategy: "jwt" },
+  session: {
+    strategy: "jwt",
+  },
 };
 
 const handler = NextAuth(authOptions);
