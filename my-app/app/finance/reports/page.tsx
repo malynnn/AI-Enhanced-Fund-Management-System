@@ -68,8 +68,11 @@ export default function FinancialReportsPage() {
           className="w-48 py-2 px-3 border border-gray-300 rounded-md text-sm font-medium focus:ring-2 focus:ring-black outline-none"
         >
           <option>All Funds</option>
-          <option>General Operating</option>
-          <option>Loan Fund</option>
+          <option>General Fund</option>
+          <option>Union Fund</option>
+          <option>Loans</option>
+          <option>Foreign Assistance</option>
+          <option>Death Assistance</option>
         </select>
       </div>
 

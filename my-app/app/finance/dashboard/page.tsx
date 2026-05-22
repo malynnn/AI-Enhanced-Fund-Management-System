@@ -5,15 +5,20 @@ import { Wallet, Printer, ArrowUpRight, ArrowDownRight, Clock, CheckCircle2, Shi
 
 // --- MOCK DATABASE ---
 const initialFunds = [
-  { id: 'OF', name: 'Operating Fund', balance: 1812350, txCount: 248 },
-  { id: 'LF', name: 'Loan Fund', balance: 4520900, txCount: 112 },
-  { id: 'PC', name: 'Petty Cash', balance: 18750, txCount: 45 },
+  { id: 'GF', name: 'General Fund', balance: 1812350, txCount: 248 },
+  { id: 'UF', name: 'Union Fund', balance: 4520900, txCount: 112 },
+  { id: 'LN', name: 'Loans', balance: 1518750, txCount: 45 },
+  { id: 'FA', name: 'Foreign Assistance', balance: 2500000, txCount: 30 },
+  { id: 'DA', name: 'Death Assistance', balance: 850000, txCount: 20 },
 ];
 
 const initialLedger = [
-  { id: 1, fundId: 'OF', date: '2026-04-22', desc: 'Member Dues Batch Remittance', type: 'Credit', amount: 15000, ref: 'REF-8812' },
-  { id: 2, fundId: 'LF', date: '2026-04-26', desc: 'Disbursement: VINLUAN, VEN', type: 'Debit', amount: 30000, ref: 'LN-2026-071' },
-  { id: 3, fundId: 'OF', date: '2026-04-20', desc: 'Office Supplies Vendor Payment', type: 'Debit', amount: 4500, ref: 'REF-8809' },
+  { id: 1, fundId: 'GF', date: '2026-04-22', desc: 'Member Dues Batch Remittance', type: 'Credit', amount: 15000, ref: 'REF-8812' },
+  { id: 2, fundId: 'LN', date: '2026-04-26', desc: 'Disbursement: VINLUAN, VEN', type: 'Debit', amount: 30000, ref: 'LN-2026-071' },
+  { id: 3, fundId: 'GF', date: '2026-04-20', desc: 'Office Supplies Vendor Payment', type: 'Debit', amount: 4500, ref: 'REF-8809' },
+  { id: 4, fundId: 'UF', date: '2026-04-18', desc: 'Union Assembly Expense', type: 'Debit', amount: 12000, ref: 'UN-2026-004' },
+  { id: 5, fundId: 'FA', date: '2026-04-15', desc: 'Foreign Grant Received', type: 'Credit', amount: 500000, ref: 'FG-8801' },
+  { id: 6, fundId: 'DA', date: '2026-04-10', desc: 'Death Claim Benefit Release', type: 'Debit', amount: 20000, ref: 'DC-2026-012' },
 ];
 
 // MOCK INPUT: Incoming Webhook Payload from LAS (From your image)
@@ -26,8 +31,8 @@ const incomingWebhookQueue = [
     amount: 50000, 
     date: '2026-05-11', 
     payment_method: 'Bank Transfer', 
-    fund_to_debit: 'Loan Fund', 
-    fund_id: 'LF',
+    fund_to_debit: 'Loans', 
+    fund_id: 'LN',
     authorised_by: 'LAS_SYSTEM_AUTO' 
   },
 ];
@@ -83,7 +88,7 @@ export default function TreasurerDashboardPage() {
       </div>
 
       {/* TASK REQUIREMENT: Real-time balance card per fund */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 flex-shrink-0">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 flex-shrink-0">
         {funds.map((fund) => (
           <div 
             key={fund.id}

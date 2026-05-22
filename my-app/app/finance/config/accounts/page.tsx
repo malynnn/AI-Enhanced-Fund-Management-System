@@ -6,10 +6,11 @@ import { Plus, Edit2, Power, Save, X, Hash, ShieldAlert } from 'lucide-react';
 
 // --- MOCK DATABASE ---
 const initialAccounts = [
-  { id: 1, code: '1010', name: 'Cash on Hand', type: 'Asset', fund: 'Operating Fund', status: 'Active' },
-  { id: 2, code: '1100', name: 'Loan Receivables', type: 'Asset', fund: 'Loan Fund', status: 'Active' },
-  { id: 3, code: '2010', name: 'Accounts Payable', type: 'Liability', fund: 'Operating Fund', status: 'Active' },
-  { id: 4, code: '5020', name: 'Event Expenses', type: 'Expense', fund: 'Operating Fund', status: 'Inactive' },
+  { id: 1, code: '1010', name: 'General Cash Fund', type: 'Asset', fund: 'General Fund', status: 'Active' },
+  { id: 2, code: '1100', name: 'Loan Receivables', type: 'Asset', fund: 'Loans', status: 'Active' },
+  { id: 3, code: '2010', name: 'Union Accounts Payable', type: 'Liability', fund: 'Union Fund', status: 'Active' },
+  { id: 4, code: '5020', name: 'Foreign Assistance Project Expenses', type: 'Expense', fund: 'Foreign Assistance', status: 'Inactive' },
+  { id: 5, code: '6010', name: 'Death Benefit Disbursements', type: 'Expense', fund: 'Death Assistance', status: 'Active' },
 ];
 
 export default function AdminChartOfAccountsPage() {
@@ -19,7 +20,7 @@ export default function AdminChartOfAccountsPage() {
   const [accounts, setAccounts] = useState(initialAccounts);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [formData, setFormData] = useState({ code: '', name: '', type: 'Asset', fund: 'Operating Fund', status: 'Active' });
+  const [formData, setFormData] = useState({ code: '', name: '', type: 'Asset', fund: 'General Fund', status: 'Active' });
 
   // ==========================================
   // 1. STRICT ROLE GATEKEEPER
@@ -69,7 +70,7 @@ export default function AdminChartOfAccountsPage() {
       setFormData({ ...acc });
     } else {
       setEditingId(null);
-      setFormData({ code: '', name: '', type: 'Asset', fund: 'Operating Fund', status: 'Active' });
+      setFormData({ code: '', name: '', type: 'Asset', fund: 'General Fund', status: 'Active' });
     }
     setIsModalOpen(true);
   };
@@ -181,7 +182,11 @@ export default function AdminChartOfAccountsPage() {
                 <div className="flex-1">
                   <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Fund Mapping</label>
                   <select value={formData.fund} onChange={e => setFormData({...formData, fund: e.target.value})} className="w-full p-2.5 border border-gray-300 rounded-lg text-sm bg-white">
-                    <option>Operating Fund</option><option>Loan Fund</option><option>Petty Cash</option>
+                    <option>General Fund</option>
+                    <option>Union Fund</option>
+                    <option>Loans</option>
+                    <option>Foreign Assistance</option>
+                    <option>Death Assistance</option>
                   </select>
                 </div>
               </div>
