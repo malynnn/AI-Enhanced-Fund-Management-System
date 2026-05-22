@@ -9,18 +9,20 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@nestjs/swagger": "^11.4.4",
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "bcrypt": "^6.0.0",
     "jsonwebtoken": "^9.0.3",
-    "lucide-react": "^1.14.0",
+    "lucide-react": "^1.16.0",
     "next": "^16.2.6",
     "next-auth": "^4.24.14",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "pg": "^8.21.0",
     "react": "^19.2.6",
-    "react-dom": "^19.2.6"
+    "react-dom": "^19.2.6",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
