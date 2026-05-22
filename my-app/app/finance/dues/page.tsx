@@ -210,14 +210,14 @@ export default function DuesCollectionPage() {
         </button>
       </div>
 
-      {/* Main Two-Column Layout */}
-      <div className="flex flex-col lg:flex-row gap-8 flex-1 min-h-0">
+      {/* Main Stacked Layout (Table Full Width, Webhooks Below) */}
+      <div className="flex flex-col gap-8 flex-1">
         
-        {/* Left Column: Dues Table */}
-        <div className="flex-1 flex flex-col min-h-0 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        {/* TOP ROW: Full-Width Dues Table */}
+        <div className="w-full flex flex-col bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           
           {/* Controls inside table wrapper */}
-          <div className="bg-white p-4 border-b border-gray-100 flex flex-wrap gap-4 items-center flex-shrink-0">
+          <div className="bg-white p-4 border-b border-gray-100 flex flex-wrap gap-4 items-center">
             <div className="flex-1 min-w-[200px] relative">
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input 
@@ -247,8 +247,8 @@ export default function DuesCollectionPage() {
             </div>
           </div>
 
-          <div className="overflow-y-auto flex-1 min-h-[500px]">
-            <table className="w-full text-left text-sm relative">
+          <div className="overflow-x-auto w-full">
+            <table className="w-full text-left text-sm whitespace-nowrap min-w-[800px]">
               <thead className="bg-gray-50 border-b border-gray-100 text-gray-500 uppercase text-[10px] tracking-widest font-bold sticky top-0 z-10 shadow-sm">
                 <tr>
                   <th className="px-6 py-4">Member Details</th>
@@ -280,7 +280,6 @@ export default function DuesCollectionPage() {
                       </td>
                       
                       <td className="px-6 py-4 text-right">
-                        {/* Flagging logic per your requirement */}
                         <div className="flex flex-col items-end">
                           <span className={`font-mono font-bold text-base ${isDiscrepancy ? (rec.amountPaid < standardDuesAmount ? 'text-red-600' : 'text-orange-600') : 'text-gray-900'}`}>
                             ₱{rec.amountPaid.toFixed(2)}
@@ -294,7 +293,7 @@ export default function DuesCollectionPage() {
                       </td>
 
                       <td className="px-6 py-4 text-center">
-                        <span className={`inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-bold rounded-md tracking-wider border uppercase ${
+                        <span className={`inline-flex items-center justify-center gap-1 px-2.5 py-1 text-[10px] font-bold rounded-md tracking-wider border uppercase w-24 ${
                           rec.status === 'Confirmed' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-yellow-50 text-yellow-700 border-yellow-200'
                         }`}>
                           {rec.status === 'Confirmed' ? <CheckCircle2 size={12} /> : <AlertTriangle size={12} />}
@@ -307,12 +306,12 @@ export default function DuesCollectionPage() {
                           <button 
                             onClick={() => handlePostLedger(rec.id, rec.name)}
                             disabled={isPosting === rec.id}
-                            className="inline-flex items-center gap-1.5 bg-yellow-400 hover:bg-yellow-500 text-black px-3 py-1.5 rounded-md text-xs font-bold transition-colors disabled:opacity-50"
+                            className="inline-flex items-center gap-1.5 bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-md text-xs font-bold transition-colors disabled:opacity-50"
                           >
                             {isPosting === rec.id ? 'Posting...' : <><Send size={14} /> Post & Notify MS</>}
                           </button>
                         ) : (
-                          <span className="text-xs font-bold text-gray-400">Ledger Updated</span>
+                          <span className="text-xs font-bold text-gray-400 px-4">Ledger Updated</span>
                         )}
                       </td>
                     </tr>
@@ -330,11 +329,11 @@ export default function DuesCollectionPage() {
           </div>
         </div>
 
-        {/* Right Column: Webhook Simulator & Monitor */}
-        <div className="w-full lg:w-96 flex flex-col gap-6 flex-shrink-0">
+        {/* BOTTOM ROW: Webhook Tools */}
+        <div className="w-full flex flex-col lg:flex-row gap-6 mb-8">
           
           {/* Webhook Form */}
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+          <div className="w-full lg:w-[450px] flex-shrink-0 bg-white rounded-xl border border-gray-200 shadow-sm p-6">
             <h2 className="text-md font-bold text-gray-900 flex items-center gap-2 mb-2">
               <span className="bg-purple-100 text-purple-700 p-1.5 rounded-lg"><Terminal size={16} /></span>
               MS Webhook Simulator
@@ -429,7 +428,7 @@ export default function DuesCollectionPage() {
           </div>
 
           {/* Webhook Traffic Monitor */}
-          <div className="bg-gray-900 rounded-xl text-green-400 p-6 font-mono text-xs flex-1 flex flex-col shadow-lg overflow-hidden min-h-[300px] border border-gray-800">
+          <div className="flex-1 bg-gray-900 rounded-xl text-green-400 p-6 font-mono text-xs flex flex-col shadow-lg overflow-hidden h-[540px] border border-gray-800">
             <div className="flex justify-between items-center mb-4 flex-shrink-0 border-b border-gray-800 pb-2">
               <span className="text-[10px] font-bold text-gray-400 tracking-wider flex items-center gap-1.5 uppercase">
                 <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
@@ -438,7 +437,7 @@ export default function DuesCollectionPage() {
               <button onClick={clearLogs} className="text-gray-500 hover:text-white transition-colors text-[10px] font-bold uppercase">Clear</button>
             </div>
             
-            <div className="flex-1 overflow-y-auto space-y-4 pr-1">
+            <div className="flex-1 overflow-y-auto space-y-4 pr-1 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-gray-700 [&::-webkit-scrollbar-track]:transparent">
               {webhookLogs.map((log, index) => (
                 <div key={index} className="border-b border-gray-800/50 pb-3 last:border-0 last:pb-0">
                   <div className="flex justify-between text-[9px] text-gray-500 mb-1">

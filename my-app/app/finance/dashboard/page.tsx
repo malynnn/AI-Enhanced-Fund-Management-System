@@ -88,7 +88,9 @@ export default function TreasurerDashboardPage() {
       </div>
 
       {/* TASK REQUIREMENT: Real-time balance card per fund */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 flex-shrink-0">
+      {/* FIXED: Adjusted gap, padding, text sizes, added truncate, and enforced a rectangular height */}
+      {/* 3-Column Grid Layout */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 flex-shrink-0">
         {funds.map((fund) => (
           <div 
             key={fund.id}
@@ -96,26 +98,30 @@ export default function TreasurerDashboardPage() {
               const updatedFund = funds.find(f => f.id === fund.id) || fund;
               setSelectedFund(updatedFund);
             }}
-            className={`p-6 rounded-2xl border-2 transition-all cursor-pointer shadow-sm relative overflow-hidden ${
+            className={`p-5 rounded-xl border-2 transition-all cursor-pointer shadow-sm relative overflow-hidden flex flex-col justify-between h-[120px] ${
               selectedFund.id === fund.id 
                 ? 'bg-white border-bdoea-yellow ring-4 ring-yellow-400/10 scale-[1.02] z-10' 
                 : 'bg-white border-transparent hover:border-gray-200'
             }`}
           >
-            <div className="flex justify-between items-start mb-6 relative z-10">
-              <div className={`p-3 rounded-xl ${selectedFund.id === fund.id ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-400'}`}>
-                <Wallet size={24} strokeWidth={2.5} />
+            <div className="flex justify-between items-center relative z-10">
+              <div className={`p-2 rounded-lg ${selectedFund.id === fund.id ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-400'}`}>
+                <Wallet size={18} strokeWidth={2.5} />
               </div>
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Active Balance</span>
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider truncate ml-2">Balance</span>
             </div>
-            <div className="relative z-10">
-              <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest">{fund.name}</h3>
-              <p className="text-4xl font-black text-gray-900 mt-1 tracking-tight">
+            
+            <div className="relative z-10 mt-auto">
+              <h3 className="text-[11px] font-bold text-gray-500 uppercase tracking-widest truncate">{fund.name}</h3>
+              <p className="text-2xl font-black text-gray-900 mt-0.5 tracking-tight truncate">
                 ₱{fund.balance.toLocaleString()}
               </p>
             </div>
+            
             {selectedFund.id === fund.id && (
-              <div className="absolute -right-6 -bottom-6 opacity-[0.03] text-black"><Wallet size={140} /></div>
+              <div className="absolute -right-6 -bottom-6 opacity-[0.03] text-black">
+                <Wallet size={100} />
+              </div>
             )}
           </div>
         ))}

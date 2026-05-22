@@ -101,7 +101,7 @@ export default function LoginPage() {
                 onChange={(e) => setUsername(e.target.value)}
                 disabled={!!detectedRole}
                 className="w-full p-3 bg-white border border-gray-200 rounded text-sm focus:ring-2 focus:ring-[#021124] outline-none transition-all disabled:opacity-50"
-                placeholder="e.g. admin@pup.edu.ph"
+                placeholder="Example: member, admin, treasuerer, auditor, superadmin"
               />
             </div>
 

@@ -131,7 +131,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-[280px] h-full flex-shrink-0 shadow-2xl z-10 flex flex-col">
+    <aside className="w-[280px] h-full flex-shrink-0 shadow-2xl z-10 flex flex-col print:hidden">
       {status === "loading" ? (
         <div className={`w-full h-full ${sidebarBgColor}`} />
       ) : (
