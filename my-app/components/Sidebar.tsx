@@ -50,6 +50,10 @@ export default function Sidebar() {
         { label: 'Dues & Contributions', href: '/finance/dues', roles: ['Superadmin', 'Officer/Admin', 'Treasurer', 'Auditor'] },
         { label: 'Disbursement', href: '/finance/disbursement', roles: ['Superadmin', 'Officer/Admin', 'Treasurer'] },
         { label: 'Fund Management', href: '/finance/funds', roles: ['Superadmin', 'Officer/Admin', 'Treasurer', 'Auditor'] },
+        
+        // Properly updated Chart of Accounts link
+        { label: 'Chart of Accounts', href: '/finance/config/accounts', roles: ['Superadmin', 'Officer/Admin', 'Treasurer', 'Auditor'] },
+        
         { label: 'Reports Center', href: '/finance/reports', roles: ['Superadmin', 'Officer/Admin', 'Treasurer', 'Auditor'] },
         { label: 'Bank Reconciliation', href: '/finance/reconciliation', roles: ['Superadmin', 'Officer/Admin', 'Treasurer'] },
         { label: 'System Config', href: '/finance/config', roles: ['Superadmin', 'Officer/Admin'] },
