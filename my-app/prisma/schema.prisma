@@ -51,17 +51,18 @@ model ReportSignoff {
 }
 
 // ===================================================
-//   ADDED FOR USER STORY FS-004: FUND LEDGER SYSTEM
+//      ADDED FOR USER STORY FS-004: FUND LEDGER SYSTEM
 // ===================================================
 
 model Fund {
-  id           String            @id @default(uuid())
-  name         String            @unique // e.g., "General Fund", "Loan Capital Fund"
-  code         String            @unique // e.g., "GEN", "LOAN"
-  balance      Float             @default(0.0) // Real-time balance tracker
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
-  transactions FundTransaction[]
+  id            String                @id @default(uuid())
+  name          String                @unique // e.g., "General Fund", "Loan Capital Fund"
+  code          String                @unique // e.g., "GEN", "LOAN"
+  balance       Float                 @default(0.0) // Real-time balance tracker
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+  transactions  FundTransaction[]
+  disbursements DisbursementRequest[] // <-- Merged successfully here
 
   @@map("funds")
 }
@@ -78,4 +79,24 @@ model FundTransaction {
 
   @@index([fundId])
   @@map("fund_transactions")
+}
+
+model DisbursementRequest {
+  id             String   @id @default(uuid())
+  loanReference  String   @unique @map("loan_reference")
+  memberId       String   @map("member_id")
+  memberName     String   @map("member_name")
+  amount         Float
+  paymentMethod  String   @map("payment_method") // e.g., "BANK_TRANSFER", "CHECK"
+  bankAccount    String   @map("bank_account")   // Task 4: Bank account tracking
+  paymentDetails String?  @map("payment_details") // Task 4: Additional details
+  status         String   @default("PENDING")    // Task 2: Tracking pending vs completed
+  authorizedBy   String?  @map("authorized_by")   // Task 3: Officer signature name/role
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  fundId         String   @map("fund_id")
+  fund           Fund     @relation(fields: [fundId], references: [id], onDelete: Cascade)
+
+  @@map("disbursement_requests")
 }

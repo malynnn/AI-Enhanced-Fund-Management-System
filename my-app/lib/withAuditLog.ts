@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import jwt from 'jsonwebtoken';
+import { Prisma } from '@prisma/client';
 
 type HttpMethod = 'POST' | 'PUT' | 'DELETE' | 'GET' | 'PATCH';
 
@@ -10,7 +11,7 @@ export function withAuditLog(
 ) {
   return async (req: NextRequest, context?: any) => {
     const method = req.method as HttpMethod;
-    const ipAddress = req.headers.get('x-forwarded-for') || req.ip || 'Unknown';
+    const ipAddress = req.headers.get('x-forwarded-for') || (req as any).ip || 'Unknown';
     let userId = null;
     
     // Extract User ID from JWT
@@ -59,8 +60,8 @@ export function withAuditLog(
             action_type: method,
             table_name: tableName,
             record_id: recordId,
-            new_value_json: newValueJson,
-            old_value_json: null, // old_value_json requires explicit fetching before update
+            new_value_json: newValueJson ?? Prisma.JsonNull,
+            old_value_json: Prisma.DbNull, // old_value_json requires explicit fetching before update
             ip_address: ipAddress,
           },
         });

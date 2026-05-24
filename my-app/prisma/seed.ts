@@ -1,9 +1,11 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import pg from 'pg';
-import 'dotenv/config'; // Ensures it can read your DATABASE_URL from the .env file
+import dotenv from 'dotenv';
 
-// Set up the PostgreSQL connection pool and adapter required by Prisma 7
+// Siguraduhing may access ang process constructor dito
+dotenv.config({ path: '.env.local' });
+
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
@@ -17,7 +19,7 @@ async function main() {
     update: {},
     create: {
       email: 'admin@system.com',
-      password: 'hashed_password_here', // Use a real hash if testing login
+      password: 'hashed_password_here', 
       role: 'ADMIN',
     },
   });
@@ -156,7 +158,18 @@ async function main() {
     }
   });
 
-  console.log('✅ Mock financial ledger profiles injected.');
+  // REQUIRED FOR ACCEPTANCE CRITERIA
+  await prisma.fund.upsert({
+    where: { code: 'LOAN_BDOEA' },
+    update: {},
+    create: {
+      name: 'BDOEA Loans Fund',
+      code: 'LOAN_BDOEA',
+      balance: 1000000.00,
+    },
+  });
+
+  console.log('✅ BDOEA Loans Fund initialized successfully.');
   console.log('🏁 Seeding complete!');
 }
 

@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { signIn, getSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AlertCircle, Loader2, CheckCircle2 } from "lucide-react";
 import Image from "next/image"; 
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const errorUrl = searchParams.get("error");
@@ -136,5 +136,17 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen w-full flex items-center justify-center bg-[#021124] text-white">
+        <Loader2 className="animate-spin" size={32} />
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }
