@@ -11,12 +11,7 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
   console.log('🌱 Starting database seeding...');
 
-  // 1. Clear existing data (Be careful: Delete orders matter because of Foreign Keys!)
-  // Note: We CANNOT delete from fs_audit_log because of your trigger! 
-  // If you need to clear audit logs during dev, you'd have to manually drop the table in pgAdmin, 
-  // but for seeding, we will just create unique users.
-  
-  // 2. Create Mock Users
+  // 1. Create Mock Users
   const adminUser = await prisma.user.upsert({
     where: { email: 'admin@system.com' },
     update: {},
@@ -39,7 +34,7 @@ async function main() {
 
   console.log('✅ Mock users created.');
 
-  // 3. Create Mock Report Signoffs
+  // 2. Create Mock Report Signoffs
   const mockSignoff = await prisma.reportSignoff.create({
     data: {
       report_id: 'report-2026-q1',
@@ -50,8 +45,7 @@ async function main() {
   });
   console.log('✅ Mock report signoffs created.');
 
-  // 4. Create Mock Audit Logs
-  // This proves your insert flow works flawlessly even with the immutability triggers active!
+  // 3. Create Mock Audit Logs
   await prisma.fSAuditLog.create({
     data: {
       user_id: adminUser.id,
@@ -73,14 +67,102 @@ async function main() {
       ip_address: '192.168.1.50',
     },
   });
-
   console.log('✅ Mock audit logs generated.');
+
+  // ==========================================
+  // 4. Create Mock Fund Ledgers (FS-004)
+  // ==========================================
+  console.log('🔄 Populating real-time financial ledger accounts...');
+
+  // General Fund Setup
+  await prisma.fund.upsert({
+    where: { code: 'GF' },
+    update: {},
+    create: {
+      name: 'General Fund',
+      code: 'GF',
+      balance: 1812350.00,
+      transactions: {
+        create: [
+          { amount: 1827350.00, type: 'DEPOSIT', description: 'Member Dues Batch Remittance', referenceId: 'REF-8812' },
+          { amount: -15000.00, type: 'WITHDRAWAL', description: 'Office Supplies Vendor Payment', referenceId: 'REF-8809' }
+        ]
+      }
+    }
+  });
+
+  // Union Fund Setup
+  await prisma.fund.upsert({
+    where: { code: 'UF' },
+    update: {},
+    create: {
+      name: 'Union Fund',
+      code: 'UF',
+      balance: 4520900.00,
+      transactions: {
+        create: [
+          { amount: 4532900.00, type: 'DEPOSIT', description: 'Quarterly Dividend Allocation', referenceId: 'REF-9901' },
+          { amount: -12000.00, type: 'WITHDRAWAL', description: 'Union Assembly Expense', referenceId: 'UN-2026-004' }
+        ]
+      }
+    }
+  });
+
+  // Loans Capital Setup
+  await prisma.fund.upsert({
+    where: { code: 'LN' },
+    update: {},
+    create: {
+      name: 'Loans Capital',
+      code: 'LN',
+      balance: 1518750.00,
+      transactions: {
+        create: [
+          { amount: -30000.00, type: 'LOAN_DISBURSEMENT', description: 'Disbursement: VINLUAN, VEN', referenceId: 'LN-2026-071' }
+        ]
+      }
+    }
+  });
+
+  // Foreign Assistance Setup
+  await prisma.fund.upsert({
+    where: { code: 'FA' },
+    update: {},
+    create: {
+      name: 'Foreign Assistance',
+      code: 'FA',
+      balance: 2500000.00,
+      transactions: {
+        create: [
+          { amount: 2500000.00, type: 'DEPOSIT', description: 'Foreign Grant Received', referenceId: 'FG-8801' }
+        ]
+      }
+    }
+  });
+
+  // Death Assistance Setup
+  await prisma.fund.upsert({
+    where: { code: 'DA' },
+    update: {},
+    create: {
+      name: 'Death Assistance',
+      code: 'DA',
+      balance: 850000.00,
+      transactions: {
+        create: [
+          { amount: -20000.00, type: 'WITHDRAWAL', description: 'Death Claim Benefit Release', referenceId: 'DC-2026-012' }
+        ]
+      }
+    }
+  });
+
+  console.log('✅ Mock financial ledger profiles injected.');
   console.log('🏁 Seeding complete!');
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error('❌ Seeding failed runtime error:', e);
     process.exit(1);
   })
   .finally(async () => {

@@ -1,31 +1,94 @@
 "use client";
 
-import { useState } from 'react';
-import { Wallet, Printer, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Wallet, Printer, ArrowUpRight, ArrowDownRight, RefreshCw } from 'lucide-react';
 
-const fundData = [
-  { id: 'GF', name: 'General Fund', balance: 1812350, txCount: 248 },
-  { id: 'UF', name: 'Union Fund', balance: 4520900, txCount: 112 },
-  { id: 'LN', name: 'Loans', balance: 1518750, txCount: 45 },
-  { id: 'FA', name: 'Foreign Assistance', balance: 2500000, txCount: 30 },
-  { id: 'DA', name: 'Death Assistance', balance: 850000, txCount: 20 },
-];
+interface Transaction {
+  id: string;
+  amount: number;
+  type: string;
+  description: string;
+  referenceId: string | null;
+  date: string;
+}
 
-const mockLedger = [
-  { id: 1, fundId: 'GF', date: '2026-04-22', desc: 'Member Dues Batch Remittance', type: 'Credit', amount: 15000, ref: 'REF-8812' },
-  { id: 2, fundId: 'LN', date: '2026-04-26', desc: 'Disbursement: VINLUAN, VEN', type: 'Debit', amount: 30000, ref: 'LN-2026-071' },
-  { id: 3, fundId: 'GF', date: '2026-04-20', desc: 'Office Supplies Vendor Payment', type: 'Debit', amount: 4500, ref: 'REF-8809' },
-  { id: 4, fundId: 'UF', date: '2026-04-18', desc: 'Union Assembly Expense', type: 'Debit', amount: 12000, ref: 'UN-2026-004' },
-  { id: 5, fundId: 'FA', date: '2026-04-15', desc: 'Foreign Grant Received', type: 'Credit', amount: 500000, ref: 'FG-8801' },
-  { id: 6, fundId: 'DA', date: '2026-04-10', desc: 'Death Claim Benefit Release', type: 'Debit', amount: 20000, ref: 'DC-2026-012' },
-];
+interface Fund {
+  id: string;
+  name: string;
+  code: string;
+  currentBalance: number;
+  totalTransactionsCount: number;
+  history: Transaction[];
+}
 
 export default function FundBalancePanel() {
-  const [selectedFund, setSelectedFund] = useState(fundData[0]);
-  const activeTransactions = mockLedger.filter(tx => tx.fundId === selectedFund.id);
+  const [funds, setFunds] = useState<Fund[]>([]);
+  const [selectedFund, setSelectedFund] = useState<Fund | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch data directly from your new API backend route
+  const loadLedgerData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await fetch('/api/finance/funds');
+      
+      if (!res.ok) {
+        throw new Error(`Failed to read ledger standings (Status: ${res.status})`);
+      }
+      
+      const data: Fund[] = await res.json();
+      setFunds(data);
+      
+      // Keep the current fund selected if refreshing, otherwise default to the first fund
+      if (data.length > 0) {
+        setSelectedFund((prev) => {
+          const stillExists = data.find(f => f.id === prev?.id);
+          return stillExists || data[0];
+        });
+      }
+    } catch (err: any) {
+      console.error("Ledger synchronization error:", err);
+      setError(err.message || "An unexpected error occurred while loading funds.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadLedgerData();
+  }, []);
+
+  // Graceful loading layout
+  if (loading && funds.length === 0) {
+    return (
+      <div className="p-8 min-h-screen flex flex-col items-center justify-center bg-gray-50 gap-3">
+        <RefreshCw className="animate-spin text-gray-400" size={32} />
+        <p className="text-sm font-medium text-gray-500">Synchronizing database ledgers...</p>
+      </div>
+    );
+  }
+
+  // Graceful error layout
+  if (error && funds.length === 0) {
+    return (
+      <div className="p-8 min-h-screen flex flex-col items-center justify-center bg-gray-50 gap-4">
+        <div className="bg-red-50 text-red-800 p-4 rounded-xl border border-red-100 max-w-md text-center text-sm shadow-sm">
+          <p className="font-bold mb-1">Database Connection Issue</p>
+          <p className="text-red-600/90">{error}</p>
+        </div>
+        <button 
+          onClick={loadLedgerData}
+          className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-xs font-bold hover:bg-gray-50 transition-all"
+        >
+          <RefreshCw size={14} /> Retry Connection
+        </button>
+      </div>
+    );
+  }
 
   return (
-    // FIX 1: Changed `h-full overflow-hidden` to `min-h-full pb-10` to allow natural page scrolling
     <div className="p-8 min-h-full pb-12 flex flex-col gap-6 bg-gray-50">
       
       <div className="flex justify-between items-end flex-shrink-0">
@@ -33,48 +96,61 @@ export default function FundBalancePanel() {
           <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Fund Dashboard</h1>
           <p className="text-sm text-gray-500 mt-1 font-medium">Real-time liquidity monitoring and fund ledgers.</p>
         </div>
+        <button 
+          onClick={loadLedgerData}
+          disabled={loading}
+          className="p-2 text-gray-500 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:text-gray-700 transition-all disabled:opacity-50 shadow-sm"
+          title="Refresh Data"
+        >
+          <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
+        </button>
       </div>
 
       {/* 3-Column Grid Layout */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 flex-shrink-0">
-        {fundData.map((fund) => (
-          <div 
-            key={fund.id}
-            onClick={() => setSelectedFund(fund)}
-            className={`p-5 rounded-xl border transition-all cursor-pointer shadow-sm relative overflow-hidden flex flex-col justify-between h-[120px] ${
-              selectedFund.id === fund.id 
-                ? 'bg-white border-bdoea-yellow ring-2 ring-yellow-100' 
-                : 'bg-white border-gray-200 hover:border-gray-300'
-            }`}
-          >
-            <div className="flex justify-between items-center relative z-10">
-              <div className={`p-2 rounded-lg ${selectedFund.id === fund.id ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-500'}`}>
-                <Wallet size={18} />
+        {funds.map((fund) => {
+          const isSelected = selectedFund?.id === fund.id;
+          return (
+            <div 
+              key={fund.id}
+              onClick={() => setSelectedFund(fund)}
+              className={`p-5 rounded-xl border transition-all cursor-pointer shadow-sm relative overflow-hidden flex flex-col justify-between h-[120px] ${
+                isSelected 
+                  ? 'bg-white border-bdoea-yellow ring-2 ring-yellow-100' 
+                  : 'bg-white border-gray-200 hover:border-gray-300'
+              }`}
+            >
+              <div className="flex justify-between items-center relative z-10">
+                <div className={`p-2 rounded-lg ${isSelected ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-500'}`}>
+                  <Wallet size={18} />
+                </div>
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider truncate ml-2">
+                  {fund.code} Assets
+                </span>
               </div>
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider truncate ml-2">Balance</span>
-            </div>
-            
-            <div className="relative z-10 mt-auto">
-              <h3 className="text-[11px] font-bold text-gray-500 uppercase tracking-widest truncate">{fund.name}</h3>
-              <p className="text-2xl font-black text-gray-900 mt-0.5 tracking-tight truncate">
-                ₱{fund.balance.toLocaleString()}
-              </p>
-            </div>
-            
-            {selectedFund.id === fund.id && (
-              <div className="absolute -right-4 -bottom-4 opacity-[0.03] text-black">
+              
+              <div className="relative z-10 mt-auto">
+                <h3 className="text-[11px] font-bold text-gray-500 uppercase tracking-widest truncate">{fund.name}</h3>
+                <p className="text-2xl font-black text-gray-900 mt-0.5 tracking-tight truncate">
+                  ₱{fund.currentBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                </p>
+              </div>
+              
+              {isSelected && (
+                <div className="absolute -right-4 -bottom-4 opacity-[0.03] text-black">
                   <Wallet size={100} />
-              </div>
-            )}
-          </div>
-        ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
 
-      {/* FIX 2: Added `min-h-[500px]` to the table wrapper so it never gets crushed vertically */}
+      {/* Interactive Account Ledgers Table */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm flex-1 flex flex-col overflow-hidden min-h-[500px]">
         <div className="p-6 border-b border-gray-100 flex justify-between items-center flex-shrink-0">
           <h2 className="text-lg font-bold text-gray-900">
-            {selectedFund.name} Ledger
+            {selectedFund ? `${selectedFund.name} Ledger` : "Select a Fund"}
           </h2>
           <button className="flex items-center gap-2 bg-gray-50 border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-xs font-bold hover:bg-gray-100 transition-colors whitespace-nowrap">
             <Printer size={14} /> Export Register
@@ -93,32 +169,44 @@ export default function FundBalancePanel() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {activeTransactions.length > 0 ? activeTransactions.map((tx) => (
-                <tr key={tx.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 text-gray-500 font-medium whitespace-nowrap">{tx.date}</td>
-                  <td className="px-6 py-4 font-bold text-gray-900 min-w-[250px]">{tx.desc}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {tx.type === 'Credit' ? (
-                      <span className="inline-flex items-center gap-1 text-green-700 font-bold text-[10px] uppercase bg-green-50 px-2 py-1 rounded border border-green-100">
-                        <ArrowUpRight size={12}/> Credit
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 text-red-700 font-bold text-[10px] uppercase bg-red-50 px-2 py-1 rounded border border-red-100">
-                        <ArrowDownRight size={12}/> Debit
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 text-right font-black text-gray-900 whitespace-nowrap">
-                    {tx.type === 'Debit' ? '-' : ''} ₱{tx.amount.toLocaleString()}
-                  </td>
-                  <td className="px-6 py-4 text-right font-mono text-xs text-blue-600 cursor-pointer hover:underline whitespace-nowrap">
-                    {tx.ref}
-                  </td>
-                </tr>
-              )) : (
+              {selectedFund && selectedFund.history.length > 0 ? (
+                selectedFund.history.map((tx) => {
+                  // In modern ledger models, negative amounts signify structural disbursements (Debits)
+                  const isCredit = tx.amount >= 0;
+                  const formattedDate = new Date(tx.date).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                  });
+
+                  return (
+                    <tr key={tx.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4 text-gray-500 font-medium whitespace-nowrap">{formattedDate}</td>
+                      <td className="px-6 py-4 font-bold text-gray-900 min-w-[250px]">{tx.description}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {isCredit ? (
+                          <span className="inline-flex items-center gap-1 text-green-700 font-bold text-[10px] uppercase bg-green-50 px-2 py-1 rounded border border-green-100">
+                            <ArrowUpRight size={12}/> Credit
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-red-700 font-bold text-[10px] uppercase bg-red-50 px-2 py-1 rounded border border-red-100">
+                            <ArrowDownRight size={12}/> Debit
+                          </span>
+                        )}
+                      </td>
+                      <td className={`px-6 py-4 text-right font-black whitespace-nowrap ${isCredit ? 'text-green-600' : 'text-gray-900'}`}>
+                        {isCredit ? '' : '- '}₱{Math.abs(tx.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                      </td>
+                      <td className="px-6 py-4 text-right font-mono text-xs text-blue-600 cursor-pointer hover:underline whitespace-nowrap">
+                        {tx.referenceId || 'N/A'}
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center text-gray-400 font-medium">
-                    No transactions recorded for this fund yet.
+                    No historic transaction ledger lines tied to this fund.
                   </td>
                 </tr>
               )}

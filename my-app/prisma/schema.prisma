@@ -10,27 +10,27 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  role      String   @default("USER") // USER, ADMIN, TREASURER, PRESIDENT
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String          @id @default(uuid())
+  email          String          @unique
+  password       String
+  role           String          @default("USER") // USER, ADMIN, TREASURER, PRESIDENT
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 
   auditLogs      FSAuditLog[]
   reportSignoffs ReportSignoff[]
 }
 
 model FSAuditLog {
-  id             String   @id @default(uuid())
+  id             String    @id @default(uuid())
   user_id        String?
-  action_type    String   // POST, PUT, DELETE
+  action_type    String    // POST, PUT, DELETE
   table_name     String
   record_id      String
   old_value_json Json?
   new_value_json Json?
   ip_address     String?
-  timestamp      DateTime @default(now())
+  timestamp      DateTime  @default(now())
 
   user User? @relation(fields: [user_id], references: [id])
 
@@ -38,14 +38,44 @@ model FSAuditLog {
 }
 
 model ReportSignoff {
-  id             String   @id @default(uuid())
-  report_id      String
-  user_id        String
-  role           String   // e.g., TREASURER, PRESIDENT
-  digital_sig    String
-  signed_at      DateTime @default(now())
+  id          String   @id @default(uuid())
+  report_id   String
+  user_id     String
+  role        String   // e.g., TREASURER, PRESIDENT
+  digital_sig String
+  signed_at   DateTime @default(now())
 
   user User @relation(fields: [user_id], references: [id])
 
   @@map("report_signoffs")
+}
+
+// ===================================================
+//   ADDED FOR USER STORY FS-004: FUND LEDGER SYSTEM
+// ===================================================
+
+model Fund {
+  id           String            @id @default(uuid())
+  name         String            @unique // e.g., "General Fund", "Loan Capital Fund"
+  code         String            @unique // e.g., "GEN", "LOAN"
+  balance      Float             @default(0.0) // Real-time balance tracker
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  transactions FundTransaction[]
+
+  @@map("funds")
+}
+
+model FundTransaction {
+  id          String   @id @default(uuid())
+  fundId      String   @map("fund_id")
+  fund        Fund     @relation(fields: [fundId], references: [id], onDelete: Cascade)
+  amount      Float    // Positive for deposits, Negative for disbursements
+  type        String   // e.g., "DEPOSIT", "WITHDRAWAL", "LOAN_DISBURSEMENT"
+  description String   // Narrative describing the activity context
+  referenceId String?  @map("reference_id") // Links directly to specific internal system records
+  timestamp   DateTime @default(now()) @map("timestamp")
+
+  @@index([fundId])
+  @@map("fund_transactions")
 }
