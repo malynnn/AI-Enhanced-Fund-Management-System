@@ -72,13 +72,61 @@ export default function DuesCollectionPage() {
     return { totalCollected, totalDiscrepancies, totalConfirmed, count: filteredRecords.length };
   }, [filteredRecords]);
 
-  // --- HANDLERS ---
-  const handlePostLedger = (id: number, name: string) => {
+  // --- UPDATED: NOW MAKES A REAL HTTP REQUEST TO THE BACKEND ---
+  const handlePostLedger = async (id: number, name: string) => {
     setIsPosting(id);
-    setTimeout(() => {
-      setDuesRecords(prev => prev.map(rec => rec.id === id ? { ...rec, status: 'Confirmed' } : rec));
+    const record = duesRecords.find(r => r.id === id);
+
+    if (!record) return;
+
+    try {
+      // 1. Send the actual payload to our newly secured API route
+      const response = await fetch('/api/mock/ms-callback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          transaction_id: record.transaction_id,
+          member_id: record.memberId,
+          reference_number: record.reference_number,
+          posted_amount: record.amountPaid,
+          fund_credited: record.fund_to_credit,
+          
+          // 🚨 THE TEST: We are intentionally sending a fake role here!
+          requesting_role: 'MS_Admin', 
+        })
+      });
+
+      const responseData = await response.json();
+
+      // 2. Update the local UI state so the row turns gray (if successful)
+      if (response.ok) {
+        setDuesRecords(prev => prev.map(rec => 
+          rec.id === id ? { ...rec, status: 'Confirmed' } : rec
+        ));
+      }
+
+      // 3. Print the backend's response in our UI Webhook Console
+      setWebhookLogs(prev => [
+        {
+          timestamp: new Date().toLocaleTimeString(),
+          type: response.ok ? 'CONFIRMATION_RESPONSE_OUT (200)' : `ERROR_REJECTED (${response.status})`,
+          payload: responseData
+        },
+        ...prev
+      ]);
+      
+      // 4. Show a browser alert based on what the backend decided
+      if (!response.ok) {
+        alert(`Rejected!\n\nStatus: ${response.status}\nError: ${responseData.error}`);
+      } else {
+        alert(`✅ SUCCESS!\n\nBackend says: ${responseData.message}`);
+      }
+
+    } catch (error) {
+      console.error("Failed to reach API", error);
+    } finally {
       setIsPosting(null);
-    }, 800);
+    }
   };
 
   const triggerWebhookSimulation = (e: React.FormEvent) => {
