@@ -63,6 +63,30 @@ const MS_AUTH_ME_URL =
 async function validateMSToken(
   bearerToken: string
 ): Promise<MSAuthMeResponse> {
+  // --- MOCK IMPLEMENTATION START ---
+  // Since MS /auth/me is not yet integrated, we mock the response based on the token
+  const USE_MOCK = process.env.USE_MOCK_MS !== "false";
+  if (USE_MOCK) {
+    if (bearerToken === "mock-admin-token") {
+      return { id: "u1", displayName: "Mock Admin", roles: ["FS.Admin"] };
+    } else if (bearerToken === "mock-treasurer-token") {
+      return { id: "u2", displayName: "Mock Treasurer", roles: ["FS.TreasurerFinance"] };
+    } else if (bearerToken === "mock-auditor-token") {
+       return { id: "u3", displayName: "Mock Auditor", roles: ["FS.InternalAuditor"] };
+    } else if (bearerToken === "mock-unauthorized-token") {
+       return { id: "u4", displayName: "Mock User", roles: ["Other.Role"] };
+    } else if (bearerToken === "mock-invalid-token") {
+       throw new Error("MS /auth/me rejected token: 401 Unauthorized");
+    }
+    // Default mock behavior
+    return {
+      id: "mock-user-default",
+      displayName: "Default Mock User",
+      roles: ["FS.Admin"],
+    };
+  }
+  // --- MOCK IMPLEMENTATION END ---
+
   const response = await fetch(MS_AUTH_ME_URL, {
     headers: {
       Authorization: `Bearer ${bearerToken}`,
