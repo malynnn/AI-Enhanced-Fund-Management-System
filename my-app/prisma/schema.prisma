@@ -100,3 +100,43 @@ model DisbursementRequest {
 
   @@map("disbursement_requests")
 }
+
+// ===================================================
+//      ADDED FOR USER STORY FS-005: REPAYMENT & WRITE-OFFS
+// ===================================================
+
+model LoanRepayment {
+  id                 String   @id @default(uuid())
+  loanReference      String   @map("loan_reference")
+  memberId           String   @map("member_id")
+  memberName         String   @map("member_name")
+  amount             Float    // Total amount paid
+  principalAmount    Float    @map("principal_amount")
+  serviceFeeAmount   Float    @map("service_fee_amount")
+  overpaymentAmount  Float    @default(0.0) @map("overpayment_amount")
+  paymentMethod      String   @map("payment_method")
+  referenceNumber    String?  @map("reference_number")
+  status             String   @default("PROCESSED") // PROCESSED, OVERPAYMENT_PENDING, OVERPAYMENT_CREDITED, OVERPAYMENT_REFUNDED
+  treasurerDecision  String   @default("NONE") // NONE, ADVANCE_CREDIT, REFUND
+  processedAt        DateTime @default(now()) @map("processed_at")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  @@map("loan_repayments")
+}
+
+model LoanWriteOff {
+  id             String    @id @default(uuid())
+  loanReference  String    @unique @map("loan_reference")
+  memberId       String    @map("member_id")
+  memberName     String    @map("member_name")
+  amount         Float
+  reason         String
+  status         String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  requestedBy    String    @map("requested_by")
+  authorizedBy   String?   @map("authorized_by")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  @@map("loan_write_offs")
+}

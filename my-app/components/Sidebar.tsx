@@ -47,7 +47,7 @@ export default function Sidebar() {
       icon: CircleDollarSign, 
       roles: ['User', 'Officer/Admin', 'Superadmin', 'Treasurer', 'Auditor'],
       subItems: [
-        { label: 'Overview', href: '/loans', icon: FileText, roles: ['User', 'Officer/Admin', 'Superadmin', 'Treasurer', 'Auditor'] }
+        { label: 'Overview (External LAS)', href: '#', icon: FileText, roles: ['User', 'Officer/Admin', 'Superadmin', 'Treasurer', 'Auditor'] }
       ]
     },
     { 
@@ -59,6 +59,7 @@ export default function Sidebar() {
         { label: 'Dashboard', href: '/finance/dashboard', icon: LayoutDashboard, roles: ['Superadmin', 'Officer/Admin', 'Treasurer', 'Auditor'] },
         { label: 'Dues & Contributions', href: '/finance/dues', icon: WalletCards, roles: ['Superadmin', 'Officer/Admin', 'Treasurer', 'Auditor'] },
         { label: 'Disbursement', href: '/finance/disbursement', icon: Send, roles: ['Superadmin', 'Officer/Admin', 'Treasurer'] },
+        { label: 'Loan Ledger', href: '/finance/loans', icon: CircleDollarSign, roles: ['Superadmin', 'Officer/Admin', 'Treasurer', 'Auditor'] },
         { label: 'Fund Management', href: '/finance/funds', icon: Briefcase, roles: ['Superadmin', 'Officer/Admin', 'Treasurer', 'Auditor'] },
         { label: 'Chart of Accounts', href: '/finance/config/accounts', icon: ListTree, roles: ['Superadmin', 'Officer/Admin', 'Treasurer', 'Auditor'] },
         { label: 'Reports Center', href: '/finance/reports', icon: BarChart3, roles: ['Superadmin', 'Officer/Admin', 'Treasurer', 'Auditor'] },
