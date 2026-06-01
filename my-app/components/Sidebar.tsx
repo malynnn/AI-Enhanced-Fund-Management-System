@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  Home, Bell, Calendar, CreditCard, CircleDollarSign, Book, LogOut, ChevronDown, 
-  Settings, PanelLeftClose, PanelLeftOpen, LayoutDashboard, WalletCards, Send, 
+import {
+  Home, Bell, Calendar, CreditCard, CircleDollarSign, Book, LogOut, ChevronDown,
+  Settings, PanelLeftClose, PanelLeftOpen, LayoutDashboard, WalletCards, Send,
   Briefcase, ListTree, BarChart3, RefreshCw, ClipboardList, PieChart, FileText, User
 } from 'lucide-react';
 import { signOut, useSession } from "next-auth/react";
@@ -13,11 +13,11 @@ import { signOut, useSession } from "next-auth/react";
 export default function Sidebar() {
   const pathname = usePathname();
   const { data: session, status } = useSession();
-  
+
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({
-    'Finance & Dues': true, 
+    'Finance & Dues': true,
   });
-  
+
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   if (pathname === '/login') return null;
@@ -34,25 +34,25 @@ export default function Sidebar() {
 
   // Group 2: Systems Navigation (with individual sub-icons)
   const systemNavItems = [
-    { 
-      label: 'My Membership', 
-      icon: CreditCard, 
+    {
+      label: 'My Membership',
+      icon: CreditCard,
       roles: ['User', 'Officer/Admin', 'Superadmin', 'Treasurer', 'Auditor'],
       subItems: [
         { label: 'Overview', href: '/membership', icon: User, roles: ['User', 'Officer/Admin', 'Superadmin', 'Treasurer', 'Auditor'] }
       ]
     },
-    { 
-      label: 'Loan Center', 
-      icon: CircleDollarSign, 
+    {
+      label: 'Loan Center',
+      icon: CircleDollarSign,
       roles: ['User', 'Officer/Admin', 'Superadmin', 'Treasurer', 'Auditor'],
       subItems: [
         { label: 'Overview (External LAS)', href: '#', icon: FileText, roles: ['User', 'Officer/Admin', 'Superadmin', 'Treasurer', 'Auditor'] }
       ]
     },
-    { 
-      label: 'Finance & Dues', 
-      icon: Book, 
+    {
+      label: 'Finance & Dues',
+      icon: Book,
       roles: ['User', 'Officer/Admin', 'Superadmin', 'Treasurer', 'Auditor'],
       subItems: [
         { label: 'My Summary', href: '/', icon: PieChart, roles: ['User'] },
@@ -66,6 +66,7 @@ export default function Sidebar() {
         { label: 'Bank Reconciliation', href: '/finance/reconciliation', icon: RefreshCw, roles: ['Superadmin', 'Officer/Admin', 'Treasurer'] },
         { label: 'System Config', href: '/finance/config', icon: Settings, roles: ['Superadmin', 'Officer/Admin'] },
         { label: 'Audit Logs', href: '/finance/audit', icon: ClipboardList, roles: ['Superadmin'] },
+        { label: 'Expenses & Petty Cash', href: '/finance/expenses', roles: ['Superadmin', 'Officer/Admin', 'Treasurer', 'Auditor'] },
       ]
     },
   ];
@@ -82,7 +83,7 @@ export default function Sidebar() {
       const Icon = item.icon;
       const hasSubItems = item.subItems && item.subItems.length > 0;
       const visibleSubItems = hasSubItems ? item.subItems.filter((sub: any) => sub.roles.includes(currentUserRole)) : [];
-      
+
       if (hasSubItems && visibleSubItems.length === 0) return null;
 
       const isParentActive = hasSubItems && visibleSubItems.some((sub: any) => pathname === sub.href || pathname.startsWith(`${sub.href}/`));
@@ -90,12 +91,11 @@ export default function Sidebar() {
       const isOpen = openMenus[item.label] || isParentActive;
 
       // Ensure elements perfectly conform to the container width when collapsed
-      const baseClasses = `flex items-center transition-all font-medium text-sm w-full ${
-        isCollapsed ? 'justify-center aspect-square rounded-xl' : 'px-3.5 py-2.5 rounded-xl justify-between'
-      }`;
+      const baseClasses = `flex items-center transition-all font-medium text-sm w-full ${isCollapsed ? 'justify-center aspect-square rounded-xl' : 'px-3.5 py-2.5 rounded-xl justify-between'
+        }`;
 
-      const activeClasses = isOpen || isParentActive || isDirectActive 
-        ? 'bg-bdoea-yellow text-black shadow-md' 
+      const activeClasses = isOpen || isParentActive || isDirectActive
+        ? 'bg-bdoea-yellow text-black shadow-md'
         : 'text-gray-400 hover:bg-white/5 hover:text-white';
 
       return (
@@ -118,17 +118,17 @@ export default function Sidebar() {
           {/* Sub Items Container - Padding fixed to remove the empty space left by the removed line! */}
           {hasSubItems && isOpen && (
             <div className={`flex flex-col relative w-full ${isCollapsed ? 'mt-1 gap-1 items-center' : 'mt-1 mb-2 space-y-0.5'}`}>
-              
+
               {visibleSubItems.map((sub: any) => {
                 const isSubActive = pathname === sub.href;
                 const SubIcon = sub.icon;
-                
+
                 return (
-                  <Link 
-                    key={sub.label} 
+                  <Link
+                    key={sub.label}
                     href={sub.href}
                     title={isCollapsed ? sub.label : undefined}
-                    className={isCollapsed 
+                    className={isCollapsed
                       ? `flex items-center justify-center w-full aspect-square rounded-xl transition-all relative ${isSubActive ? 'bg-white/10 text-bdoea-yellow' : 'text-gray-400 hover:text-white hover:bg-white/5'}`
                       // The padding left is updated here to `pl-6` (instead of `pl-10`) to perfectly tuck the icon under the parent text
                       : `flex items-center gap-3 pl-6 pr-3.5 py-2.5 text-xs font-medium rounded-xl transition-all relative whitespace-nowrap ${isSubActive ? 'text-bdoea-yellow bg-white/5' : 'text-gray-400 hover:text-white hover:bg-white/5'}`
@@ -148,22 +148,21 @@ export default function Sidebar() {
 
   return (
     <aside className={`relative h-full flex-shrink-0 shadow-2xl z-20 flex flex-col transition-all duration-300 ease-in-out print:hidden ${isCollapsed ? 'w-[88px]' : 'w-[280px]'}`}>
-      
+
       {status === "loading" ? (
         <div className={`w-full h-full ${sidebarBgColor}`} />
       ) : (
         <div className={`flex flex-col h-full overflow-hidden text-white py-6 transition-colors duration-300 ${sidebarBgColor} ${isCollapsed ? 'px-[18px]' : 'px-5'}`}>
-          
+
           {/* HEADER: Logo & Native Toggle Button */}
           <div className={`mb-8 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
             {!isCollapsed && (
               <img src="/bdoea-logo.png" alt="BDOEA Logo" className="w-[155px] h-auto object-contain pl-1" />
             )}
-            <button 
-              onClick={() => setIsCollapsed(!isCollapsed)} 
-              className={`flex items-center justify-center border border-white/10 text-gray-400 hover:text-white hover:bg-white/5 transition-colors shadow-sm ${
-                isCollapsed ? 'w-full aspect-square rounded-2xl bg-transparent' : 'h-10 w-10 rounded-xl bg-white/5'
-              }`}
+            <button
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className={`flex items-center justify-center border border-white/10 text-gray-400 hover:text-white hover:bg-white/5 transition-colors shadow-sm ${isCollapsed ? 'w-full aspect-square rounded-2xl bg-transparent' : 'h-10 w-10 rounded-xl bg-white/5'
+                }`}
               title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
             >
               {isCollapsed ? <PanelLeftOpen size={20} /> : <PanelLeftClose size={20} />}
@@ -174,7 +173,7 @@ export default function Sidebar() {
           <div className={`border border-white/10 flex items-center mb-8 shadow-sm transition-all ${isCollapsed ? 'p-1.5 rounded-full justify-center w-full aspect-square bg-transparent' : 'p-3 rounded-2xl justify-between bg-white/5'}`}>
             <div className={`flex items-center gap-3 overflow-hidden ${isCollapsed ? 'justify-center w-full h-full' : ''}`}>
               <div className={`rounded-full bg-gray-200 border border-white/10 flex-shrink-0 ${isCollapsed ? 'w-full h-full' : 'w-10 h-10'}`} title={session?.user?.email?.split('@')[0] || "VEN"} />
-              
+
               {!isCollapsed && (
                 <div className="overflow-hidden">
                   <p className="text-[9px] tracking-widest uppercase m-0 leading-tight font-black text-bdoea-yellow">
@@ -184,7 +183,7 @@ export default function Sidebar() {
                 </div>
               )}
             </div>
-            
+
             {!isCollapsed && (
               <button className="p-1.5 hover:bg-white/10 rounded-md transition-colors text-gray-400 hover:text-white flex-shrink-0">
                 <Settings size={16} />
@@ -194,7 +193,7 @@ export default function Sidebar() {
 
           {/* SCROLLABLE NAVIGATION AREA */}
           <nav className="flex-1 overflow-y-auto overflow-x-hidden space-y-6 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-track]:transparent pr-2 -mr-2">
-            
+
             {/* CONTAINER 1: Main Menu */}
             <div className="flex flex-col">
               {!isCollapsed && <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3 px-3 whitespace-nowrap">Main Menu</p>}
@@ -210,7 +209,7 @@ export default function Sidebar() {
               ) : (
                 <div className="h-px bg-white/10 w-6 mx-auto mt-2 mb-1" />
               )}
-              
+
               {visibleSystemItems.map((item, idx) => (
                 <div key={idx} className={`flex flex-col bg-white/[0.02] border border-white/5 rounded-2xl ${isCollapsed ? 'p-1.5' : 'p-2'}`}>
                   {renderNavItems([item])}
@@ -222,14 +221,13 @@ export default function Sidebar() {
 
           {/* BOTTOM: Logout Container */}
           <div className={`mt-4 pt-4 border-t border-white/10 flex ${isCollapsed ? 'justify-center' : 'justify-start'}`}>
-            <button 
-              onClick={() => signOut({ callbackUrl: '/login' })} 
-              className={`transition-all flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 ${
-                isCollapsed ? 'w-full aspect-square rounded-2xl' : 'h-11 w-11 rounded-xl'
-              }`}
+            <button
+              onClick={() => signOut({ callbackUrl: '/login' })}
+              className={`transition-all flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 ${isCollapsed ? 'w-full aspect-square rounded-2xl' : 'h-11 w-11 rounded-xl'
+                }`}
               title="Log out"
             >
-              <LogOut size={20} strokeWidth={2} className="flex-shrink-0" /> 
+              <LogOut size={20} strokeWidth={2} className="flex-shrink-0" />
             </button>
           </div>
 

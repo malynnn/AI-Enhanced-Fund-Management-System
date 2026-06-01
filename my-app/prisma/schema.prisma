@@ -139,7 +139,8 @@ model LoanWriteOff {
   updatedAt      DateTime  @updatedAt @map("updated_at")
 
   @@map("loan_write_offs")
-}// ===================================================
+}
+// ===================================================
 //      ADDED FOR USER STORY FS-003: DUES COLLECTION
 // ===================================================
 
@@ -228,4 +229,53 @@ model BudgetCategory {
   updatedAt      DateTime @updatedAt @map("updated_at")
 
   @@map("budget_categories")
+}
+
+// ===================================================
+//      ADDED FOR USER STORY FS-006: ORGANIZATIONAL EXPENSES & PETTY CASH
+// ===================================================
+
+model ExpenseVoucher {
+  id             String    @id @default(uuid())
+  voucherNumber  String    @unique @map("voucher_number")
+  payee          String
+  purpose        String
+  amount         Float
+  accountCodeId  String    @map("account_code_id")
+  accountCode    AccountCode @relation(fields: [accountCodeId], references: [id])
+  documentUrl    String?   @map("document_url")
+  status         String    @default("PENDING") // PENDING, APPROVED, POSTED
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  
+  @@map("expense_vouchers")
+}
+
+model AccountCode {
+  id             String    @id @default(uuid())
+  code           String    @unique
+  name           String
+  budgetAmount   Float     @default(0.0) @map("budget_amount")
+  vouchers       ExpenseVoucher[]
+  
+  @@map("account_codes")
+}
+
+model PettyCashTransaction {
+  id             String    @id @default(uuid())
+  type           String    // REPLENISHMENT, DISBURSEMENT
+  amount         Float
+  date           DateTime  @default(now())
+  description    String
+  balanceAfter   Float     @map("balance_after")
+  
+  @@map("petty_cash_transactions")
+}
+
+model PettyCashFund {
+  id             String    @id @default(uuid())
+  balance        Float     @default(0.0)
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  
+  @@map("petty_cash_fund")
 }
