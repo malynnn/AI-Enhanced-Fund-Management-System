@@ -1,22 +1,34 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Search, AlertTriangle, CheckCircle2, Send, Filter, UploadCloud, Terminal, RefreshCw, Layers, Calendar, CreditCard, FileText, BarChart3, Printer } from 'lucide-react';
 
 // --- INITIAL DATA ---
 const standardDuesAmount = 500.00;
 
-const initialDues = [
-  { id: 1, transaction_id: 'TXN-MS-881203', memberId: 'M-2023-001', name: 'ALARCO, MICO', month: 'April 2026', amountPaid: 500.00, method: 'Salary Deduction', reference_number: 'REF-8812', fund_to_credit: 'General Fund', status: 'Pending' },
-  { id: 2, transaction_id: 'TXN-MS-451992', memberId: 'M-2023-045', name: 'ZEN, SHEN', month: 'April 2026', amountPaid: 500.00, method: 'Online Transfer', reference_number: 'REF-9921', fund_to_credit: 'Union Fund', status: 'Pending' },
-  { id: 3, transaction_id: 'TXN-MS-112349', memberId: 'M-2024-112', name: 'SIDI, EYBI', month: 'April 2026', amountPaid: 250.00, method: 'Cash', reference_number: 'REF-0012', fund_to_credit: 'General Fund', status: 'Pending' },
-  { id: 4, transaction_id: 'TXN-MS-998822', memberId: 'M-2022-088', name: 'KU, JUSS', month: 'April 2026', amountPaid: 500.00, method: 'Salary Deduction', reference_number: 'REF-8210', fund_to_credit: 'General Fund', status: 'Confirmed' },
-  { id: 5, transaction_id: 'TXN-MS-331290', memberId: 'M-2025-019', name: 'VINLUAN, VEN', month: 'May 2026', amountPaid: 1000.00, method: 'Online Transfer', reference_number: 'REF-4902', fund_to_credit: 'General Fund', status: 'Confirmed' },
-  { id: 6, transaction_id: 'TXN-MS-441002', memberId: 'M-2026-002', name: 'DELA CRUZ, JUAN', month: 'May 2026', amountPaid: 500.00, method: 'Salary Deduction', reference_number: 'REF-5511', fund_to_credit: 'General Fund', status: 'Pending' },
-];
-
 export default function DuesCollectionPage() {
-  const [duesRecords, setDuesRecords] = useState(initialDues);
+  const [duesRecords, setDuesRecords] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchDuesRecords = async () => {
+    try {
+      setIsLoading(true);
+      const res = await fetch('/api/finance/dues');
+      if (res.ok) {
+        const data = await res.json();
+        setDuesRecords(data);
+      }
+    } catch (err) {
+      console.error('Error fetching dues:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDuesRecords();
+  }, []);
+
   const [activeTab, setActiveTab] = useState<'ledger' | 'report'>('ledger');
   
   // Filters
@@ -25,7 +37,7 @@ export default function DuesCollectionPage() {
   const [filterMonth, setFilterMonth] = useState('ALL');
   const [filterMethod, setFilterMethod] = useState('ALL');
   
-  const [isPosting, setIsPosting] = useState<number | null>(null);
+  const [isPosting, setIsPosting] = useState<string | null>(null);
 
   // Webhook State
   const [webhookData, setWebhookData] = useState({
@@ -37,7 +49,7 @@ export default function DuesCollectionPage() {
     amount: '500.00',
     payment_method: 'Salary Deduction',
     reference_number: `REF-${Math.floor(10000 + Math.random() * 90000)}`,
-    fund_to_credit: 'General Fund'
+    fund_to_credit: 'GF'
   });
   const [webhookLogs, setWebhookLogs] = useState<Array<{ timestamp: string; type: string; payload: any }>>([{
     timestamp: new Date().toLocaleTimeString(),
@@ -72,83 +84,114 @@ export default function DuesCollectionPage() {
     return { totalCollected, totalDiscrepancies, totalConfirmed, count: filteredRecords.length };
   }, [filteredRecords]);
 
-  // --- UPDATED: NOW MAKES A REAL HTTP REQUEST TO THE BACKEND ---
-  const handlePostLedger = async (id: number, name: string) => {
+  // --- TREASURER: POST & NOTIFY ---
+  // Called when Treasurer clicks "Post & Notify" on a Pending dues record.
+  // Sends to backend which posts to the fund ledger and notifies the MS.
+  const handlePostLedger = async (id: string, name: string) => {
     setIsPosting(id);
-    const record = duesRecords.find(r => r.id === id);
-
-    if (!record) return;
 
     try {
-      // 1. Send the actual payload to our newly secured API route
-      const response = await fetch('/api/mock/ms-callback', {
+      const response = await fetch(`/api/finance/dues/${id}/confirm`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          transaction_id: record.transaction_id,
-          member_id: record.memberId,
-          reference_number: record.reference_number,
-          posted_amount: record.amountPaid,
-          fund_credited: record.fund_to_credit,
-          
-          // 🚨 THE TEST: We are intentionally sending a fake role here!
-          requesting_role: 'MS_Admin', 
-        })
       });
 
       const responseData = await response.json();
 
-      // 2. Update the local UI state so the row turns gray (if successful)
-      if (response.ok) {
-        setDuesRecords(prev => prev.map(rec => 
-          rec.id === id ? { ...rec, status: 'Confirmed' } : rec
-        ));
-      }
-
-      // 3. Print the backend's response in our UI Webhook Console
+      // Log to the Webhook Console
       setWebhookLogs(prev => [
         {
           timestamp: new Date().toLocaleTimeString(),
-          type: response.ok ? 'CONFIRMATION_RESPONSE_OUT (200)' : `ERROR_REJECTED (${response.status})`,
+          type: response.ok
+            ? `✅ LEDGER_POSTED + MS_NOTIFIED (200)`
+            : `❌ ERROR (${response.status})`,
           payload: responseData
         },
         ...prev
       ]);
-      
-      // 4. Show a browser alert based on what the backend decided
-      if (!response.ok) {
-        alert(`Rejected!\n\nStatus: ${response.status}\nError: ${responseData.error}`);
+
+      if (response.ok) {
+        // Refresh table from DB to reflect updated status
+        fetchDuesRecords();
+        if (responseData.hasDiscrepancy) {
+          alert(`⚠️ Posted with DISCREPANCY flagged.\n\nBackend: ${responseData.message}`);
+        }
       } else {
-        alert(`✅ SUCCESS!\n\nBackend says: ${responseData.message}`);
+        alert(`❌ Failed to post.\n\nError: ${responseData.error}`);
       }
 
     } catch (error) {
-      console.error("Failed to reach API", error);
+      console.error('Failed to reach confirm API', error);
+      setWebhookLogs(prev => [
+        {
+          timestamp: new Date().toLocaleTimeString(),
+          type: 'NETWORK_ERROR',
+          payload: String(error)
+        },
+        ...prev
+      ]);
     } finally {
       setIsPosting(null);
     }
   };
 
-  const triggerWebhookSimulation = (e: React.FormEvent) => {
+
+  const triggerWebhookSimulation = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newRecord = {
-      id: Date.now(),
-      transaction_id: webhookData.transaction_id,
-      memberId: webhookData.member_id,
-      name: webhookData.full_name.toUpperCase(),
-      month: webhookData.month_covered,
-      amountPaid: parseFloat(webhookData.amount) || 0,
-      method: webhookData.payment_method,
-      reference_number: webhookData.reference_number,
-      fund_to_credit: webhookData.fund_to_credit,
-      status: 'Pending'
-    };
-    setDuesRecords(prev => [newRecord, ...prev]);
-    setWebhookData(prev => ({
-      ...prev,
-      transaction_id: `TXN-MS-${Math.floor(100000 + Math.random() * 900000)}`,
-      reference_number: `REF-${Math.floor(10000 + Math.random() * 90000)}`,
-    }));
+    setIsPosting('__sim__'); // flag to indicate sending simulator
+    
+    try {
+      const response = await fetch('/api/webhooks/dues', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          transactionId: webhookData.transaction_id,
+          date: webhookData.date,
+          memberId: webhookData.member_id,
+          fullName: webhookData.full_name,
+          monthCovered: webhookData.month_covered,
+          amount: parseFloat(webhookData.amount),
+          paymentMethod: webhookData.payment_method,
+          referenceNumber: webhookData.reference_number,
+          fundCredited: webhookData.fund_to_credit
+        })
+      });
+
+      const responseData = await response.json();
+
+      setWebhookLogs(prev => [
+        {
+          timestamp: new Date().toLocaleTimeString(),
+          type: response.ok ? 'WEBHOOK_SUCCESS (201)' : `WEBHOOK_ERROR (${response.status})`,
+          payload: responseData
+        },
+        ...prev
+      ]);
+
+      if (response.ok) {
+        // Fetch fresh records to reflect new database state
+        fetchDuesRecords();
+        
+        // Reset form to random next
+        setWebhookData(prev => ({
+          ...prev,
+          transaction_id: `TXN-MS-${Math.floor(100000 + Math.random() * 900000)}`,
+          reference_number: `REF-${Math.floor(10000 + Math.random() * 90000)}`,
+        }));
+      }
+
+    } catch (err: any) {
+      setWebhookLogs(prev => [
+        {
+          timestamp: new Date().toLocaleTimeString(),
+          type: 'NETWORK_ERROR',
+          payload: err.message
+        },
+        ...prev
+      ]);
+    } finally {
+      setIsPosting(null);
+    }
   };
 
   return (
@@ -301,14 +344,8 @@ export default function DuesCollectionPage() {
           </div>
 
           {/* Webhook Tools */}
-          <div className="w-full flex flex-col lg:flex-row gap-6 mb-8">
-            <div className="w-full lg:w-[450px] flex-shrink-0 bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-              <h2 className="text-md font-bold text-gray-900 flex items-center gap-2 mb-2"><Terminal size={16} className="text-purple-700" /> Webhook Simulator</h2>
-              <form onSubmit={triggerWebhookSimulation} className="space-y-3 mt-4">
-                <button type="submit" className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-lg text-xs transition-colors flex items-center justify-center gap-1.5"><RefreshCw size={14} /> Send Random Webhook Event</button>
-              </form>
-            </div>
-            <div className="flex-1 bg-gray-900 rounded-xl text-green-400 p-6 font-mono text-xs flex flex-col shadow-lg overflow-hidden h-[200px] border border-gray-800">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div className="lg:col-span-2 bg-gray-900 rounded-xl text-green-400 p-6 font-mono text-xs flex flex-col shadow-lg overflow-hidden min-h-[300px] border border-gray-800">
               <div className="flex justify-between items-center mb-2 flex-shrink-0 border-b border-gray-800 pb-2">
                 <span className="text-[10px] font-bold text-gray-400 uppercase">Webhook Console Traffic</span>
               </div>
@@ -317,6 +354,133 @@ export default function DuesCollectionPage() {
                   <div key={index} className="text-[10px] text-gray-300 font-mono whitespace-pre-wrap">{log.timestamp} - {log.type}</div>
                 ))}
               </div>
+            </div>
+
+            <div className="bg-[#021124] text-white p-6 rounded-xl border border-blue-900 shadow-md h-fit">
+              <div className="mb-4">
+                <span className="bg-blue-600 text-white text-[10px] uppercase font-black tracking-widest px-2.5 py-1 rounded-full">
+                  Integration Simulator
+                </span>
+                <h2 className="text-xl font-bold mt-2.5">MS Webhook</h2>
+                <p className="text-blue-200 text-xs mt-1.5 leading-relaxed">
+                  Since MS is not integrated yet, use this panel to simulate receiving a dues posting webhook from the Membership system.
+                </p>
+              </div>
+
+              <form onSubmit={triggerWebhookSimulation} className="space-y-4 text-sm">
+                <div>
+                  <label className="block text-xs font-bold text-blue-300 uppercase mb-1">Transaction ID</label>
+                  <input 
+                    type="text" 
+                    required 
+                    value={webhookData.transaction_id}
+                    onChange={(e) => setWebhookData({...webhookData, transaction_id: e.target.value})}
+                    className="w-full p-2.5 bg-slate-900 border border-blue-900 rounded text-xs text-white focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-blue-300 uppercase mb-1">Member ID</label>
+                    <input 
+                      type="text" 
+                      required 
+                      value={webhookData.member_id}
+                      onChange={(e) => setWebhookData({...webhookData, member_id: e.target.value})}
+                      className="w-full p-2.5 bg-slate-900 border border-blue-900 rounded text-xs text-white focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-blue-300 uppercase mb-1">Amount (₱)</label>
+                    <input 
+                      type="number" 
+                      required 
+                      value={webhookData.amount}
+                      onChange={(e) => setWebhookData({...webhookData, amount: e.target.value})}
+                      className="w-full p-2.5 bg-slate-900 border border-blue-900 rounded text-xs text-white focus:outline-none font-bold"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-blue-300 uppercase mb-1">Full Name</label>
+                  <input 
+                    type="text" 
+                    required 
+                    value={webhookData.full_name}
+                    onChange={(e) => setWebhookData({...webhookData, full_name: e.target.value})}
+                    className="w-full p-2.5 bg-slate-900 border border-blue-900 rounded text-xs text-white focus:outline-none font-bold"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-blue-300 uppercase mb-1">Month Covered</label>
+                    <input 
+                      type="text" 
+                      required 
+                      value={webhookData.month_covered}
+                      onChange={(e) => setWebhookData({...webhookData, month_covered: e.target.value})}
+                      className="w-full p-2.5 bg-slate-900 border border-blue-900 rounded text-xs text-white focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-blue-300 uppercase mb-1">Date</label>
+                    <input 
+                      type="date" 
+                      required 
+                      value={webhookData.date}
+                      onChange={(e) => setWebhookData({...webhookData, date: e.target.value})}
+                      className="w-full p-2.5 bg-slate-900 border border-blue-900 rounded text-xs text-white focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-blue-300 uppercase mb-1">Payment Method</label>
+                    <select 
+                      value={webhookData.payment_method}
+                      onChange={(e) => setWebhookData({...webhookData, payment_method: e.target.value})}
+                      className="w-full p-2.5 bg-slate-900 border border-blue-900 rounded text-xs text-white focus:outline-none"
+                    >
+                      <option value="Salary Deduction">Salary Deduction</option>
+                      <option value="Online Transfer">Online Transfer</option>
+                      <option value="Cash">Cash</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-blue-300 uppercase mb-1">Reference No.</label>
+                    <input 
+                      type="text" 
+                      required 
+                      value={webhookData.reference_number}
+                      onChange={(e) => setWebhookData({...webhookData, reference_number: e.target.value})}
+                      className="w-full p-2.5 bg-slate-900 border border-blue-900 rounded text-xs text-white focus:outline-none font-mono"
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-xs font-bold text-blue-300 uppercase mb-1">Fund Credited</label>
+                  <select 
+                    value={webhookData.fund_to_credit}
+                    onChange={(e) => setWebhookData({...webhookData, fund_to_credit: e.target.value})}
+                    className="w-full p-2.5 bg-slate-900 border border-blue-900 rounded text-xs text-white focus:outline-none"
+                  >
+                    <option value="GF">General Fund</option>
+                    <option value="UF">Union Fund</option>
+                  </select>
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full py-3 mt-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-bold text-xs flex justify-center items-center gap-2 transition-all active:scale-[0.98]"
+                >
+                  <Send size={14} />
+                  🚀 Send Mock Webhook
+                </button>
+              </form>
             </div>
           </div>
         </div>

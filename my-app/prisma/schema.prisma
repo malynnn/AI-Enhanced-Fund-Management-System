@@ -139,4 +139,93 @@ model LoanWriteOff {
   updatedAt      DateTime  @updatedAt @map("updated_at")
 
   @@map("loan_write_offs")
-}
+}// ===================================================
+//      ADDED FOR USER STORY FS-003: DUES COLLECTION
+// ===================================================
+
+model DuesRecord {
+  id               String   @id @default(uuid())
+  transactionId    String   @unique @map("transaction_id")
+  memberId         String   @map("member_id")
+  name             String
+  month            String
+  amountPaid       Float    @map("amount_paid")
+  method           String
+  referenceNumber  String?  @map("reference_number")
+  fundToCredit     String   @map("fund_to_credit")
+  status           String   @default("Pending") // Pending, Confirmed
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@map("dues_records")
+}
+
+// ===================================================
+//      ADDED FOR BACKEND TASK: CHART OF ACCOUNTS
+// ===================================================
+
+model ChartOfAccount {
+  id        String   @id @default(uuid())
+  code      String   @unique
+  name      String
+  type      String   // Asset, Liability, Equity, Income, Expense
+  fund      String   // e.g., "General Fund", "Loans"
+  status    String   @default("Active") // Active, Inactive
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("chart_of_accounts")
+}
+
+// ===================================================
+//      ADDED FOR USER STORY FS-006: EXPENSE VOUCHERS
+// ===================================================
+
+model ExpenseVoucher {
+  id            String    @id @default(uuid())
+  voucherNumber String    @unique @map("voucher_number") // e.g., "EV-2026-001"
+  date          DateTime
+  payee         String
+  purpose       String
+  amount        Float
+  accountCode   String    @map("account_code")          // FK ref to ChartOfAccount.code
+  approvedBy    String?   @map("approved_by")           // Name/role of approver
+  status        String    @default("PENDING")           // PENDING, APPROVED, REJECTED, POSTED
+  receiptUrl    String?   @map("receipt_url")           // Path to uploaded receipt file
+  postedAt      DateTime? @map("posted_at")             // Set when status → POSTED
+  notes         String?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  // Relation: a posted voucher may have a linked petty cash disbursement
+  pettyCashTransactions PettyCashTransaction[]
+
+  @@map("expense_vouchers")
+}
+
+model PettyCashTransaction {
+  id               String    @id @default(uuid())
+  type             String    // REPLENISHMENT, DISBURSEMENT, OPENING_BALANCE
+  amount           Float
+  description      String
+  runningBalance   Float     @map("running_balance")   // Balance after this transaction
+  referenceVoucherId String? @map("reference_voucher_id") // Optional FK to ExpenseVoucher
+  transactedAt     DateTime  @default(now()) @map("transacted_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+
+  voucher ExpenseVoucher? @relation(fields: [referenceVoucherId], references: [id])
+
+  @@map("petty_cash_transactions")
+}
+
+model BudgetCategory {
+  id             String   @id @default(uuid())
+  accountCode    String   @unique @map("account_code") // Corresponds to ChartOfAccount.code
+  accountName    String   @map("account_name")         // Denormalized for display
+  approvedAmount Float    @map("approved_amount")      // The annual/period budget ceiling
+  fiscalYear     Int      @map("fiscal_year")          // e.g., 2026
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@map("budget_categories")
+}
