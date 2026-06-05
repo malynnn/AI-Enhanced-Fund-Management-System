@@ -61,10 +61,13 @@ export default function Sidebar() {
         { label: 'Disbursement', href: '/finance/disbursement', icon: Send, roles: ['Superadmin', 'Officer/Admin', 'Treasurer'] },
         { label: 'Loan Ledger', href: '/finance/loans', icon: CircleDollarSign, roles: ['Superadmin', 'Officer/Admin', 'Treasurer', 'Auditor'] },
         { label: 'Fund Management', href: '/finance/funds', icon: Briefcase, roles: ['Superadmin', 'Officer/Admin', 'Treasurer', 'Auditor'] },
-        { label: 'Chart of Accounts', href: '/finance/config/accounts', icon: ListTree, roles: ['Superadmin', 'Officer/Admin', 'Treasurer', 'Auditor'] },
+        { label: 'Chart of Accounts', href: '/finance/config/accounts', icon: ListTree, roles: ['Superadmin', 'Officer/Admin'] },
         { label: 'Reports Center', href: '/finance/reports', icon: BarChart3, roles: ['Superadmin', 'Officer/Admin', 'Treasurer', 'Auditor'] },
-        { label: 'Bank Reconciliation', href: '/finance/reconciliation', icon: RefreshCw, roles: ['Superadmin', 'Officer/Admin', 'Treasurer'] },
-        { label: 'System Config', href: '/finance/config', icon: Settings, roles: ['Superadmin', 'Officer/Admin'] },
+        
+        // FIXED: Removed 'Officer/Admin' from these restricted pages
+        { label: 'Bank Reconciliation', href: '/finance/reconciliation', icon: RefreshCw, roles: ['Superadmin', 'Treasurer'] },
+        { label: 'System Config', href: '/finance/config', icon: Settings, roles: ['Superadmin'] },
+        
         { label: 'Audit Logs', href: '/finance/audit', icon: ClipboardList, roles: ['Superadmin'] },
       ]
     },
@@ -89,7 +92,6 @@ export default function Sidebar() {
       const isDirectActive = !hasSubItems && (item.href === '/' ? pathname === '/' : pathname.startsWith(item.href!));
       const isOpen = openMenus[item.label] || isParentActive;
 
-      // Ensure elements perfectly conform to the container width when collapsed
       const baseClasses = `flex items-center transition-all font-medium text-sm w-full ${
         isCollapsed ? 'justify-center aspect-square rounded-xl' : 'px-3.5 py-2.5 rounded-xl justify-between'
       }`;
@@ -115,7 +117,6 @@ export default function Sidebar() {
             </Link>
           )}
 
-          {/* Sub Items Container - Padding fixed to remove the empty space left by the removed line! */}
           {hasSubItems && isOpen && (
             <div className={`flex flex-col relative w-full ${isCollapsed ? 'mt-1 gap-1 items-center' : 'mt-1 mb-2 space-y-0.5'}`}>
               
@@ -130,7 +131,6 @@ export default function Sidebar() {
                     title={isCollapsed ? sub.label : undefined}
                     className={isCollapsed 
                       ? `flex items-center justify-center w-full aspect-square rounded-xl transition-all relative ${isSubActive ? 'bg-white/10 text-bdoea-yellow' : 'text-gray-400 hover:text-white hover:bg-white/5'}`
-                      // The padding left is updated here to `pl-6` (instead of `pl-10`) to perfectly tuck the icon under the parent text
                       : `flex items-center gap-3 pl-6 pr-3.5 py-2.5 text-xs font-medium rounded-xl transition-all relative whitespace-nowrap ${isSubActive ? 'text-bdoea-yellow bg-white/5' : 'text-gray-400 hover:text-white hover:bg-white/5'}`
                     }
                   >
@@ -195,7 +195,6 @@ export default function Sidebar() {
           {/* SCROLLABLE NAVIGATION AREA */}
           <nav className="flex-1 overflow-y-auto overflow-x-hidden space-y-6 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-track]:transparent pr-2 -mr-2">
             
-            {/* CONTAINER 1: Main Menu */}
             <div className="flex flex-col">
               {!isCollapsed && <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3 px-3 whitespace-nowrap">Main Menu</p>}
               <div className={`flex flex-col space-y-1 bg-white/[0.02] border border-white/5 rounded-2xl ${isCollapsed ? 'p-1.5' : 'p-2'}`}>
@@ -203,7 +202,6 @@ export default function Sidebar() {
               </div>
             </div>
 
-            {/* CONTAINER 2: BDOEA Systems */}
             <div className="flex flex-col space-y-3 mt-2">
               {!isCollapsed ? (
                 <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1 px-3 whitespace-nowrap">BDOEA Systems</p>

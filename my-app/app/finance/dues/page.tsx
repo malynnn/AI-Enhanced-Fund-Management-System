@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useMemo } from 'react';
-import { Search, AlertTriangle, CheckCircle2, Send, Filter, UploadCloud, Terminal, RefreshCw, Layers, Calendar, CreditCard, FileText, BarChart3, Printer } from 'lucide-react';
+import { Search, AlertTriangle, CheckCircle2, Send, Filter, UploadCloud, Terminal, RefreshCw, Calendar, CreditCard, FileText, BarChart3, Printer } from 'lucide-react';
+import Header from '@/components/Header'; 
+import ActionModal from '@/components/ActionModal'; // Imported our new modal component
 
-// --- INITIAL DATA ---
+// --- INITIAL DATA (UNTOUCHED) ---
 const standardDuesAmount = 500.00;
 
 const initialDues = [
@@ -24,8 +26,16 @@ export default function DuesCollectionPage() {
   const [filterStatus, setFilterStatus] = useState('ALL');
   const [filterMonth, setFilterMonth] = useState('ALL');
   const [filterMethod, setFilterMethod] = useState('ALL');
-  
-  const [isPosting, setIsPosting] = useState<number | null>(null);
+
+  // --- NEW: MODAL STATE MANAGEMENT ---
+  const [modal, setModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    actionId?: number | 'batch';
+    status: 'idle' | 'loading' | 'success' | 'error';
+    resultMsg?: string;
+  }>({ isOpen: false, title: '', message: '', status: 'idle' });
 
   // Webhook State
   const [webhookData, setWebhookData] = useState({
@@ -45,7 +55,7 @@ export default function DuesCollectionPage() {
     payload: { status: 'ONLINE', message: 'Webhook Listener initialized.' }
   }]);
 
-  // --- FILTERING LOGIC (AC 1) ---
+  // --- FILTERING LOGIC ---
   const filteredRecords = useMemo(() => {
     return duesRecords.filter(record => {
       const matchesSearch = record.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -60,11 +70,10 @@ export default function DuesCollectionPage() {
     });
   }, [duesRecords, searchTerm, filterStatus, filterMonth, filterMethod]);
 
-  // Extract unique months and methods for dropdowns
   const uniqueMonths = Array.from(new Set(duesRecords.map(r => r.month)));
   const uniqueMethods = Array.from(new Set(duesRecords.map(r => r.method)));
 
-  // --- REPORT AGGREGATION (AC 2) ---
+  // --- REPORT AGGREGATION ---
   const reportTotals = useMemo(() => {
     const totalCollected = filteredRecords.reduce((sum, rec) => sum + rec.amountPaid, 0);
     const totalDiscrepancies = filteredRecords.filter(rec => rec.amountPaid !== standardDuesAmount).length;
@@ -72,15 +81,52 @@ export default function DuesCollectionPage() {
     return { totalCollected, totalDiscrepancies, totalConfirmed, count: filteredRecords.length };
   }, [filteredRecords]);
 
-  // --- UPDATED: NOW MAKES A REAL HTTP REQUEST TO THE BACKEND ---
-  const handlePostLedger = async (id: number, name: string) => {
-    setIsPosting(id);
-    const record = duesRecords.find(r => r.id === id);
+  // --- TRIGGER MODALS ---
+  const triggerSinglePost = (id: number, name: string) => {
+    setModal({
+      isOpen: true,
+      title: 'Confirm Ledger Posting',
+      message: `Are you sure you want to verify and post the remittance for ${name} to the active ledger? This will notify the member system.`,
+      actionId: id,
+      status: 'idle'
+    });
+  };
 
+  const triggerBatchPost = () => {
+    const pendingCount = filteredRecords.filter(r => r.status === 'Pending').length;
+    if (pendingCount === 0) return;
+    
+    setModal({
+      isOpen: true,
+      title: 'Confirm Batch Posting',
+      message: `You are about to verify and post ${pendingCount} pending records from the current view. Proceed?`,
+      actionId: 'batch',
+      status: 'idle'
+    });
+  };
+
+  // --- EXECUTE HTTP REQUEST VIA MODAL ---
+  const executeModalAction = async () => {
+    setModal(prev => ({ ...prev, status: 'loading' }));
+
+    if (modal.actionId === 'batch') {
+      // Mocking batch post delay
+      setTimeout(() => {
+        setDuesRecords(prev => prev.map(rec => {
+          const isPendingInView = filteredRecords.some(fr => fr.id === rec.id && fr.status === 'Pending');
+          return isPendingInView ? { ...rec, status: 'Confirmed' } : rec;
+        }));
+        setModal(prev => ({ ...prev, status: 'success', resultMsg: 'Batch posting completed successfully!' }));
+      }, 1500);
+      return;
+    }
+
+    // Single record post logic (Your original fetch logic untouched)
+    const recordId = modal.actionId as number;
+    const record = duesRecords.find(r => r.id === recordId);
     if (!record) return;
 
     try {
-      // 1. Send the actual payload to our newly secured API route
       const response = await fetch('/api/mock/ms-callback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -90,22 +136,18 @@ export default function DuesCollectionPage() {
           reference_number: record.reference_number,
           posted_amount: record.amountPaid,
           fund_credited: record.fund_to_credit,
-          
-          // 🚨 THE TEST: We are intentionally sending a fake role here!
           requesting_role: 'MS_Admin', 
         })
       });
 
       const responseData = await response.json();
 
-      // 2. Update the local UI state so the row turns gray (if successful)
       if (response.ok) {
         setDuesRecords(prev => prev.map(rec => 
-          rec.id === id ? { ...rec, status: 'Confirmed' } : rec
+          rec.id === recordId ? { ...rec, status: 'Confirmed' } : rec
         ));
       }
 
-      // 3. Print the backend's response in our UI Webhook Console
       setWebhookLogs(prev => [
         {
           timestamp: new Date().toLocaleTimeString(),
@@ -115,17 +157,15 @@ export default function DuesCollectionPage() {
         ...prev
       ]);
       
-      // 4. Show a browser alert based on what the backend decided
       if (!response.ok) {
-        alert(`Rejected!\n\nStatus: ${response.status}\nError: ${responseData.error}`);
+        setModal(prev => ({ ...prev, status: 'error', resultMsg: `Status: ${response.status} - Error: ${responseData.error}` }));
       } else {
-        alert(`✅ SUCCESS!\n\nBackend says: ${responseData.message}`);
+        setModal(prev => ({ ...prev, status: 'success', resultMsg: `Backend response: ${responseData.message}` }));
       }
 
     } catch (error) {
       console.error("Failed to reach API", error);
-    } finally {
-      setIsPosting(null);
+      setModal(prev => ({ ...prev, status: 'error', resultMsg: 'Network error. Failed to reach the API.' }));
     }
   };
 
@@ -152,263 +192,341 @@ export default function DuesCollectionPage() {
   };
 
   return (
-    <div className="p-8 min-h-screen flex flex-col bg-gray-50 print:p-0 print:bg-white">
+    <div className="flex flex-col min-h-screen bg-transparent print:bg-white relative">
       
-      {/* Header Area (Hidden on Print) */}
-      <div className="mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 flex-shrink-0 print:hidden">
-        <div>
-          <h1 className="text-3xl font-extrabold text-[#021124] tracking-tight">Dues Collection</h1>
-          <p className="text-sm text-gray-500 mt-1">Review MS remittances, filter records, and generate monthly reports.</p>
-        </div>
-        {activeTab === 'ledger' && (
-          <button className="flex items-center justify-center gap-2 bg-[#021124] text-white px-5 py-2.5 rounded-lg font-bold text-sm hover:bg-black transition-colors shadow-sm">
-            <UploadCloud size={18} strokeWidth={2.5} /> Batch Post to MS
-          </button>
-        )}
-        {activeTab === 'report' && (
-          <button onClick={() => window.print()} className="flex items-center justify-center gap-2 bg-gray-200 text-[#021124] px-5 py-2.5 rounded-lg font-bold text-sm hover:bg-gray-300 transition-colors shadow-sm">
-            <Printer size={18} strokeWidth={2.5} /> Print Report
-          </button>
-        )}
+      {/* GLOBAL MODAL COMPONENT */}
+      <ActionModal 
+        isOpen={modal.isOpen}
+        title={modal.title}
+        message={modal.message}
+        status={modal.status}
+        resultMsg={modal.resultMsg}
+        onConfirm={executeModalAction}
+        onClose={() => setModal({ ...modal, isOpen: false })}
+        confirmText="Confirm & Post"
+      />
+
+      <div className="print:hidden">
+        <Header />
       </div>
 
-      {/* Tabs (Hidden on Print) */}
-      <div className="flex gap-2 border-b border-gray-200 mb-6 print:hidden">
-        <button 
-          onClick={() => setActiveTab('ledger')}
-          className={`px-6 py-3 font-bold text-sm rounded-t-lg transition-colors flex items-center gap-2 ${activeTab === 'ledger' ? 'bg-white text-[#021124] border-t border-x border-gray-200 shadow-[0_2px_0_white] relative translate-y-px' : 'text-gray-500 hover:bg-gray-100'}`}
-        >
-          <FileText size={16} /> Ledger & Posting
-        </button>
-        <button 
-          onClick={() => setActiveTab('report')}
-          className={`px-6 py-3 font-bold text-sm rounded-t-lg transition-colors flex items-center gap-2 ${activeTab === 'report' ? 'bg-white text-[#021124] border-t border-x border-gray-200 shadow-[0_2px_0_white] relative translate-y-px' : 'text-gray-500 hover:bg-gray-100'}`}
-        >
-          <BarChart3 size={16} /> Summary Report
-        </button>
-      </div>
-
-      {/* FILTER BAR (Visible on both tabs to control the data scope, hidden on print) */}
-      <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-wrap gap-4 items-center mb-6 print:hidden">
-        <div className="flex-1 min-w-[200px] relative">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input 
-            type="text" placeholder="Search Member Name or ID..." 
-            value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#021124] outline-none"
-          />
-        </div>
+      <main className="p-4 md:p-8 max-w-[1600px] w-full mx-auto space-y-8 flex-1 print:p-0 print:m-0 print:max-w-none">
         
-        {/* AC 1: New Month Filter */}
-        <div className="relative">
-          <Calendar size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-          <select value={filterMonth} onChange={(e) => setFilterMonth(e.target.value)} className="pl-9 pr-8 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#021124] outline-none appearance-none bg-white font-medium">
-            <option value="ALL">All Months</option>
-            {uniqueMonths.map(m => <option key={m} value={m}>{m}</option>)}
-          </select>
+        {/* TOP TABS & ACTION BUTTONS */}
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6 flex-shrink-0 print:hidden mt-2">
+          
+          <div className="flex gap-8 border-b-2 border-gray-200/60 w-full sm:w-auto">
+            <button 
+              onClick={() => setActiveTab('ledger')}
+              className={`pb-3 flex items-center gap-2 text-sm font-black transition-all relative ${
+                activeTab === 'ledger' 
+                  ? 'text-[#04152d] border-b-4 border-[#04152d] translate-y-[2px]' 
+                  : 'text-gray-400 hover:text-[#04152d]'
+              }`}
+            >
+              <FileText size={18} /> Ledger & Posting
+            </button>
+            <button 
+              onClick={() => setActiveTab('report')}
+              className={`pb-3 flex items-center gap-2 text-sm font-black transition-all relative ${
+                activeTab === 'report' 
+                  ? 'text-[#04152d] border-b-4 border-[#04152d] translate-y-[2px]' 
+                  : 'text-gray-400 hover:text-[#04152d]'
+              }`}
+            >
+              <BarChart3 size={18} /> Summary Report
+            </button>
+          </div>
+
+          <div className="flex items-center gap-4">
+            {activeTab === 'ledger' && (
+              <button 
+                onClick={triggerBatchPost}
+                disabled={filteredRecords.filter(r => r.status === 'Pending').length === 0}
+                className="inline-flex items-center justify-center gap-2 bg-[#04152d] text-white font-bold py-2.5 px-5 rounded-xl text-sm shadow-[0_6px_0_rgba(2,6,15,0.55),0_4px_18px_rgba(4,21,45,0.35)] hover:-translate-y-[1px] active:translate-y-[4px] active:shadow-[0_2px_0_rgba(2,6,15,0.55),0_2px_8px_rgba(4,21,45,0.25)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <UploadCloud size={16} /> Batch Post to MS
+              </button>
+            )}
+            {activeTab === 'report' && (
+              <button onClick={() => window.print()} className="inline-flex items-center justify-center gap-2 border-2 border-[#04152d] text-[#04152d] hover:bg-[#04152d] hover:text-white font-bold py-2.5 px-5 rounded-xl text-sm transition-all duration-150">
+                <Printer size={16} /> Print Report
+              </button>
+            )}
+          </div>
         </div>
 
-        {/* AC 1: New Payment Method Filter */}
-        <div className="relative">
-          <CreditCard size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-          <select value={filterMethod} onChange={(e) => setFilterMethod(e.target.value)} className="pl-9 pr-8 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#021124] outline-none appearance-none bg-white font-medium">
-            <option value="ALL">All Methods</option>
-            {uniqueMethods.map(m => <option key={m} value={m}>{m}</option>)}
-          </select>
-        </div>
+        {/* ========================================= */}
+        {/* TAB 1: LEDGER VIEW                        */}
+        {/* ========================================= */}
+        {activeTab === 'ledger' && (
+          <div className="flex flex-col gap-6 flex-1 print:hidden animate-fade-in">
+            
+            {/* FILTER BAR - Full Width */}
+            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 flex flex-wrap gap-4 items-center">
+              
+              <div className="flex-1 min-w-[250px] relative">
+                <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input 
+                  type="text" placeholder="Search Member Name or ID..." 
+                  value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full rounded-xl pl-11 pr-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#04152d] focus:ring-[3px] focus:ring-[#04152d]/10 outline-none transition-colors font-bold text-[#04152d]"
+                />
+              </div>
+              
+              <div className="relative inline-block w-full sm:w-auto min-w-[180px]">
+                <Calendar size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                <select value={filterMonth} onChange={(e) => setFilterMonth(e.target.value)} className="w-full rounded-xl pl-11 pr-10 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#04152d] focus:ring-[3px] focus:ring-[#04152d]/10 outline-none transition-colors appearance-none font-bold text-[#04152d] cursor-pointer">
+                  <option value="ALL">All Months</option>
+                  {uniqueMonths.map(m => <option key={m} value={m}>{m}</option>)}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#04152d]">
+                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+                </div>
+              </div>
 
-        {/* AC 1: Discrepancy & Status Filter */}
-        <div className="relative">
-          <Filter size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-          <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="pl-9 pr-8 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#021124] outline-none appearance-none bg-white font-medium">
-            <option value="ALL">All Status</option>
-            <option value="Pending">Pending Review</option>
-            <option value="Confirmed">Posted to Ledger</option>
-            <option value="DISCREPANCY">⚠️ Discrepancies Only</option>
-          </select>
-        </div>
-      </div>
+              <div className="relative inline-block w-full sm:w-auto min-w-[180px]">
+                <CreditCard size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                <select value={filterMethod} onChange={(e) => setFilterMethod(e.target.value)} className="w-full rounded-xl pl-11 pr-10 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#04152d] focus:ring-[3px] focus:ring-[#04152d]/10 outline-none transition-colors appearance-none font-bold text-[#04152d] cursor-pointer">
+                  <option value="ALL">All Methods</option>
+                  {uniqueMethods.map(m => <option key={m} value={m}>{m}</option>)}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#04152d]">
+                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+                </div>
+              </div>
 
-      {/* ========================================= */}
-      {/* TAB 1: LEDGER VIEW (Hidden on Print)      */}
-      {/* ========================================= */}
-      {activeTab === 'ledger' && (
-        <div className="flex flex-col gap-8 flex-1 print:hidden">
-          {/* Table Container */}
-          <div className="w-full flex flex-col bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="overflow-x-auto w-full">
-              <table className="w-full text-left text-sm whitespace-nowrap min-w-[800px]">
-                <thead className="bg-gray-50 border-b border-gray-100 text-gray-500 uppercase text-[10px] tracking-widest font-bold sticky top-0 z-10 shadow-sm">
-                  <tr>
-                    <th className="px-6 py-4">Member Details</th>
-                    <th className="px-6 py-4">Coverage</th>
-                    <th className="px-6 py-4">Method & Ref</th>
-                    <th className="px-6 py-4 text-right">Amount Remitted</th>
-                    <th className="px-6 py-4 text-center">Status</th>
-                    <th className="px-6 py-4 text-right">Ledger Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {filteredRecords.map((rec) => {
-                    const isDiscrepancy = rec.amountPaid !== standardDuesAmount;
-                    return (
-                      <tr key={rec.id} className={`transition-colors ${rec.status === 'Confirmed' ? 'bg-gray-50/50 opacity-70' : 'hover:bg-gray-50'}`}>
-                        <td className="px-6 py-4">
-                          <p className="font-bold text-gray-900">{rec.name}</p>
-                          <p className="text-xs font-mono text-gray-500 mt-0.5">{rec.memberId}</p>
-                        </td>
-                        <td className="px-6 py-4 text-gray-700 font-medium">{rec.month}</td>
-                        <td className="px-6 py-4 text-gray-600">
-                          <div>{rec.method}</div>
-                          <div className="text-xs font-mono text-blue-600 mt-0.5">{rec.reference_number || 'N/A'}</div>
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          <div className="flex flex-col items-end">
-                            <span className={`font-mono font-bold text-base ${isDiscrepancy ? (rec.amountPaid < standardDuesAmount ? 'text-red-600' : 'text-orange-600') : 'text-gray-900'}`}>
-                              ₱{rec.amountPaid.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                            </span>
-                            {isDiscrepancy && (
-                              <span className="flex items-center gap-1 text-[10px] font-bold mt-1 tracking-wider uppercase bg-red-50 text-red-700 px-1.5 py-0.5 rounded border border-red-100">
-                                <AlertTriangle size={10} /> Discrepancy
+              <div className="relative inline-block w-full sm:w-auto min-w-[200px]">
+                <Filter size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="w-full rounded-xl pl-11 pr-10 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#04152d] focus:ring-[3px] focus:ring-[#04152d]/10 outline-none transition-colors appearance-none font-bold text-[#04152d] cursor-pointer">
+                  <option value="ALL">All Status</option>
+                  <option value="Pending">Pending Review</option>
+                  <option value="Confirmed">Posted to Ledger</option>
+                  <option value="DISCREPANCY">Discrepancies Only</option>
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#04152d]">
+                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+                </div>
+              </div>
+            </div>
+
+            {/* TOP COMPONENT: LEDGER TABLE - FULL WIDTH */}
+            <div className="w-full bg-white rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 overflow-hidden flex flex-col">
+              <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+                <h2 className="text-xl font-black text-[#04152d]">Collection Ledger</h2>
+                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600 shadow-[inset_0_0_0_1.5px_rgba(107,114,128,0.2)]">{filteredRecords.length} Records</span>
+              </div>
+
+              <div className="overflow-x-auto w-full max-h-[500px] overflow-y-auto">
+                <table className="w-full text-left whitespace-nowrap min-w-[900px]">
+                  <thead className="sticky top-0 z-10">
+                    <tr>
+                      <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)]">Member Details</th>
+                      <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)]">Coverage</th>
+                      <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)]">Method & Ref</th>
+                      <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] text-right">Amount Remitted</th>
+                      <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)]">Status</th>
+                      <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] text-right">Ledger Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {filteredRecords.map((rec) => {
+                      const isDiscrepancy = rec.amountPaid !== standardDuesAmount;
+                      return (
+                        <tr key={rec.id} className="hover:bg-[#e8edf8]/60 transition-colors duration-100">
+                          <td className="px-6 py-4 text-sm">
+                            <p className="font-bold text-[#04152d]">{rec.name}</p>
+                            <p className="text-xs font-mono text-gray-400 mt-0.5">{rec.memberId}</p>
+                          </td>
+                          <td className="px-6 py-4 text-sm text-[#04152d] font-medium">{rec.month}</td>
+                          <td className="px-6 py-4 text-sm">
+                            <div className="font-bold text-[#04152d]">{rec.method}</div>
+                            <div className="text-xs font-mono text-blue-500 mt-0.5">{rec.reference_number || 'N/A'}</div>
+                          </td>
+                          <td className="px-6 py-4 text-sm text-right">
+                            <div className="flex flex-col items-end">
+                              <span className={`font-black text-lg ${isDiscrepancy ? 'text-red-600' : 'text-[#04152d]'}`}>
+                                ₱{rec.amountPaid.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                              </span>
+                              {isDiscrepancy && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-700 shadow-[inset_0_0_0_1.5px_rgba(220,38,38,0.3)] mt-1 uppercase tracking-widest">
+                                  <AlertTriangle size={10} /> Discrepancy
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-sm">
+                            {rec.status === 'Confirmed' ? (
+                              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 shadow-[inset_0_0_0_1.5px_rgba(5,150,105,0.3)]">
+                                <CheckCircle2 size={12} /> Posted
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700 shadow-[inset_0_0_0_1.5px_rgba(217,119,6,0.3)]">
+                                <AlertTriangle size={12} /> Pending
                               </span>
                             )}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          <span className={`inline-flex items-center justify-center gap-1 px-2.5 py-1 text-[10px] font-bold rounded-md tracking-wider border uppercase w-24 ${rec.status === 'Confirmed' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-yellow-50 text-yellow-700 border-yellow-200'}`}>
-                            {rec.status === 'Confirmed' ? <CheckCircle2 size={12} /> : <AlertTriangle size={12} />}
-                            {rec.status === 'Confirmed' ? 'Posted' : 'Pending'}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          {rec.status === 'Pending' ? (
-                            <button onClick={() => handlePostLedger(rec.id, rec.name)} disabled={isPosting === rec.id} className="inline-flex items-center gap-1.5 bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-md text-xs font-bold transition-colors disabled:opacity-50">
-                              {isPosting === rec.id ? 'Posting...' : <><Send size={14} /> Post & Notify</>}
-                            </button>
-                          ) : (
-                            <span className="text-xs font-bold text-gray-400 px-4">Ledger Updated</span>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                  {filteredRecords.length === 0 && (
-                    <tr><td colSpan={6} className="px-6 py-12 text-center text-gray-400 font-medium">No dues records found matching criteria.</td></tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Webhook Tools */}
-          <div className="w-full flex flex-col lg:flex-row gap-6 mb-8">
-            <div className="w-full lg:w-[450px] flex-shrink-0 bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-              <h2 className="text-md font-bold text-gray-900 flex items-center gap-2 mb-2"><Terminal size={16} className="text-purple-700" /> Webhook Simulator</h2>
-              <form onSubmit={triggerWebhookSimulation} className="space-y-3 mt-4">
-                <button type="submit" className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-lg text-xs transition-colors flex items-center justify-center gap-1.5"><RefreshCw size={14} /> Send Random Webhook Event</button>
-              </form>
-            </div>
-            <div className="flex-1 bg-gray-900 rounded-xl text-green-400 p-6 font-mono text-xs flex flex-col shadow-lg overflow-hidden h-[200px] border border-gray-800">
-              <div className="flex justify-between items-center mb-2 flex-shrink-0 border-b border-gray-800 pb-2">
-                <span className="text-[10px] font-bold text-gray-400 uppercase">Webhook Console Traffic</span>
-              </div>
-              <div className="flex-1 overflow-y-auto space-y-4">
-                {webhookLogs.map((log, index) => (
-                  <div key={index} className="text-[10px] text-gray-300 font-mono whitespace-pre-wrap">{log.timestamp} - {log.type}</div>
-                ))}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-right">
+                            {rec.status === 'Pending' ? (
+                              <button 
+                                onClick={() => triggerSinglePost(rec.id, rec.name)} 
+                                className="inline-flex items-center justify-center gap-2 bg-[#facc15] text-[#04152d] font-black py-2.5 px-5 rounded-xl text-xs shadow-[0_6px_0_rgba(110,76,0,0.45),0_4px_18px_rgba(250,204,21,0.4)] hover:-translate-y-[1px] active:translate-y-[4px] active:shadow-[0_2px_0_rgba(110,76,0,0.45),0_2px_8px_rgba(250,204,21,0.25)] transition-all"
+                              >
+                                <Send size={14} /> Post & Notify
+                              </button>
+                            ) : (
+                              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest pr-4">Ledger Updated</span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                    {filteredRecords.length === 0 && (
+                      <tr><td colSpan={6} className="px-6 py-16 text-center text-gray-400 font-medium">No dues records found matching criteria.</td></tr>
+                    )}
+                  </tbody>
+                </table>
               </div>
             </div>
-          </div>
-        </div>
-      )}
 
-      {/* ========================================= */}
-      {/* TAB 2: SUMMARY REPORT VIEW (AC 2)           */}
-      {/* ========================================= */}
-      {activeTab === 'report' && (
-        <div className="bg-white p-10 rounded-xl border border-gray-200 shadow-sm w-full max-w-5xl mx-auto print:border-none print:shadow-none print:p-0">
-          
-          {/* Report Header */}
-          <div className="text-center mb-10 border-b-2 border-[#021124] pb-6 flex flex-col items-center">
-            <img src="/bdoea-logo-blue.png" alt="BDOEA Logo" className="h-16 object-contain mb-3" />
-            <h2 className="text-xl font-bold bg-[#021124] text-white inline-block px-6 py-1.5 rounded-full uppercase tracking-widest text-sm print:bg-white print:text-[#021124] print:border-2 print:border-[#021124]">
-              Monthly Dues Summary Report
-            </h2>
-            <p className="mt-4 font-bold text-gray-600 uppercase tracking-widest">
-              Reporting Period: <span className="text-[#021124]">{filterMonth === 'ALL' ? 'All Data Records' : filterMonth}</span>
-            </p>
-          </div>
+            {/* BOTTOM COMPONENT: SIMULATOR & CONSOLE UNDERNEATH TABLE */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-4">
+              
+              <div className="bg-white rounded-2xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 h-full">
+                <div className="mb-6 border-b border-gray-100 pb-4">
+                  <h2 className="text-xs font-black text-gray-400 uppercase tracking-[0.15em] mb-2 flex items-center gap-2">
+                    <span className="text-[#8b5cf6]">{`>_`}</span> Webhook Simulator
+                  </h2>
+                  <p className="text-gray-500 text-xs leading-relaxed font-medium">
+                    Inject test payloads into the collection queue.
+                  </p>
+                </div>
 
-          {/* Aggregate Summary Cards */}
-          <div className="grid grid-cols-3 gap-6 mb-10">
-            <div className="bg-gray-50 border border-gray-200 p-6 rounded-xl text-center">
-              <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Total Collections</p>
-              <p className="text-3xl font-black text-[#021124]">₱{reportTotals.totalCollected.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
-            </div>
-            <div className="bg-gray-50 border border-gray-200 p-6 rounded-xl text-center">
-              <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Members Paid</p>
-              <p className="text-3xl font-black text-[#021124]">{reportTotals.count}</p>
-            </div>
-            <div className={`border p-6 rounded-xl text-center ${reportTotals.totalDiscrepancies > 0 ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'}`}>
-              <p className={`text-xs font-bold uppercase tracking-wider mb-2 ${reportTotals.totalDiscrepancies > 0 ? 'text-red-700' : 'text-green-700'}`}>Total Discrepancies</p>
-              <p className={`text-3xl font-black ${reportTotals.totalDiscrepancies > 0 ? 'text-red-700' : 'text-green-700'}`}>{reportTotals.totalDiscrepancies}</p>
-            </div>
-          </div>
+                <form onSubmit={triggerWebhookSimulation}>
+                  <button type="submit" className="w-full inline-flex items-center justify-center gap-2 bg-[#8b5cf6] hover:bg-[#7c3aed] text-white font-bold py-3 px-6 rounded-xl text-sm shadow-[0_6px_0_rgba(109,40,217,0.45),0_4px_18px_rgba(139,92,246,0.4)] hover:-translate-y-[1px] active:translate-y-[4px] active:shadow-[0_2px_0_rgba(109,40,217,0.45),0_2px_8px_rgba(139,92,246,0.25)] transition-all">
+                    <RefreshCw size={16} /> Send Random Event
+                  </button>
+                </form>
+              </div>
 
-          {/* Per-Member Breakdown Table */}
-          <h3 className="text-sm font-bold text-[#021124] uppercase tracking-wider mb-4 border-b border-gray-200 pb-2">Per-Member Collection Breakdown</h3>
-          <table className="w-full text-left text-sm mb-12 border-collapse">
-            <thead>
-              <tr className="bg-gray-100 border-y-2 border-[#021124]">
-                <th className="py-3 px-4 text-xs font-bold text-[#021124] uppercase">Member Name & ID</th>
-                <th className="py-3 px-4 text-xs font-bold text-[#021124] uppercase">Payment Method</th>
-                <th className="py-3 px-4 text-xs font-bold text-[#021124] uppercase text-center">Status</th>
-                <th className="py-3 px-4 text-right text-xs font-bold text-[#021124] uppercase">Amount Remitted</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredRecords.map(rec => (
-                <tr key={rec.id} className="border-b border-gray-200">
-                  <td className="py-3 px-4">
-                    <span className="font-bold text-[#021124] block">{rec.name}</span>
-                    <span className="text-xs font-mono text-gray-500">{rec.memberId}</span>
-                  </td>
-                  <td className="py-3 px-4 text-gray-600 text-xs">{rec.method} <br/><span className="font-mono text-[10px]">{rec.reference_number}</span></td>
-                  <td className="py-3 px-4 text-center">
-                    <span className={`text-[10px] font-bold uppercase ${rec.status === 'Confirmed' ? 'text-green-600' : 'text-orange-600'}`}>{rec.status}</span>
-                  </td>
-                  <td className="py-3 px-4 text-right font-mono font-bold text-[#021124]">
-                    ₱{rec.amountPaid.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                  </td>
+              <div className="lg:col-span-2 bg-[#04152d] rounded-2xl text-green-400 p-6 font-mono text-xs flex flex-col shadow-2xl h-[250px] border border-[#071c3a]">
+                <div className="flex justify-between items-center mb-4 flex-shrink-0 border-b border-[#0f2a52] pb-4">
+                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+                    Traffic Console
+                  </span>
+                </div>
+                <div className="flex-1 overflow-y-auto space-y-3 pr-2 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full">
+                  {webhookLogs.map((log, index) => (
+                    <div key={index} className="text-xs text-gray-300 font-mono whitespace-pre-wrap leading-relaxed">
+                      <span className="text-blue-400">[{log.timestamp}]</span> <span className="text-[#facc15]">{log.type}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        )}
+
+        {/* ========================================= */}
+        {/* TAB 2: SUMMARY REPORT VIEW                */}
+        {/* ========================================= */}
+        {activeTab === 'report' && (
+          <div className="bg-white p-10 rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 w-full max-w-5xl mx-auto print:border-none print:shadow-none print:p-0 animate-fade-in">
+            
+            {/* Report Header */}
+            <div className="text-center mb-10 border-b-2 border-[#04152d] pb-8 flex flex-col items-center">
+              <img src="/bdoea-logo-blue.png" alt="BDOEA Logo" className="h-16 object-contain mb-6" />
+              <h2 className="text-lg font-black bg-[#04152d] text-white inline-block px-10 py-3 rounded-full uppercase tracking-widest shadow-[0_4px_12px_rgba(4,21,45,0.2)] print:bg-white print:text-[#04152d] print:border-2 print:border-[#04152d] print:shadow-none">
+                Monthly Dues Summary Report
+              </h2>
+              <p className="mt-6 font-bold text-gray-500 uppercase tracking-widest text-xs">
+                Reporting Period: <span className="text-[#04152d] text-sm">{filterMonth === 'ALL' ? 'All Data Records' : filterMonth}</span>
+              </p>
+            </div>
+
+            {/* Stat Cards */}
+            <div className="grid grid-cols-3 gap-6 mb-12">
+              <div className="border-t-4 border-[#04152d] bg-gray-50 p-6 rounded-2xl text-center">
+                <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Total Collections</p>
+                <p className="text-3xl font-black text-[#04152d] tracking-tight">₱{reportTotals.totalCollected.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+              </div>
+              <div className="border-t-4 border-[#04152d] bg-gray-50 p-6 rounded-2xl text-center">
+                <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Members Paid</p>
+                <p className="text-3xl font-black text-[#04152d] tracking-tight">{reportTotals.count}</p>
+              </div>
+              <div className={`border-t-4 p-6 rounded-2xl text-center ${reportTotals.totalDiscrepancies > 0 ? 'border-[#ef4444] bg-red-50' : 'border-[#10b981] bg-emerald-50'}`}>
+                <p className={`text-[10px] font-black uppercase tracking-widest mb-2 ${reportTotals.totalDiscrepancies > 0 ? 'text-red-700' : 'text-emerald-700'}`}>Total Discrepancies</p>
+                <p className={`text-3xl font-black tracking-tight ${reportTotals.totalDiscrepancies > 0 ? 'text-red-700' : 'text-emerald-700'}`}>{reportTotals.totalDiscrepancies}</p>
+              </div>
+            </div>
+
+            {/* Per-Member Breakdown Table */}
+            <table className="w-full text-left text-sm mb-16 border-collapse">
+              <thead>
+                <tr className="bg-white border-y-2 border-[#04152d]">
+                  <th className="py-4 px-2 text-[10px] font-black text-[#04152d] uppercase tracking-widest">Member Name & ID</th>
+                  <th className="py-4 px-2 text-[10px] font-black text-[#04152d] uppercase tracking-widest">Payment Method</th>
+                  <th className="py-4 px-2 text-[10px] font-black text-[#04152d] uppercase tracking-widest text-center">Status</th>
+                  <th className="py-4 px-2 text-[10px] font-black text-[#04152d] uppercase tracking-widest text-right">Amount Remitted</th>
                 </tr>
-              ))}
-              {filteredRecords.length === 0 && (
-                <tr><td colSpan={4} className="py-8 text-center text-gray-400">No records to display for this period.</td></tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredRecords.map(rec => {
+                  const isDiscrepancy = rec.amountPaid !== standardDuesAmount;
+                  return (
+                    <tr key={rec.id} className="border-b border-gray-100">
+                      <td className="py-4 px-2">
+                        <span className="font-bold text-[#04152d] block text-sm">{rec.name}</span>
+                        <span className="text-xs font-mono text-gray-500 mt-1 block">{rec.memberId}</span>
+                      </td>
+                      <td className="py-4 px-2 text-[#04152d] font-bold text-sm">
+                        {rec.method} <br/>
+                        <span className="font-mono font-medium text-gray-400 mt-1 block text-xs">{rec.reference_number}</span>
+                      </td>
+                      <td className="py-4 px-2 text-center">
+                        <span className={`text-[10px] font-black uppercase tracking-widest ${rec.status === 'Confirmed' ? 'text-gray-500' : (isDiscrepancy ? 'text-[#ef4444]' : 'text-[#04152d]')}`}>
+                          {isDiscrepancy && rec.status === 'Pending' ? 'Discrepancy' : rec.status}
+                        </span>
+                      </td>
+                      <td className="py-4 px-2 text-right">
+                        <span className={`font-mono font-black text-lg ${isDiscrepancy ? 'text-[#ef4444]' : 'text-[#04152d]'}`}>
+                          ₱{rec.amountPaid.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        </span>
+                      </td>
+                    </tr>
+                  )
+                })}
+                {filteredRecords.length === 0 && (
+                  <tr><td colSpan={4} className="py-12 text-center text-gray-400 font-medium">No records to display for this period.</td></tr>
+                )}
+              </tbody>
+            </table>
 
-          {/* Signatures */}
-          <div className="grid grid-cols-2 gap-16 pt-8 max-w-2xl mx-auto print:mt-12">
-            <div>
-              <p className="text-xs text-gray-500 mb-10">Prepared & Noted By:</p>
-              <div className="border-t border-black pt-2 text-center">
-                <p className="font-bold text-sm text-[#021124]">Treasurer</p>
-                <p className="text-xs text-gray-500">BDOEA Finance</p>
+            {/* Signatures */}
+            <div className="grid grid-cols-2 gap-16 pt-8 max-w-3xl mx-auto print:mt-16">
+              <div>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-12">Prepared & Noted By:</p>
+                <div className="border-t-2 border-[#04152d] pt-3 text-center">
+                  <p className="font-black text-sm text-[#04152d] uppercase tracking-wider">Treasurer</p>
+                  <p className="text-xs text-gray-500 font-medium mt-1">BDOEA Finance</p>
+                </div>
+              </div>
+              <div>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-12">System Generated On:</p>
+                <div className="border-t-2 border-[#04152d] pt-3 text-center">
+                  <p className="font-black text-sm text-[#04152d] uppercase tracking-wider">{new Date().toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                  <p className="text-xs text-gray-500 font-medium mt-1">Finance & Dues Module</p>
+                </div>
               </div>
             </div>
-            <div>
-              <p className="text-xs text-gray-500 mb-10">System Generated On:</p>
-              <div className="border-t border-black pt-2 text-center">
-                <p className="font-bold text-sm text-[#021124]">{new Date().toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                <p className="text-xs text-gray-500">Finance & Dues Module</p>
-              </div>
-            </div>
+
           </div>
+        )}
 
-        </div>
-      )}
-
+      </main>
     </div>
   );
 }

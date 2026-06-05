@@ -2,7 +2,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
-import { CheckCircle, Eye, Printer, X, FileText, Clock, Check, Send, AlertTriangle, Download, Loader } from 'lucide-react';
+import { CheckCircle, Eye, Printer, X, FileText, Clock, Check, Send, AlertTriangle, Download, Loader, PieChart as PieChartIcon } from 'lucide-react';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+import Header from '@/components/Header';
 
 interface Disbursement {
   id: string;
@@ -64,8 +66,6 @@ export default function DisbursementPage() {
     if (!selectedVoucher) return;
     setIsGeneratingPDF(true);
 
-    // Create a temporary hidden iframe to render the voucher
-    // This isolates the styling from Tailwind v4's lab() / oklch() color functions which crash html2canvas.
     const iframe = document.createElement('iframe');
     iframe.style.position = 'fixed';
     iframe.style.right = '0';
@@ -78,8 +78,6 @@ export default function DisbursementPage() {
     document.body.appendChild(iframe);
 
     try {
-      // Helper function to fetch the local BDOEA logo and convert it to Base64
-      // This guarantees the image displays instantly and renders perfectly inside the canvas capture.
       let logoBase64 = '';
       try {
         const logoRes = await fetch('/bdoea-logo-blue.png');
@@ -388,7 +386,6 @@ export default function DisbursementPage() {
       doc.write(voucherHTML);
       doc.close();
 
-      // Wait a tiny bit for render to complete inside iframe
       await new Promise((resolve) => setTimeout(resolve, 150));
 
       const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
@@ -397,7 +394,7 @@ export default function DisbursementPage() {
       ]);
 
       const canvas = await html2canvas(doc.body, {
-        scale: 2,          // Keep high resolution for sharp text/PDF
+        scale: 2,          
         useCORS: true,
         backgroundColor: '#ffffff',
         logging: false,
@@ -413,7 +410,6 @@ export default function DisbursementPage() {
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
       
-      // Leave 15mm margins on each side
       const margin = 15;
       const imgWidth = pageWidth - (margin * 2); 
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
@@ -424,7 +420,6 @@ export default function DisbursementPage() {
       console.error('PDF generation failed:', err);
       alert('Failed to generate PDF. Please try again.');
     } finally {
-      // Clean up the iframe
       if (document.body.contains(iframe)) {
         document.body.removeChild(iframe);
       }
@@ -432,12 +427,10 @@ export default function DisbursementPage() {
     }
   };
 
-  // Simple print handler utilizing browser print (Tailwind handles hiding other page elements with print:hidden)
   const printVoucher = () => {
     window.print();
   };
 
-  // --- CONFIRM DISBURSEMENT ACTION ---
   const handleConfirm = async (id: string) => {
     setIsProcessing(id);
     try {
@@ -448,7 +441,6 @@ export default function DisbursementPage() {
       });
       if (res.ok) {
         await fetchDisbursements();
-        // Find the confirmed disbursement and open voucher modal
         const confirmedDisb = disbursements.find(d => d.id === id);
         if (confirmedDisb) {
           const completedDisb: Disbursement = {
@@ -458,7 +450,6 @@ export default function DisbursementPage() {
           };
           setJustConfirmed(true);
           setSelectedVoucher(completedDisb);
-          // Auto-download PDF right after confirm
           setTimeout(() => downloadVoucherPDF(), 300);
         }
       }
@@ -469,7 +460,6 @@ export default function DisbursementPage() {
     }
   };
 
-  // --- SIMULATE LAS WEBHOOK ACTION ---
   const handleSendWebhook = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSendingSim(true);
@@ -495,9 +485,7 @@ export default function DisbursementPage() {
 
       if (res.ok) {
         setSimSuccessMsg('Webhook sent! Fund auto-debited and request queued.');
-        // Refresh data
         await fetchDisbursements();
-        // Generate new random loan reference for convenience
         setSimLoanRef(`LN-2026-${Math.floor(100 + Math.random() * 900)}`);
       } else {
         setSimErrMsg(data.error || 'Failed to send webhook');
@@ -509,119 +497,156 @@ export default function DisbursementPage() {
     }
   };
 
-  return (
-    <div className="p-8 max-w-7xl mx-auto print:p-0 print:m-0 font-sans">
-      
-      {/* --- DASHBOARD VIEW (Hidden when printing) --- */}
-      <div className="print:hidden">
-        <div className="mb-8">
-          <h1 className="text-3xl font-black text-[#021124] tracking-tight">Disbursement Control Center</h1>
-          <p className="text-gray-500 mt-1 font-medium">Automatic debit ledger posting, verification, and Treasurer confirmation queue (User Story FS-004).</p>
-        </div>
+  const pendingCount = disbursements.filter(d => d.status === 'PENDING').length;
+  const completedCount = disbursements.filter(d => d.status === 'COMPLETED').length;
+  const chartData = [
+    { name: 'Pending Review', value: pendingCount, color: '#facc15' }, 
+    { name: 'Completed', value: completedCount, color: '#10b981' } 
+  ].filter(d => d.value > 0);
 
-        {/* TOP LAYOUT: QUEUE + SIMULATOR SIDE-BY-SIDE */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8 items-start">
+  return (
+    <div className="flex flex-col min-h-screen">
+      
+      <div className="print:hidden">
+        <Header />
+      </div>
+
+      <main className="p-4 md:p-8 max-w-[1600px] w-full mx-auto space-y-6 flex-1 print:p-0 print:m-0 print:max-w-none">
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 items-start">
           
-          {/* LEFT SIDE: QUEUE LIST */}
           <div className="lg:col-span-2 space-y-6">
             
-            {/* SUMMARY CARDS */}
-            <div className="grid grid-cols-2 gap-6">
-              <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
-                  <FileText size={24} />
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-gray-400 uppercase">Total Requests</p>
-                  <p className="text-2xl font-black text-[#021124]">{disbursements.length}</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              
+              <div className="bg-white rounded-2xl p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 flex flex-col justify-center animate-slide-up" style={{ animationDelay: '0.05s' }}>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+                    <FileText size={24} />
+                  </div>
+                  <div>
+                    <p className="block text-xs font-black text-gray-500 uppercase tracking-[0.12em] mb-0.5">Total Requests</p>
+                    <p className="text-3xl font-black text-[#04152d]">{disbursements.length}</p>
+                  </div>
                 </div>
               </div>
-              <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center text-orange-600">
-                  <Clock size={24} />
+
+              <div className="bg-white rounded-2xl p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 flex flex-col justify-center animate-slide-up" style={{ animationDelay: '0.1s' }}>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center text-amber-600">
+                    <Clock size={24} />
+                  </div>
+                  <div>
+                    <p className="block text-xs font-black text-amber-600 uppercase tracking-[0.12em] mb-0.5">Pending Review</p>
+                    <p className="text-3xl font-black text-[#04152d]">{pendingCount}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs font-bold text-gray-400 uppercase">Pending Review</p>
-                  <p className="text-2xl font-black text-[#021124]">
-                    {disbursements.filter(d => d.status === 'PENDING').length}
-                  </p>
-                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 flex items-center justify-center animate-slide-up" style={{ animationDelay: '0.15s' }}>
+                {chartData.length > 0 ? (
+                  <div className="w-full h-[80px] flex items-center justify-between">
+                    <div className="h-[80px] w-[80px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie data={chartData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={25} outerRadius={38} paddingAngle={3}>
+                            {chartData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', fontSize: '12px', fontWeight: 'bold' }} itemStyle={{ color: '#04152d' }} />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      {chartData.map(d => (
+                        <div key={d.name} className="flex items-center gap-2 text-xs font-bold text-gray-500">
+                          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: d.color }}></div>
+                          {d.name}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-xs font-bold text-gray-400">No Chart Data</p>
+                )}
               </div>
             </div>
 
-            {/* DISBURSEMENT TABLE */}
-            <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-              <div className="p-5 border-b border-gray-100 flex items-center justify-between">
-                <h2 className="font-bold text-[#021124]">Treasurer Confirmation Queue</h2>
-                <span className="text-xs text-gray-400 font-mono">Real-Time Sync</span>
+            <div className="bg-white rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 overflow-hidden flex flex-col min-h-[400px] animate-slide-up" style={{ animationDelay: '0.2s' }}>
+              <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+                <h2 className="text-xl font-black text-[#04152d]">Treasurer Confirmation Queue</h2>
+                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600 shadow-[inset_0_0_0_1.5px_rgba(107,114,128,0.2)] font-mono">Real-Time Sync</span>
               </div>
-              <div className="overflow-x-auto">
+              
+              <div className="overflow-x-auto w-full">
                 {isLoading ? (
-                  <div className="p-8 text-center text-gray-500 font-medium">Loading ledger records...</div>
+                  <div className="p-16 flex flex-col items-center justify-center text-gray-500">
+                    <Loader size={32} className="animate-spin mb-4 text-[#04152d]" />
+                    <p className="font-bold">Loading ledger records...</p>
+                  </div>
                 ) : disbursements.length === 0 ? (
-                  <div className="p-12 text-center text-gray-400">
-                    <AlertTriangle className="mx-auto mb-3 text-gray-300" size={36} />
-                    <p className="font-bold">No disbursement requests found.</p>
-                    <p className="text-xs mt-1">Use the simulator on the right to send a mock LAS webhook request!</p>
+                  <div className="p-16 flex flex-col items-center justify-center text-gray-400">
+                    <AlertTriangle className="mb-4 text-amber-400" size={48} />
+                    <p className="font-black text-[#04152d] text-lg">No disbursement requests found.</p>
+                    <p className="text-sm mt-1">Use the simulator to send a mock LAS webhook request.</p>
                   </div>
                 ) : (
-                  <table className="w-full text-left border-collapse">
+                  <table className="w-full text-left whitespace-nowrap min-w-[900px]">
                     <thead>
-                      <tr className="bg-gray-50 border-b border-gray-200 text-xs uppercase tracking-wider text-gray-500 font-bold">
-                        <th className="p-4">Reference</th>
-                        <th className="p-4">Payee (Member)</th>
-                        <th className="p-4">Amount</th>
-                        <th className="p-4">Bank Details</th>
-                        <th className="p-4">Status</th>
-                        <th className="p-4 text-center">Actions</th>
+                      <tr>
+                        <th className="px-4 py-3 text-xs font-black text-gray-500 uppercase tracking-wide bg-[#f8faff] pl-6">Reference</th>
+                        <th className="px-4 py-3 text-xs font-black text-gray-500 uppercase tracking-wide bg-[#f8faff]">Payee (Member)</th>
+                        <th className="px-4 py-3 text-xs font-black text-gray-500 uppercase tracking-wide bg-[#f8faff] text-right">Amount</th>
+                        <th className="px-4 py-3 text-xs font-black text-gray-500 uppercase tracking-wide bg-[#f8faff]">Bank Details</th>
+                        <th className="px-4 py-3 text-xs font-black text-gray-500 uppercase tracking-wide bg-[#f8faff]">Status</th>
+                        <th className="px-4 py-3 text-xs font-black text-gray-500 uppercase tracking-wide bg-[#f8faff] text-center pr-6">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100 text-sm">
+                    <tbody>
                       {disbursements.map((disb) => (
-                        <tr key={disb.id} className="hover:bg-gray-50/50 transition-colors">
-                          <td className="p-4">
-                            <div className="font-mono font-bold text-[#021124]">{disb.loanReference}</div>
-                            <span className="text-[10px] text-gray-400 font-mono block">{disb.id.substring(0, 8)}...</span>
+                        <tr key={disb.id} className="border-b border-gray-50 hover:bg-[#e8edf8]/60 transition-colors duration-100">
+                          <td className="px-4 py-4 text-sm text-gray-700 pl-6">
+                            <div className="font-mono font-bold text-[#04152d]">{disb.loanReference}</div>
+                            <span className="text-[10px] text-gray-400 font-mono block mt-0.5">{disb.id.substring(0, 8)}...</span>
                           </td>
-                          <td className="p-4">
-                            <div className="font-bold text-[#021124]">{disb.memberName}</div>
-                            <span className="text-xs text-gray-500">ID: {disb.memberId}</span>
+                          <td className="px-4 py-4 text-sm text-gray-700">
+                            <div className="font-bold text-[#04152d]">{disb.memberName}</div>
+                            <span className="text-xs text-gray-500 font-mono mt-0.5 block">ID: {disb.memberId}</span>
                           </td>
-                          <td className="p-4 font-extrabold text-green-700">₱{disb.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                          <td className="p-4">
-                            <div className="font-mono text-xs">{disb.bankAccount}</div>
-                            <span className="text-xs text-gray-400 block">{disb.paymentMethod}</span>
+                          <td className="px-4 py-4 text-sm text-right font-black text-lg text-emerald-600">
+                            ₱{disb.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                           </td>
-                          <td className="p-4">
-                            <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold inline-flex items-center gap-1 ${
-                              disb.status === 'PENDING' ? 'bg-orange-50 text-orange-700 border border-orange-100' : 'bg-green-50 text-green-700 border border-green-100'
-                            }`}>
-                              {disb.status === 'PENDING' ? <Clock size={11} /> : <CheckCircle size={11} />}
+                          <td className="px-4 py-4 text-sm text-gray-700">
+                            <div className="font-mono text-xs font-bold text-[#04152d]">{disb.bankAccount}</div>
+                            <span className="text-[10px] text-gray-500 uppercase tracking-widest mt-1 block">{disb.paymentMethod}</span>
+                          </td>
+                          <td className="px-4 py-4 text-sm text-gray-700">
+                            <span className={disb.status === 'PENDING' ? 'inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700 shadow-[inset_0_0_0_1.5px_rgba(217,119,6,0.3)]' : 'inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 shadow-[inset_0_0_0_1.5px_rgba(5,150,105,0.3)]'}>
+                              {disb.status === 'PENDING' ? <Clock size={12} /> : <CheckCircle size={12} />}
                               {disb.status}
                             </span>
                           </td>
-                          <td className="p-4">
-                            <div className="flex items-center justify-center gap-2">
-                              {/* VIEW VOUCHER BUTTON */}
+                          <td className="px-4 py-4 text-sm text-gray-700 pr-6">
+                            <div className="flex items-center justify-center gap-3">
                               <button 
                                 onClick={() => setSelectedVoucher(disb)}
-                                className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                                className="inline-flex items-center justify-center gap-2 text-gray-600 hover:text-gray-900 hover:bg-gray-200/80 font-medium py-2 px-3 rounded-xl text-sm transition-all duration-150"
                                 title="View / Print Voucher"
                               >
                                 <Eye size={18} />
                               </button>
                               
-                              {/* CONFIRM DISBURSEMENT BUTTON (Only if pending) */}
                               {disb.status === 'PENDING' ? (
                                 <button 
                                   onClick={() => handleConfirm(disb.id)}
                                   disabled={isProcessing === disb.id}
-                                  className="flex items-center gap-1 px-3 py-1.5 bg-[#021124] text-white rounded-md text-xs font-bold hover:bg-black transition-colors disabled:opacity-50"
+                                  className="inline-flex items-center justify-center gap-2 bg-[#04152d] text-white font-bold py-2.5 px-5 rounded-xl text-sm shadow-[0_6px_0_rgba(2,6,15,0.55),0_4px_18px_rgba(4,21,45,0.35)] hover:-translate-y-[1px] active:translate-y-[4px] active:shadow-[0_2px_0_rgba(2,6,15,0.55),0_2px_8px_rgba(4,21,45,0.25)] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                                 >
-                                  {isProcessing === disb.id ? 'Saving...' : <><Check size={13} /> Confirm</>}
+                                  {isProcessing === disb.id ? 'Saving...' : <><Check size={14} /> Confirm</>}
                                 </button>
                               ) : (
-                                <span className="text-xs text-gray-400 font-bold italic pr-2">Fully Posted</span>
+                                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest pr-4">Fully Posted</span>
                               )}
                             </div>
                           </td>
@@ -635,150 +660,146 @@ export default function DisbursementPage() {
 
           </div>
 
-          {/* RIGHT SIDE: INTERACTIVE MOCK SIMULATOR */}
-          <div className="bg-[#021124] text-white p-6 rounded-xl border border-blue-900 shadow-md">
-            <div className="mb-4">
-              <span className="bg-blue-600 text-white text-[10px] uppercase font-black tracking-widest px-2.5 py-1 rounded-full">
-                Integration Simulator
-              </span>
-              <h2 className="text-xl font-bold mt-2.5">Loan App (LAS) Webhook</h2>
-              <p className="text-blue-200 text-xs mt-1.5 leading-relaxed">
+          <div className="bg-white rounded-2xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 animate-slide-in-right" style={{ animationDelay: '0.1s' }}>
+            <div className="mb-6 border-b border-gray-100 pb-4">
+              <h2 className="text-xs font-black text-gray-400 uppercase tracking-[0.15em] mb-2 flex items-center gap-2">
+                <span className="text-blue-500">{`>_`}</span> Webhook Simulator
+              </h2>
+              <p className="text-gray-500 text-xs leading-relaxed font-medium">
                 Since LAS is not integrated yet, use this panel to simulate receiving an approved loan webhook from the Loan system.
               </p>
             </div>
 
             {simSuccessMsg && (
-              <div className="mb-4 bg-green-900/60 border border-green-700 text-green-200 p-3 rounded text-xs font-bold flex gap-2">
-                <CheckCircle size={16} className="shrink-0 mt-0.5" />
+              <div className="mb-5 bg-emerald-50 border border-emerald-200 text-emerald-700 p-4 rounded-xl text-xs font-bold flex gap-3 shadow-[inset_0_0_0_1.5px_rgba(5,150,105,0.3)]">
+                <CheckCircle size={18} className="shrink-0 mt-0.5 text-emerald-500" />
                 <p>{simSuccessMsg}</p>
               </div>
             )}
 
             {simErrMsg && (
-              <div className="mb-4 bg-red-950/60 border border-red-800 text-red-200 p-3 rounded text-xs font-bold flex gap-2">
-                <AlertTriangle size={16} className="shrink-0 mt-0.5" />
+              <div className="mb-5 bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-xs font-bold flex gap-3 shadow-[inset_0_0_0_1.5px_rgba(220,38,38,0.3)]">
+                <AlertTriangle size={18} className="shrink-0 mt-0.5 text-red-500" />
                 <p>{simErrMsg}</p>
               </div>
             )}
 
-            <form onSubmit={handleSendWebhook} className="space-y-4 text-sm">
+            <form onSubmit={handleSendWebhook} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-blue-300 uppercase mb-1">Loan Reference</label>
+                <label className="block text-xs font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Loan Reference</label>
                 <input 
                   type="text" 
                   required 
                   value={simLoanRef}
                   onChange={(e) => setSimLoanRef(e.target.value)}
-                  className="w-full p-2.5 bg-slate-900 border border-blue-900 rounded text-xs text-white focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono"
+                  className="w-full rounded-xl px-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#04152d] focus:ring-[3px] focus:ring-[#04152d]/10 outline-none transition-colors font-mono font-bold text-[#04152d]"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-blue-300 uppercase mb-1">Member ID</label>
+                  <label className="block text-xs font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Member ID</label>
                   <input 
                     type="text" 
                     required 
                     value={simMemberId}
                     onChange={(e) => setSimMemberId(e.target.value)}
-                    className="w-full p-2.5 bg-slate-900 border border-blue-900 rounded text-xs text-white focus:outline-none"
+                    className="w-full rounded-xl px-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#04152d] focus:ring-[3px] focus:ring-[#04152d]/10 outline-none transition-colors font-mono font-bold text-[#04152d]"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-blue-300 uppercase mb-1">Disbursement (₱)</label>
+                  <label className="block text-xs font-black text-[#04152d] uppercase tracking-[0.12em] mb-1.5">Disbursement (₱)</label>
                   <input 
                     type="number" 
                     required 
                     value={simAmount}
                     onChange={(e) => setSimAmount(e.target.value)}
-                    className="w-full p-2.5 bg-slate-900 border border-blue-900 rounded text-xs text-white focus:outline-none font-bold"
+                    className="w-full rounded-xl px-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#04152d] focus:ring-[3px] focus:ring-[#04152d]/10 outline-none transition-colors text-lg font-black text-[#04152d]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-blue-300 uppercase mb-1">Payee (Member Name)</label>
+                <label className="block text-xs font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Payee (Member Name)</label>
                 <input 
                   type="text" 
                   required 
                   value={simMemberName}
                   onChange={(e) => setSimMemberName(e.target.value)}
-                  className="w-full p-2.5 bg-slate-900 border border-blue-900 rounded text-xs text-white focus:outline-none font-bold"
+                  className="w-full rounded-xl px-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#04152d] focus:ring-[3px] focus:ring-[#04152d]/10 outline-none transition-colors font-bold text-[#04152d]"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-blue-300 uppercase mb-1">Payment Method</label>
+                  <label className="block text-xs font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Payment Method</label>
                   <select 
                     value={simPayMethod}
                     onChange={(e) => setSimPayMethod(e.target.value)}
-                    className="w-full p-2.5 bg-slate-900 border border-blue-900 rounded text-xs text-white focus:outline-none"
+                    className="w-full rounded-xl px-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#04152d] focus:ring-[3px] focus:ring-[#04152d]/10 outline-none transition-colors font-bold cursor-pointer text-[#04152d]"
                   >
                     <option value="BANK_TRANSFER">Bank Transfer</option>
                     <option value="CHECK">Check</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-blue-300 uppercase mb-1">Bank Account</label>
+                  <label className="block text-xs font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Bank Account</label>
                   <input 
                     type="text" 
                     required 
                     value={simBankAccount}
                     onChange={(e) => setSimBankAccount(e.target.value)}
-                    className="w-full p-2.5 bg-slate-900 border border-blue-900 rounded text-xs text-white focus:outline-none font-mono"
+                    className="w-full rounded-xl px-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#04152d] focus:ring-[3px] focus:ring-[#04152d]/10 outline-none transition-colors font-mono font-bold text-[#04152d]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-blue-300 uppercase mb-1">Narrative / Description</label>
+                <label className="block text-xs font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Narrative / Description</label>
                 <textarea 
                   value={simDetails}
                   onChange={(e) => setSimDetails(e.target.value)}
                   rows={2}
-                  className="w-full p-2.5 bg-slate-900 border border-blue-900 rounded text-xs text-white focus:outline-none resize-none"
+                  className="w-full rounded-xl px-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#04152d] focus:ring-[3px] focus:ring-[#04152d]/10 outline-none transition-colors resize-none font-bold text-[#04152d]"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={isSendingSim}
-                className="w-full py-3 mt-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-bold text-xs flex justify-center items-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50"
+                className="w-full inline-flex items-center justify-center gap-2 bg-[#facc15] text-[#04152d] font-black py-3 px-6 rounded-xl text-sm shadow-[0_6px_0_rgba(110,76,0,0.45),0_4px_18px_rgba(250,204,21,0.4)] hover:-translate-y-[1px] active:translate-y-[4px] active:shadow-[0_2px_0_rgba(110,76,0,0.45),0_2px_8px_rgba(250,204,21,0.25)] transition-all mt-6 disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                <Send size={14} />
-                {isSendingSim ? 'Firing Webhook...' : '🚀 Send Mock Webhook'}
+                {isSendingSim ? 'Firing Webhook...' : <><Send size={16} /> Send Mock Webhook</>}
               </button>
             </form>
           </div>
 
         </div>
-      </div>
+      </main>
 
       {/* --- MODAL / PRINTABLE VOUCHER VIEW --- */}
       {selectedVoucher && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 print:bg-white print:static print:block print:inset-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#04152d]/60 backdrop-blur-sm print:bg-white print:static print:block print:inset-auto animate-fade-in p-4">
           
-          <div className="bg-white w-full max-w-2xl rounded-xl shadow-2xl flex flex-col max-h-[90vh] print:max-h-none print:shadow-none print:rounded-none print:mx-auto">
+          <div className="bg-white w-full max-w-3xl rounded-[24px] shadow-2xl flex flex-col max-h-[95vh] print:max-h-none print:shadow-none print:rounded-none print:mx-auto animate-pop overflow-hidden">
             
-            {/* Modal Header (Hidden on print) */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-100 print:hidden">
-              <h2 className="font-bold text-lg text-[#021124]">Disbursement Voucher Details</h2>
-              <div className="flex gap-2">
+            <div className="flex items-center justify-between p-5 border-b border-gray-100 print:hidden bg-gray-50/80">
+              <h2 className="font-black text-xl text-[#04152d]">Disbursement Voucher</h2>
+              <div className="flex gap-3">
                 <button 
                   onClick={printVoucher}
-                  className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-[#021124] rounded-lg text-sm font-bold transition-colors"
+                  className="inline-flex items-center justify-center gap-2 border-2 border-[#04152d] text-[#04152d] hover:bg-[#04152d] hover:text-white font-bold py-2.5 px-5 rounded-xl text-sm transition-all duration-150"
                 >
                   <Printer size={16} /> Print
                 </button>
                 <button 
                   onClick={downloadVoucherPDF}
                   disabled={isGeneratingPDF}
-                  className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-green-800/80 text-white rounded-lg text-sm font-bold transition-all shadow-sm active:scale-95 disabled:cursor-not-allowed"
+                  className="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-5 rounded-xl text-sm shadow-[0_5px_0_rgba(5,70,40,0.45),0_4px_14px_rgba(16,185,129,0.3)] active:translate-y-[4px] active:shadow-[0_1px_0_rgba(5,70,40,0.45),0_1px_6px_rgba(16,185,129,0.2)] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {isGeneratingPDF ? (
                     <>
-                      <Loader size={16} className="animate-spin" /> Generating PDF...
+                      <Loader size={16} className="animate-spin" /> Generating...
                     </>
                   ) : (
                     <>
@@ -786,121 +807,104 @@ export default function DisbursementPage() {
                     </>
                   )}
                 </button>
-                <button onClick={() => { setSelectedVoucher(null); setJustConfirmed(false); }} className="p-2 text-gray-400 hover:bg-gray-100 rounded-lg">
-                  <X size={20} />
+                <button onClick={() => { setSelectedVoucher(null); setJustConfirmed(false); }} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors ml-2">
+                  <X size={24} />
                 </button>
               </div>
             </div>
 
-            {/* Success Banner (shown only right after confirmation) */}
             {justConfirmed && (
-              <div className="print:hidden mx-4 mt-4 bg-green-50 border border-green-200 rounded-lg p-3 flex items-start gap-3">
-                <CheckCircle size={20} className="text-green-600 shrink-0 mt-0.5" />
+              <div className="print:hidden mx-6 mt-6 bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex items-start gap-4 shadow-[inset_0_0_0_1.5px_rgba(5,150,105,0.3)]">
+                <div className="bg-emerald-100 p-2 rounded-full">
+                  <CheckCircle size={24} className="text-emerald-600 shrink-0" />
+                </div>
                 <div>
-                  <p className="text-green-800 font-bold text-sm">Disbursement Successfully Confirmed!</p>
-                  <p className="text-green-600 text-xs mt-0.5">The voucher has been authorized. A PDF voucher file was generated and downloaded automatically to your device.</p>
+                  <p className="text-emerald-800 font-black text-base">Disbursement Successfully Confirmed!</p>
+                  <p className="text-emerald-600 text-sm mt-1 font-medium">The voucher has been authorized. A PDF voucher file was generated and downloaded automatically to your device.</p>
                 </div>
               </div>
             )}
 
-            {/* VOUCHER CONTENT (This is the only part that prints/gets captured) */}
-            <div ref={voucherRef} className="p-10 overflow-y-auto print:p-0 bg-white">
+            <div ref={voucherRef} className="p-8 md:p-12 overflow-y-auto print:p-0 bg-white">
               
-              {/* Voucher Header */}
-              <div className="text-center mb-10 border-b-2 border-[#021124] pb-6 flex flex-col items-center">
-                <img 
-                  src="/bdoea-logo-blue.png" 
-                  alt="BDOEA Logo" 
-                  className="h-16 object-contain mb-3" 
-                />
-                <p className="text-xs text-gray-500 font-bold uppercase tracking-wider">Banco de Oro Employees Association (BDOEA)</p>
-                <p className="text-[10px] text-gray-400 font-medium">Ortigas Avenue, San Juan, Metro Manila, Philippines</p>
-                
-                <h2 className="mt-5 text-lg font-bold bg-[#021124] text-white inline-block px-6 py-1 rounded-full uppercase tracking-widest text-xs print:bg-white print:text-[#021124] print:border-2 print:border-[#021124]">
+              <div className="text-center mb-10 border-b-2 border-[#04152d] pb-8 flex flex-col items-center">
+                <img src="/bdoea-logo-blue.png" alt="BDOEA Logo" className="h-16 object-contain mb-4" />
+                <p className="text-xs text-gray-500 font-black uppercase tracking-widest">Banco de Oro Employees Association (BDOEA)</p>
+                <p className="text-[10px] text-gray-400 font-bold mt-1">Ortigas Avenue, San Juan, Metro Manila, Philippines</p>
+                <h2 className="mt-6 text-lg font-black bg-[#04152d] text-white inline-block px-8 py-2 rounded-full uppercase tracking-widest text-xs shadow-md print:bg-white print:text-[#04152d] print:border-2 print:border-[#04152d] print:shadow-none">
                   Disbursement Voucher
                 </h2>
               </div>
 
-              {/* Voucher Details Grid */}
-              <div className="grid grid-cols-2 gap-y-4 gap-x-12 mb-8 text-sm">
+              <div className="grid grid-cols-2 gap-y-6 gap-x-12 mb-10 text-sm bg-[#f8faff] p-6 rounded-2xl border border-gray-100">
                 <div>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Voucher Reference</p>
-                  <p className="font-mono font-bold text-sm text-[#021124]">{selectedVoucher.id}</p>
+                  <p className="block text-xs font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Voucher Reference</p>
+                  <p className="font-mono font-bold text-sm text-[#04152d]">{selectedVoucher.id}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Posting Date</p>
-                  <p className="font-bold text-[#021124]">{new Date(selectedVoucher.createdAt).toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+                  <p className="block text-xs font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Posting Date</p>
+                  <p className="font-bold text-[#04152d]">{new Date(selectedVoucher.createdAt).toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Loan Reference Code</p>
-                  <p className="font-mono font-black text-[#021124]">{selectedVoucher.loanReference}</p>
+                  <p className="block text-xs font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Loan Reference Code</p>
+                  <p className="font-mono font-black text-[#04152d] text-base">{selectedVoucher.loanReference}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Disbursement Method</p>
-                  <p className="font-bold text-blue-800 text-xs font-mono">{selectedVoucher.paymentMethod} ({selectedVoucher.bankAccount})</p>
+                  <p className="block text-xs font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Disbursement Method</p>
+                  <p className="font-bold text-blue-700 text-xs font-mono bg-blue-50 px-3 py-1.5 rounded-lg inline-block">{selectedVoucher.paymentMethod} &mdash; {selectedVoucher.bankAccount}</p>
                 </div>
-                <div className="col-span-2">
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Payee (Member Name & ID)</p>
-                  <p className="font-black text-lg text-[#021124] border-b border-gray-200 pb-1">{selectedVoucher.memberName} <span className="text-xs font-medium text-gray-400">(ID: {selectedVoucher.memberId})</span></p>
+                <div className="col-span-2 pt-4 border-t border-gray-200">
+                  <p className="block text-xs font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Payee (Member Name & ID)</p>
+                  <p className="font-black text-2xl text-[#04152d]">{selectedVoucher.memberName} <span className="text-sm font-bold text-gray-400 font-mono ml-2">ID: {selectedVoucher.memberId}</span></p>
                 </div>
               </div>
 
-              {/* Transaction Table */}
-              <table className="w-full mb-10 border-collapse text-sm">
+              <table className="w-full mb-12 border-collapse text-sm">
                 <thead>
-                  <tr className="bg-gray-100 border-y-2 border-[#021124]">
-                    <th className="py-2.5 px-4 text-left text-xs font-bold text-[#021124] uppercase">Particulars / Narrative</th>
-                    <th className="py-2.5 px-4 text-right text-xs font-bold text-[#021124] uppercase">Debit Amount (PHP)</th>
+                  <tr className="bg-[#04152d] text-white border-y-2 border-[#04152d]">
+                    <th className="py-3.5 px-5 text-left text-[10px] font-black uppercase tracking-widest rounded-tl-lg">Particulars / Narrative</th>
+                    <th className="py-3.5 px-5 text-right text-[10px] font-black uppercase tracking-widest rounded-tr-lg">Debit Amount (PHP)</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="border-b border-gray-200">
-                    <td className="py-4 px-4 font-medium text-gray-800">
-                      Disbursement release for approved loan reference <span className="font-bold text-[#021124]">{selectedVoucher.loanReference}</span>. <br/>
-                      <span className="text-xs text-gray-500 font-medium italic mt-1 block">Description: {selectedVoucher.paymentDetails || 'Approved disbursement'}</span>
-                      <span className="text-xs text-red-600 font-bold block mt-1">Charge Account: BDOEA Loans Fund (LOAN_BDOEA)</span>
+                  <tr className="border-b border-gray-200 bg-white">
+                    <td className="py-6 px-5 font-medium text-gray-800 leading-relaxed">
+                      Disbursement release for approved loan reference <span className="font-black text-[#04152d]">{selectedVoucher.loanReference}</span>. <br/>
+                      <span className="text-xs text-gray-500 font-medium italic mt-2 block">Description: {selectedVoucher.paymentDetails || 'Approved disbursement'}</span>
+                      <span className="text-xs text-red-600 font-black block mt-3 bg-red-50 p-2 rounded inline-block">Charge Account: BDOEA Loans Fund (LOAN_BDOEA)</span>
                     </td>
-                    <td className="py-4 px-4 text-right font-black text-lg text-green-700">
+                    <td className="py-6 px-5 text-right font-black text-2xl text-emerald-700 align-top">
                       ₱{selectedVoucher.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                     </td>
                   </tr>
                 </tbody>
               </table>
 
-              {/* Signatures */}
-              <div className="grid grid-cols-3 gap-8 pt-6">
+              <div className="grid grid-cols-3 gap-10 pt-8">
                 <div>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-8">Prepared By</p>
-                  <div className="border-t border-black pt-1.5 text-center">
-                    <p className="font-bold text-xs text-[#021124]">Loan App System</p>
-                    <p className="text-[10px] text-gray-500">LAS Webhook (Mocked)</p>
+                  <p className="block text-xs font-black text-gray-500 uppercase tracking-[0.12em] mb-10">Prepared By</p>
+                  <div className="border-t-2 border-[#04152d] pt-2.5 text-center">
+                    <p className="font-black text-xs text-[#04152d] uppercase tracking-wide">Loan App System</p>
+                    <p className="text-[10px] text-gray-500 font-medium mt-0.5">LAS Webhook (Mocked)</p>
                   </div>
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-8">Confirmed By</p>
-                  <div className="border-t border-black pt-1.5 text-center">
-                    <p className="font-black text-xs text-blue-900">{selectedVoucher.authorizedBy || 'PENDING'}</p>
-                    <p className="text-[10px] text-gray-500 uppercase font-bold tracking-tighter">Authorized signature</p>
+                  <p className="block text-xs font-black text-gray-500 uppercase tracking-[0.12em] mb-10">Confirmed By</p>
+                  <div className="border-t-2 border-[#04152d] pt-2.5 text-center">
+                    <p className="font-black text-xs text-blue-800 uppercase tracking-wide">{selectedVoucher.authorizedBy || 'PENDING'}</p>
+                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-0.5">Authorized signature</p>
                   </div>
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-8">Received By Payee</p>
-                  <div className="border-t border-black pt-1.5 text-center">
-                    <p className="font-bold text-xs text-[#021124]">{selectedVoucher.memberName}</p>
-                    <p className="text-[10px] text-gray-500">Member Signature</p>
+                  <p className="block text-xs font-black text-gray-500 uppercase tracking-[0.12em] mb-10">Received By Payee</p>
+                  <div className="border-t-2 border-[#04152d] pt-2.5 text-center">
+                    <p className="font-black text-xs text-[#04152d] uppercase tracking-wide">{selectedVoucher.memberName}</p>
+                    <p className="text-[10px] text-gray-500 font-medium mt-0.5">Member Signature</p>
                   </div>
                 </div>
               </div>
 
             </div>
-
-            {/* Print/PDF instructions footer (shown only in modal, hidden on print) */}
-            <div className="print:hidden p-3 bg-gray-50 border-t border-gray-100 rounded-b-xl text-center">
-              <p className="text-xs text-gray-400">
-                💡 Tip: Click <strong>Download PDF</strong> for instant direct download, or <strong>Print</strong> for physical copy printing.
-              </p>
-            </div>
-
           </div>
         </div>
       )}
