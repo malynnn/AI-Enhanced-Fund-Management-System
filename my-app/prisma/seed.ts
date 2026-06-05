@@ -4,7 +4,7 @@ import pg from 'pg';
 import dotenv from 'dotenv';
 
 // Siguraduhing may access ang process constructor dito
-dotenv.config({ path: '.env.local' });
+dotenv.config({ path: '.env' });
 
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -170,7 +170,109 @@ async function main() {
   });
 
   console.log('✅ BDOEA Loans Fund initialized successfully.');
+
+  // ==========================================
+  // 5. Seed Chart of Accounts (Backend Task)
+  // ==========================================
+  console.log('🔄 Seeding Chart of Accounts...');
+
+  const defaultAccounts = [
+    { code: '1010', name: 'General Cash Fund',                  type: 'Asset',     fund: 'General Fund',       status: 'Active'   },
+    { code: '1100', name: 'Loan Receivables',                   type: 'Asset',     fund: 'Loans',              status: 'Active'   },
+    { code: '2010', name: 'Union Accounts Payable',             type: 'Liability', fund: 'Union Fund',         status: 'Active'   },
+    { code: '5020', name: 'Foreign Assistance Project Expenses',type: 'Expense',   fund: 'Foreign Assistance', status: 'Inactive' },
+    { code: '6010', name: 'Death Benefit Disbursements',        type: 'Expense',   fund: 'Death Assistance',   status: 'Active'   },
+  ];
+
+  for (const acc of defaultAccounts) {
+    await prisma.chartOfAccount.upsert({
+      where: { code: acc.code },
+      update: {},
+      create: acc,
+    });
+  }
+
+  // ==========================================
+  // 6. Seed FS-006 Data (Expense Vouchers, Petty Cash, Budgets)
+  // ==========================================
+  console.log('🔄 Seeding FS-006 Budget Categories, Expense Vouchers, and Petty Cash...');
+
+  // 6a. Budgets
+  const currentYear = new Date().getFullYear();
+  await prisma.budgetCategory.upsert({
+    where: { accountCode: '5020' },
+    update: {},
+    create: {
+      accountCode: '5020',
+      accountName: 'Foreign Assistance Project Expenses',
+      approvedAmount: 500000.00,
+      fiscalYear: currentYear,
+    },
+  });
+
+  await prisma.budgetCategory.upsert({
+    where: { accountCode: '6010' },
+    update: {},
+    create: {
+      accountCode: '6010',
+      accountName: 'Death Benefit Disbursements',
+      approvedAmount: 200000.00,
+      fiscalYear: currentYear,
+    },
+  });
+
+  // 6b. Expense Vouchers
+  const approvedVoucher = await prisma.expenseVoucher.upsert({
+    where: { voucherNumber: 'EV-2026-001' },
+    update: {},
+    create: {
+      voucherNumber: 'EV-2026-001',
+      date: new Date(),
+      payee: 'Juan Dela Cruz',
+      purpose: 'Death Benefit Claim - Member 101',
+      amount: 15000.00,
+      accountCode: '6010',
+      approvedBy: treasurerUser.id,
+      status: 'APPROVED',
+    },
+  });
+
+  const pendingVoucher = await prisma.expenseVoucher.upsert({
+    where: { voucherNumber: 'EV-2026-002' },
+    update: {},
+    create: {
+      voucherNumber: 'EV-2026-002',
+      date: new Date(),
+      payee: 'Office Warehouse',
+      purpose: 'Project Supplies',
+      amount: 5500.00,
+      accountCode: '5020',
+      status: 'PENDING',
+    },
+  });
+
+  // 6c. Petty Cash
+  await prisma.pettyCashTransaction.create({
+    data: {
+      type: 'REPLENISHMENT',
+      amount: 10000.00,
+      description: 'Initial Petty Cash Fund Replenishment',
+      runningBalance: 10000.00,
+    }
+  });
+
+  await prisma.pettyCashTransaction.create({
+    data: {
+      type: 'DISBURSEMENT',
+      amount: 1500.00,
+      description: 'Emergency supplies',
+      runningBalance: 8500.00,
+    }
+  });
+  console.log('✅ FS-006 Data seeded.');
+
   console.log('🏁 Seeding complete!');
+
 }
 
 main()

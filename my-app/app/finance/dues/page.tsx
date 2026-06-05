@@ -8,17 +8,29 @@ import ActionModal from '@/components/ActionModal'; // Imported our new modal co
 // --- INITIAL DATA (UNTOUCHED) ---
 const standardDuesAmount = 500.00;
 
-const initialDues = [
-  { id: 1, transaction_id: 'TXN-MS-881203', memberId: 'M-2023-001', name: 'ALARCO, MICO', month: 'April 2026', amountPaid: 500.00, method: 'Salary Deduction', reference_number: 'REF-8812', fund_to_credit: 'General Fund', status: 'Pending' },
-  { id: 2, transaction_id: 'TXN-MS-451992', memberId: 'M-2023-045', name: 'ZEN, SHEN', month: 'April 2026', amountPaid: 500.00, method: 'Online Transfer', reference_number: 'REF-9921', fund_to_credit: 'Union Fund', status: 'Pending' },
-  { id: 3, transaction_id: 'TXN-MS-112349', memberId: 'M-2024-112', name: 'SIDI, EYBI', month: 'April 2026', amountPaid: 250.00, method: 'Cash', reference_number: 'REF-0012', fund_to_credit: 'General Fund', status: 'Pending' },
-  { id: 4, transaction_id: 'TXN-MS-998822', memberId: 'M-2022-088', name: 'KU, JUSS', month: 'April 2026', amountPaid: 500.00, method: 'Salary Deduction', reference_number: 'REF-8210', fund_to_credit: 'General Fund', status: 'Confirmed' },
-  { id: 5, transaction_id: 'TXN-MS-331290', memberId: 'M-2025-019', name: 'VINLUAN, VEN', month: 'May 2026', amountPaid: 1000.00, method: 'Online Transfer', reference_number: 'REF-4902', fund_to_credit: 'General Fund', status: 'Confirmed' },
-  { id: 6, transaction_id: 'TXN-MS-441002', memberId: 'M-2026-002', name: 'DELA CRUZ, JUAN', month: 'May 2026', amountPaid: 500.00, method: 'Salary Deduction', reference_number: 'REF-5511', fund_to_credit: 'General Fund', status: 'Pending' },
-];
-
 export default function DuesCollectionPage() {
-  const [duesRecords, setDuesRecords] = useState(initialDues);
+  const [duesRecords, setDuesRecords] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchDuesRecords = async () => {
+    try {
+      setIsLoading(true);
+      const res = await fetch('/api/finance/dues');
+      if (res.ok) {
+        const data = await res.json();
+        setDuesRecords(data);
+      }
+    } catch (err) {
+      console.error('Error fetching dues:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDuesRecords();
+  }, []);
+
   const [activeTab, setActiveTab] = useState<'ledger' | 'report'>('ledger');
   
   // Filters
@@ -47,7 +59,7 @@ export default function DuesCollectionPage() {
     amount: '500.00',
     payment_method: 'Salary Deduction',
     reference_number: `REF-${Math.floor(10000 + Math.random() * 90000)}`,
-    fund_to_credit: 'General Fund'
+    fund_to_credit: 'GF'
   });
   const [webhookLogs, setWebhookLogs] = useState<Array<{ timestamp: string; type: string; payload: any }>>([{
     timestamp: new Date().toLocaleTimeString(),
@@ -151,7 +163,9 @@ export default function DuesCollectionPage() {
       setWebhookLogs(prev => [
         {
           timestamp: new Date().toLocaleTimeString(),
-          type: response.ok ? 'CONFIRMATION_RESPONSE_OUT (200)' : `ERROR_REJECTED (${response.status})`,
+          type: response.ok
+            ? `✅ LEDGER_POSTED + MS_NOTIFIED (200)`
+            : `❌ ERROR (${response.status})`,
           payload: responseData
         },
         ...prev
@@ -169,26 +183,63 @@ export default function DuesCollectionPage() {
     }
   };
 
-  const triggerWebhookSimulation = (e: React.FormEvent) => {
+
+  const triggerWebhookSimulation = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newRecord = {
-      id: Date.now(),
-      transaction_id: webhookData.transaction_id,
-      memberId: webhookData.member_id,
-      name: webhookData.full_name.toUpperCase(),
-      month: webhookData.month_covered,
-      amountPaid: parseFloat(webhookData.amount) || 0,
-      method: webhookData.payment_method,
-      reference_number: webhookData.reference_number,
-      fund_to_credit: webhookData.fund_to_credit,
-      status: 'Pending'
-    };
-    setDuesRecords(prev => [newRecord, ...prev]);
-    setWebhookData(prev => ({
-      ...prev,
-      transaction_id: `TXN-MS-${Math.floor(100000 + Math.random() * 900000)}`,
-      reference_number: `REF-${Math.floor(10000 + Math.random() * 90000)}`,
-    }));
+    setIsPosting('__sim__'); // flag to indicate sending simulator
+    
+    try {
+      const response = await fetch('/api/webhooks/dues', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          transactionId: webhookData.transaction_id,
+          date: webhookData.date,
+          memberId: webhookData.member_id,
+          fullName: webhookData.full_name,
+          monthCovered: webhookData.month_covered,
+          amount: parseFloat(webhookData.amount),
+          paymentMethod: webhookData.payment_method,
+          referenceNumber: webhookData.reference_number,
+          fundCredited: webhookData.fund_to_credit
+        })
+      });
+
+      const responseData = await response.json();
+
+      setWebhookLogs(prev => [
+        {
+          timestamp: new Date().toLocaleTimeString(),
+          type: response.ok ? 'WEBHOOK_SUCCESS (201)' : `WEBHOOK_ERROR (${response.status})`,
+          payload: responseData
+        },
+        ...prev
+      ]);
+
+      if (response.ok) {
+        // Fetch fresh records to reflect new database state
+        fetchDuesRecords();
+        
+        // Reset form to random next
+        setWebhookData(prev => ({
+          ...prev,
+          transaction_id: `TXN-MS-${Math.floor(100000 + Math.random() * 900000)}`,
+          reference_number: `REF-${Math.floor(10000 + Math.random() * 90000)}`,
+        }));
+      }
+
+    } catch (err: any) {
+      setWebhookLogs(prev => [
+        {
+          timestamp: new Date().toLocaleTimeString(),
+          type: 'NETWORK_ERROR',
+          payload: err.message
+        },
+        ...prev
+      ]);
+    } finally {
+      setIsPosting(null);
+    }
   };
 
   return (

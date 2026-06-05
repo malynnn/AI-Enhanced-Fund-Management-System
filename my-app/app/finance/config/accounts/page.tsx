@@ -48,6 +48,25 @@ export default function AdminChartOfAccountsPage() {
   // ==========================================
   const isAdmin = role === 'Superadmin' || role === 'Officer/Admin';
 
+  const fetchAccounts = async () => {
+    try {
+      setIsLoading(true);
+      const res = await fetch('/api/finance/accounts');
+      if (res.ok) {
+        const data = await res.json();
+        setAccounts(data);
+      }
+    } catch (err) {
+      console.error('Error fetching accounts:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAccounts();
+  }, []);
+
   if (!isAdmin) {
     return (
       <div className="flex flex-col min-h-screen bg-transparent">
@@ -132,10 +151,10 @@ export default function AdminChartOfAccountsPage() {
     setIsFormOpen(false);
   };
 
-  const openForm = (acc?: any) => {
+  const openForm = (acc?: Account) => {
     if (acc) {
       setEditingId(acc.id);
-      setFormData({ ...acc });
+      setFormData({ code: acc.code, name: acc.name, type: acc.type, fund: acc.fund, status: acc.status });
     } else {
       setEditingId(null);
       setFormData({ code: '', name: '', type: 'Asset', fund: 'General Fund', status: 'Active' });
