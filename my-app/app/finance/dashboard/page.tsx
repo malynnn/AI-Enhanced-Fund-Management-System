@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { Wallet, Printer, Clock, CheckCircle2, ShieldCheck, CreditCard } from 'lucide-react';
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { useState, useMemo } from 'react';
+import { Wallet, Clock, CheckCircle2, ShieldCheck, CreditCard, WalletCards, CircleDollarSign, ArrowRight, Activity } from 'lucide-react';
+import { PieChart, Pie, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import Header from '@/components/Header';
+import ActionModal from '@/components/ActionModal';
 
-// --- MOCK DATABASE (UNTOUCHED) ---
+// --- MOCK DATABASE ---
 const initialFunds = [
   { id: 'GF', name: 'General Fund', balance: 1812350, txCount: 248 },
   { id: 'UF', name: 'Union Fund', balance: 4520900, txCount: 112 },
@@ -38,6 +39,10 @@ const incomingWebhookQueue = [
   },
 ];
 
+// Mock Overviews for Dashboard
+const duesOverview = { collectedThisMonth: 385000, targetThisMonth: 450000, collectionRate: 85.5, unpaidMembers: 24 };
+const loansOverview = { activeLoans: 42, totalReceivables: 1250000, pendingApplications: 3 };
+
 const CHART_COLORS = ['#04152d', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444'];
 
 export default function TreasurerDashboardPage() {
@@ -45,33 +50,34 @@ export default function TreasurerDashboardPage() {
   const [ledger, setLedger] = useState(initialLedger);
   const [pendingDisbursements, setPendingDisbursements] = useState(incomingWebhookQueue);
   const [selectedFund, setSelectedFund] = useState(initialFunds[0]);
-  const [isProcessing, setIsProcessing] = useState<string | null>(null);
   
-  const [currentDate, setCurrentDate] = useState('');
-  const [userRole, setUserRole] = useState('Officer');
+  // --- MODAL STATE ---
+  const [actionModal, setActionModal] = useState<{
+    isOpen: boolean; title: string; message: string; status: 'idle' | 'loading' | 'success' | 'error'; resultMsg?: string; payload?: any;
+  }>({ isOpen: false, title: '', message: '', status: 'idle' });
 
-  useEffect(() => {
-    const date = new Date();
-    setCurrentDate(`Today, ${date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}`);
+  // Prepare chart data with `fill` injected to fix Recharts warning
+  const chartData = useMemo(() => {
+    return funds.map((f, index) => ({
+      ...f,
+      fill: CHART_COLORS[index % CHART_COLORS.length]
+    }));
+  }, [funds]);
 
-    if (typeof window !== 'undefined') {
-      const rawUser = localStorage.getItem('user');
-      if (rawUser) {
-        try {
-          const parsedUser = JSON.parse(rawUser);
-          if (parsedUser?.role) {
-            const formattedRole = parsedUser.role.charAt(0).toUpperCase() + parsedUser.role.slice(1).toLowerCase();
-            setUserRole(formattedRole);
-          }
-        } catch (e) {
-          console.error("Failed to parse user");
-        }
-      }
-    }
-  }, []);
+  // --- MODAL HANDLERS ---
+  const triggerDisbursementConfirm = (txn: any) => {
+    setActionModal({
+      isOpen: true,
+      title: 'Authorize Disbursement',
+      message: `You are about to generate a Disbursement Voucher for ${txn.member_name} amounting to ₱${txn.amount.toLocaleString()}. This will deduct from the ${txn.fund_to_debit} fund. Proceed?`,
+      status: 'idle',
+      payload: txn
+    });
+  };
 
-  const handleConfirmDisbursement = (txn: any) => {
-    setIsProcessing(txn.disbursement_txn_id);
+  const executeDisbursement = () => {
+    setActionModal(prev => ({ ...prev, status: 'loading' }));
+    const txn = actionModal.payload;
 
     setTimeout(() => {
       setFunds(prev => prev.map(f => 
@@ -89,7 +95,12 @@ export default function TreasurerDashboardPage() {
       }, ...prev]);
 
       setPendingDisbursements(prev => prev.filter(p => p.disbursement_txn_id !== txn.disbursement_txn_id));
-      setIsProcessing(null);
+      
+      setActionModal(prev => ({ 
+        ...prev, 
+        status: 'success', 
+        resultMsg: `Disbursement Voucher DV-${txn.disbursement_txn_id.split('-')[2]} generated successfully.` 
+      }));
     }, 1200);
   };
 
@@ -106,32 +117,26 @@ export default function TreasurerDashboardPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#f3f4f6]">
+      
+      <ActionModal 
+        isOpen={actionModal.isOpen}
+        title={actionModal.title}
+        message={actionModal.message}
+        status={actionModal.status}
+        resultMsg={actionModal.resultMsg}
+        onConfirm={executeDisbursement}
+        onClose={() => setActionModal({ ...actionModal, isOpen: false })}
+        confirmText="Authorize & Generate DV"
+      />
+
       <Header />
 
       <div className="p-4 md:p-6 max-w-[1600px] w-full mx-auto space-y-6 animate-fade-in flex-1">
-        
-        {/* HEADER ROW */}
-        <div className="flex justify-between items-start mb-2">
-          <div>
-            <p className="text-sm font-medium text-gray-500 mb-0.5">Good morning, {userRole}</p>
-            {/* UNIFIED SIZING: Page Header */}
-            <h1 className="text-3xl font-black text-[#04152d] tracking-tight">Fund Overview</h1>
-          </div>
-          {currentDate && (
-            <div className="bg-[#04152d] text-white px-5 py-2.5 rounded-full text-sm font-bold shadow-md opacity-90">
-              {currentDate}
-            </div>
-          )}
-        </div>
 
         {/* STATIC TOP FUND CONTAINERS */}
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           {funds.map((fund) => (
-            <div 
-              key={fund.id}
-              // The `isolate` class fixes the Z-Index bleeding issue so cards won't overlap the Header
-              className={`relative isolate overflow-hidden rounded-[20px] p-5 shadow-sm ${fundStyles[fund.id]}`}
-            >
+            <div key={fund.id} className={`relative isolate overflow-hidden rounded-[20px] p-5 shadow-sm ${fundStyles[fund.id]}`}>
               <div className="relative z-10">
                 <h3 className="text-[11px] font-bold uppercase tracking-widest opacity-90 mb-2 truncate">{fund.name}</h3>
                 <p className="text-2xl lg:text-[28px] font-black tracking-tight truncate">
@@ -147,6 +152,68 @@ export default function TreasurerDashboardPage() {
           
           <div className="xl:col-span-2 space-y-6">
             
+            {/* NEW: DUES & LOANS HIGH-LEVEL OVERVIEW */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+              {/* Dues Overview Card */}
+              <div className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-blue-50 p-2.5 rounded-xl text-blue-600">
+                      <WalletCards size={24} strokeWidth={2.5} />
+                    </div>
+                    <h2 className="text-lg font-black text-[#04152d]">Dues Collection</h2>
+                  </div>
+                </div>
+                <div>
+                  <div className="flex justify-between items-end mb-2">
+                    <div>
+                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Collected this month</p>
+                      <p className="text-2xl font-black text-[#04152d]">₱{duesOverview.collectedThisMonth.toLocaleString()}</p>
+                    </div>
+                    <p className="text-sm font-bold text-blue-600">{duesOverview.collectionRate}%</p>
+                  </div>
+                  <div className="w-full bg-gray-100 rounded-full h-1.5 mb-3 overflow-hidden">
+                    <div className="bg-blue-600 h-1.5 rounded-full" style={{ width: `${duesOverview.collectionRate}%` }}></div>
+                  </div>
+                  <div className="flex justify-between items-center text-xs font-medium text-gray-500">
+                    <span>Target: ₱{duesOverview.targetThisMonth.toLocaleString()}</span>
+                    <span className="flex items-center gap-1 text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md"><Activity size={12}/> {duesOverview.unpaidMembers} Pending</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Loans Overview Card */}
+              <div className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-emerald-50 p-2.5 rounded-xl text-emerald-600">
+                      <CircleDollarSign size={24} strokeWidth={2.5} />
+                    </div>
+                    <h2 className="text-lg font-black text-[#04152d]">Loan Ledger</h2>
+                  </div>
+                </div>
+                <div>
+                  <div className="flex justify-between items-end mb-2">
+                    <div>
+                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Total Receivables</p>
+                      <p className="text-2xl font-black text-[#04152d]">₱{loansOverview.totalReceivables.toLocaleString()}</p>
+                    </div>
+                    <p className="text-sm font-bold text-emerald-600">{loansOverview.activeLoans} Active</p>
+                  </div>
+                  <div className="mt-5 flex justify-between items-center text-xs font-medium text-gray-500 border-t border-gray-50 pt-3">
+                    <span>Current Portfolio Status</span>
+                    {loansOverview.pendingApplications > 0 && (
+                      <span className="flex items-center gap-1 text-red-600 bg-red-50 px-2 py-0.5 rounded-md font-bold">
+                        {loansOverview.pendingApplications} Pending Approvals
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
             {/* PENDING LAS DISBURSEMENTS */}
             {pendingDisbursements.length > 0 && (
               <div className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100">
@@ -156,9 +223,7 @@ export default function TreasurerDashboardPage() {
                       <Clock size={24} strokeWidth={2.5} />
                     </div>
                     <div>
-                      {/* UNIFIED SIZING: Section Title */}
                       <h2 className="text-xl font-black text-[#04152d]">Pending LAS Disbursements</h2>
-                      {/* UNIFIED SIZING: Subtitle */}
                       <p className="text-sm text-gray-500 font-medium">Webhook payloads requiring confirmation</p>
                     </div>
                   </div>
@@ -173,7 +238,6 @@ export default function TreasurerDashboardPage() {
                       
                       <div className="flex flex-wrap gap-x-12 gap-y-4 flex-1">
                         <div className="flex flex-col max-w-[120px]">
-                          {/* UNIFIED SIZING: Label Headers */}
                           <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Member</span>
                           <p className="text-sm font-black text-[#04152d] leading-snug">{txn.member_name.replace(', ', ',\n')}</p>
                           <p className="text-[11px] font-bold text-[#3b82f6] mt-1">{txn.loan_ref}</p>
@@ -193,12 +257,11 @@ export default function TreasurerDashboardPage() {
                       </div>
 
                       <button 
-                        onClick={() => handleConfirmDisbursement(txn)}
-                        disabled={!!isProcessing}
-                        className="bg-white border border-gray-200 text-[#04152d] hover:bg-gray-50 rounded-xl px-5 py-3 font-medium text-sm flex items-center gap-2 shadow-sm transition-all"
+                        onClick={() => triggerDisbursementConfirm(txn)}
+                        className="bg-white border border-gray-200 text-[#04152d] hover:bg-gray-50 rounded-xl px-5 py-3 font-bold text-sm flex items-center gap-2 shadow-sm transition-all"
                       >
                         <CheckCircle2 size={18} className="text-[#04152d]" /> 
-                        {isProcessing === txn.disbursement_txn_id ? 'Confirming...' : 'Confirm & Generate DV'}
+                        Generate DV
                       </button>
                       
                     </div>
@@ -212,8 +275,6 @@ export default function TreasurerDashboardPage() {
               <div className="p-6 pb-4 border-b border-gray-50 flex flex-wrap gap-4 justify-between items-center bg-white">
                 <div>
                   <div className="flex items-center gap-3 relative">
-                    
-                    {/* CUSTOM STYLED SELECT DROPDOWN (Matches image_ef0424.png) */}
                     <div className="relative inline-block w-full sm:w-auto">
                       <select
                         value={selectedFund.id}
@@ -221,21 +282,17 @@ export default function TreasurerDashboardPage() {
                           const target = funds.find(f => f.id === e.target.value);
                           if (target) setSelectedFund(target);
                         }}
-                        // UNIFIED SIZING: Section Title applied to the Select box
                         className="appearance-none bg-white border border-gray-200 text-[#04152d] text-xl font-black pl-5 pr-12 py-3 rounded-[14px] focus:ring-2 focus:ring-blue-500/20 outline-none shadow-sm cursor-pointer hover:bg-gray-50 transition-all w-full sm:w-auto"
                       >
                         {funds.map((fund) => (
                           <option key={fund.id} value={fund.id}>{fund.name} Ledger</option>
                         ))}
                       </select>
-                      {/* Custom Chevron Arrow for the Dropdown */}
                       <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#04152d]">
                         <svg className="fill-current h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
                       </div>
                     </div>
-
                   </div>
-                  {/* UNIFIED SIZING: Subtitle */}
                   <p className="text-sm text-gray-500 font-medium mt-3 ml-1">Monthly transaction history</p>
                 </div>
                 
@@ -249,7 +306,6 @@ export default function TreasurerDashboardPage() {
                 <table className="w-full text-left text-sm">
                   <thead>
                     <tr>
-                      {/* UNIFIED SIZING: Label Headers */}
                       <th className="py-3 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50">Date</th>
                       <th className="py-3 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50">Transaction Detail</th>
                       <th className="py-3 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50 text-right">Amount</th>
@@ -259,14 +315,14 @@ export default function TreasurerDashboardPage() {
                   <tbody className="divide-y divide-gray-50">
                     {activeTransactions.length > 0 ? activeTransactions.map((tx) => (
                       <tr key={tx.id} className="hover:bg-gray-50/50 transition-colors">
-                        <td className="py-4 px-6 text-gray-500 font-medium whitespace-nowrap">{tx.date}</td>
-                        <td className="py-4 px-6">
+                        <td className="py-4 px-6 text-gray-500 font-medium text-sm whitespace-nowrap">{tx.date}</td>
+                        <td className="py-4 px-6 text-sm">
                           <div className="flex items-center gap-3">
                             <div className={`w-2 h-2 rounded-full flex-shrink-0 ${tx.type === 'Credit' ? 'bg-[#10b981]' : 'bg-[#ef4444]'}`}></div>
-                            <span className="font-bold text-[#04152d]">{tx.desc}</span>
+                            <span className="font-medium text-[#04152d]">{tx.desc}</span>
                           </div>
                         </td>
-                        <td className="py-4 px-6 text-right font-black text-[#04152d] whitespace-nowrap">
+                        <td className="py-4 px-6 text-right font-semibold text-[#04152d] text-sm whitespace-nowrap">
                           {tx.type === 'Debit' ? '- ' : ''}₱{tx.amount.toLocaleString()}
                         </td>
                         <td className="py-4 px-6 text-right font-mono text-xs text-[#3b82f6] cursor-pointer hover:underline whitespace-nowrap">
@@ -275,7 +331,7 @@ export default function TreasurerDashboardPage() {
                       </tr>
                     )) : (
                       <tr>
-                        <td colSpan={4} className="py-16 text-center text-gray-400 font-medium">
+                        <td colSpan={4} className="py-16 text-center text-gray-400 font-medium text-sm">
                           No transactions recorded for this fund.
                         </td>
                       </tr>
@@ -290,16 +346,12 @@ export default function TreasurerDashboardPage() {
           {/* RIGHT COLUMN: Summaries */}
           <div className="xl:col-span-1 space-y-6">
             
-            {/* POSITION SWAPPED: Liquidity Summary is now on TOP */}
             <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 p-6">
               <div className="flex justify-between items-center mb-5 pb-4">
-                 {/* UNIFIED SIZING: Section Title */}
                  <h2 className="text-xl font-black text-[#04152d]">Liquidity Summary</h2>
-                 <Printer size={16} className="text-gray-400 cursor-pointer hover:text-[#04152d]" />
               </div>
               
               <div className="mb-6">
-                {/* UNIFIED SIZING: Label Headers */}
                 <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total Active Balance</span>
                 <p className="text-4xl font-black text-[#04152d] tracking-tight">₱{totalLiquidity.toLocaleString()}</p>
               </div>
@@ -316,7 +368,7 @@ export default function TreasurerDashboardPage() {
                         <div className="text-[10px] text-gray-500">Status: <span className="text-[#10b981] font-bold">Active</span></div>
                       </div>
                     </div>
-                    <div className="text-sm font-black text-[#04152d]">
+                    <div className="text-sm font-semibold text-[#04152d]">
                       ₱{fund.balance.toLocaleString()}
                     </div>
                   </div>
@@ -324,38 +376,31 @@ export default function TreasurerDashboardPage() {
               </div>
             </div>
 
-            {/* POSITION SWAPPED: Fund Distribution is now on BOTTOM */}
             <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 p-6">
-              {/* UNIFIED SIZING: Section Title */}
               <h2 className="text-xl font-black text-[#04152d] mb-2 pb-4 border-b border-gray-50">Fund Distribution</h2>
               
-              {/* LEGEND SPACING FIXED: Increased container height and adjusted Pie cy position */}
               <div className="h-[300px] w-full mt-4">
-                <ResponsiveContainer width="100%" height="100%">
+                {/* FIXED: Added minWidth={1} and minHeight={1} to prevent Recharts rendering crash */}
+                <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
                   <PieChart>
                     <Pie
-                      data={funds}
+                      data={chartData}
                       dataKey="balance"
                       nameKey="name"
                       cx="50%"
-                      cy="40%" // Pulled the pie up to leave more room for the legend at the bottom
+                      cy="40%"
                       innerRadius={55}
                       outerRadius={80}
                       paddingAngle={3}
-                    >
-                      {funds.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
-                      ))}
-                    </Pie>
+                    />
                     <Tooltip 
-                      /* FIXED TYPESCRIPT ERROR: Used 'any' bypass and safely casted to Number */
                       formatter={(value: any) => `₱${Number(value).toLocaleString()}`}
                       contentStyle={{ borderRadius: '12px', border: '1px solid #f3f4f6', boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}
                     />
                     <Legend 
                       verticalAlign="bottom" 
                       align="center"
-                      height={80} // Increased height to allow grid wrapping
+                      height={80}
                       iconType="circle" 
                       iconSize={12} 
                       wrapperStyle={{ fontSize: '12px', fontWeight: 'bold', color: '#4b5563', paddingTop: '20px' }}

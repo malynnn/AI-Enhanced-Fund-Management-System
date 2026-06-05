@@ -330,9 +330,7 @@ export default function LoansDashboard() {
         confirmText="Confirm Action"
       />
 
-      <div className="print:hidden">
-        <Header />
-      </div>
+      <Header />
 
       <main className="p-4 md:p-8 max-w-[1600px] w-full mx-auto space-y-8 flex-1 print:p-0 print:m-0 print:max-w-none">
         

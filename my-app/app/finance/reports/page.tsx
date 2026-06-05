@@ -80,9 +80,7 @@ export default function FinancialReportsPage() {
         confirmText={modal.actionType === 'download' ? "Generate & Download" : "Generate & View"}
       />
 
-      <div className="print:hidden">
-        <Header />
-      </div>
+      <Header />
 
       <main className="p-4 md:p-8 max-w-[1600px] w-full mx-auto space-y-6 flex-1 animate-fade-in">
         

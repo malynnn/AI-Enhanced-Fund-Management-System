@@ -4,11 +4,12 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  Home, Bell, Calendar, CreditCard, CircleDollarSign, Book, LogOut, ChevronDown,
-  Settings, PanelLeftClose, PanelLeftOpen, LayoutDashboard, WalletCards, Send,
-  Briefcase, ListTree, BarChart3, RefreshCw, ClipboardList, PieChart, FileText, User
+  Home, Calendar, CreditCard, CircleDollarSign, Book, LogOut, ChevronDown,
+  PanelLeftClose, PanelLeftOpen, LayoutDashboard, WalletCards, Send,
+  Briefcase, ListTree, BarChart3, ClipboardList, PieChart, FileText, User, Receipt, Target
 } from 'lucide-react';
 import { signOut, useSession } from "next-auth/react";
+import ActionModal from '@/components/ActionModal';
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -19,20 +20,23 @@ export default function Sidebar() {
   });
 
   const [isCollapsed, setIsCollapsed] = useState(false);
+  
+  // Logout Modal State
+  const [logoutModal, setLogoutModal] = useState<{
+    isOpen: boolean;
+    status: 'idle' | 'loading' | 'success' | 'error';
+  }>({ isOpen: false, status: 'idle' });
 
   if (pathname === '/login') return null;
 
   const currentUserRole = (session?.user as any)?.role || 'User';
-  const sidebarBgColor = "bg-[#021124]"; // Strict BDOEA Navy Blue
+  const sidebarBgColor = "bg-[#021124]";
 
-  // Group 1: General Navigation
   const generalNavItems = [
     { label: 'Dashboard', href: '/dashboard', icon: Home, roles: ['User', 'Officer/Admin', 'Superadmin', 'Treasurer', 'Auditor'] },
-    { label: 'Notification', href: '/notifications', icon: Bell, roles: ['User', 'Officer/Admin', 'Superadmin', 'Treasurer', 'Auditor'] },
     { label: 'Events', href: '/events', icon: Calendar, roles: ['User', 'Officer/Admin', 'Superadmin', 'Treasurer', 'Auditor'] },
   ];
 
-  // Group 2: Systems Navigation (with individual sub-icons)
   const systemNavItems = [
     {
       label: 'My Membership',
@@ -61,15 +65,14 @@ export default function Sidebar() {
         { label: 'Disbursement', href: '/finance/disbursement', icon: Send, roles: ['Superadmin', 'Officer/Admin', 'Treasurer'] },
         { label: 'Loan Ledger', href: '/finance/loans', icon: CircleDollarSign, roles: ['Superadmin', 'Officer/Admin', 'Treasurer', 'Auditor'] },
         { label: 'Fund Management', href: '/finance/funds', icon: Briefcase, roles: ['Superadmin', 'Officer/Admin', 'Treasurer', 'Auditor'] },
+        
+        // REMOVED 'Auditor' from Budget Monitoring
+        { label: 'Budget Monitoring', href: '/finance/budget', icon: Target, roles: ['Superadmin', 'Officer/Admin', 'Treasurer'] },
+        
         { label: 'Chart of Accounts', href: '/finance/config/accounts', icon: ListTree, roles: ['Superadmin', 'Officer/Admin'] },
         { label: 'Reports Center', href: '/finance/reports', icon: BarChart3, roles: ['Superadmin', 'Officer/Admin', 'Treasurer', 'Auditor'] },
-        
-        // FIXED: Removed 'Officer/Admin' from these restricted pages
-        { label: 'Bank Reconciliation', href: '/finance/reconciliation', icon: RefreshCw, roles: ['Superadmin', 'Treasurer'] },
-        { label: 'System Config', href: '/finance/config', icon: Settings, roles: ['Superadmin'] },
-        
         { label: 'Audit Logs', href: '/finance/audit', icon: ClipboardList, roles: ['Superadmin'] },
-        { label: 'Expenses & Petty Cash', href: '/finance/expenses', roles: ['Superadmin', 'Officer/Admin', 'Treasurer', 'Auditor'] },
+        { label: 'Expenses & Petty Cash', href: '/finance/expenses', icon: Receipt, roles: ['Superadmin', 'Officer/Admin', 'Treasurer', 'Auditor'] },
       ]
     },
   ];
@@ -79,6 +82,15 @@ export default function Sidebar() {
 
   const toggleMenu = (label: string) => {
     setOpenMenus(prev => ({ ...prev, [label]: !prev[label] }));
+  };
+
+  const triggerLogout = () => {
+    setLogoutModal({ isOpen: true, status: 'idle' });
+  };
+
+  const executeLogout = async () => {
+    setLogoutModal(prev => ({ ...prev, status: 'loading' }));
+    await signOut({ callbackUrl: '/login' });
   };
 
   const renderNavItems = (items: any[]) => {
@@ -120,7 +132,6 @@ export default function Sidebar() {
 
           {hasSubItems && isOpen && (
             <div className={`flex flex-col relative w-full ${isCollapsed ? 'mt-1 gap-1 items-center' : 'mt-1 mb-2 space-y-0.5'}`}>
-
               {visibleSubItems.map((sub: any) => {
                 const isSubActive = pathname === sub.href;
                 const SubIcon = sub.icon;
@@ -148,90 +159,102 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className={`relative h-full flex-shrink-0 shadow-2xl z-20 flex flex-col transition-all duration-300 ease-in-out print:hidden ${isCollapsed ? 'w-[88px]' : 'w-[280px]'}`}>
+    <>
+      <ActionModal
+        isOpen={logoutModal.isOpen}
+        title="Confirm Sign Out"
+        message="Are you sure you want to securely sign out of your BDOEA account?"
+        status={logoutModal.status}
+        onConfirm={executeLogout}
+        onClose={() => setLogoutModal({ isOpen: false, status: 'idle' })}
+        confirmText="Sign Out"
+      />
 
-      {status === "loading" ? (
-        <div className={`w-full h-full ${sidebarBgColor}`} />
-      ) : (
-        <div className={`flex flex-col h-full overflow-hidden text-white py-6 transition-colors duration-300 ${sidebarBgColor} ${isCollapsed ? 'px-[18px]' : 'px-5'}`}>
+      <aside className={`relative h-full flex-shrink-0 shadow-2xl z-20 flex flex-col transition-all duration-300 ease-in-out print:hidden ${isCollapsed ? 'w-[88px]' : 'w-[280px]'}`}>
+        {status === "loading" ? (
+          <div className={`w-full h-full ${sidebarBgColor}`} />
+        ) : (
+          <div className={`flex flex-col h-full overflow-hidden text-white py-6 transition-colors duration-300 ${sidebarBgColor} ${isCollapsed ? 'px-[18px]' : 'px-5'}`}>
 
-          {/* HEADER: Logo & Native Toggle Button */}
-          <div className={`mb-8 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
-            {!isCollapsed && (
-              <img src="/bdoea-logo.png" alt="BDOEA Logo" className="w-[155px] h-auto object-contain pl-1" />
-            )}
-            <button
-              onClick={() => setIsCollapsed(!isCollapsed)}
-              className={`flex items-center justify-center border border-white/10 text-gray-400 hover:text-white hover:bg-white/5 transition-colors shadow-sm ${isCollapsed ? 'w-full aspect-square rounded-2xl bg-transparent' : 'h-10 w-10 rounded-xl bg-white/5'
-                }`}
-              title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-            >
-              {isCollapsed ? <PanelLeftOpen size={20} /> : <PanelLeftClose size={20} />}
-            </button>
-          </div>
-
-          {/* PROFILE SECTION */}
-          <div className={`border border-white/10 flex items-center mb-8 shadow-sm transition-all ${isCollapsed ? 'p-1.5 rounded-full justify-center w-full aspect-square bg-transparent' : 'p-3 rounded-2xl justify-between bg-white/5'}`}>
-            <div className={`flex items-center gap-3 overflow-hidden ${isCollapsed ? 'justify-center w-full h-full' : ''}`}>
-              <div className={`rounded-full bg-gray-200 border border-white/10 flex-shrink-0 ${isCollapsed ? 'w-full h-full' : 'w-10 h-10'}`} title={session?.user?.email?.split('@')[0] || "VEN"} />
-
+            <div className={`mb-8 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
               {!isCollapsed && (
-                <div className="overflow-hidden">
-                  <p className="text-[9px] tracking-widest uppercase m-0 leading-tight font-black text-bdoea-yellow">
-                    {currentUserRole}
-                  </p>
-                  <p className="text-sm font-bold truncate leading-tight mt-0.5 whitespace-nowrap">{session?.user?.email?.split('@')[0] || "VEN"}</p>
-                </div>
+                <img src="/bdoea-logo.png" alt="BDOEA Logo" className="w-[155px] h-auto object-contain pl-1" />
               )}
-            </div>
-
-            {!isCollapsed && (
-              <button className="p-1.5 hover:bg-white/10 rounded-md transition-colors text-gray-400 hover:text-white flex-shrink-0">
-                <Settings size={16} />
+              <button
+                onClick={() => setIsCollapsed(!isCollapsed)}
+                className={`flex items-center justify-center border border-white/10 text-gray-400 hover:text-white hover:bg-white/5 transition-colors shadow-sm ${isCollapsed ? 'w-full aspect-square rounded-2xl bg-transparent' : 'h-10 w-10 rounded-xl bg-white/5'}`}
+                title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+              >
+                {isCollapsed ? <PanelLeftOpen size={20} /> : <PanelLeftClose size={20} />}
               </button>
-            )}
-          </div>
-
-          {/* SCROLLABLE NAVIGATION AREA */}
-          <nav className="flex-1 overflow-y-auto overflow-x-hidden space-y-6 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-track]:transparent pr-2 -mr-2">
-            
-            <div className="flex flex-col">
-              {!isCollapsed && <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3 px-3 whitespace-nowrap">Main Menu</p>}
-              <div className={`flex flex-col space-y-1 bg-white/[0.02] border border-white/5 rounded-2xl ${isCollapsed ? 'p-1.5' : 'p-2'}`}>
-                {renderNavItems(visibleGeneralItems)}
-              </div>
             </div>
 
-            <div className="flex flex-col space-y-3 mt-2">
-              {!isCollapsed ? (
-                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1 px-3 whitespace-nowrap">BDOEA Systems</p>
-              ) : (
-                <div className="h-px bg-white/10 w-6 mx-auto mt-2 mb-1" />
-              )}
-
-              {visibleSystemItems.map((item, idx) => (
-                <div key={idx} className={`flex flex-col bg-white/[0.02] border border-white/5 rounded-2xl ${isCollapsed ? 'p-1.5' : 'p-2'}`}>
-                  {renderNavItems([item])}
+            <nav className="flex-1 overflow-y-auto overflow-x-hidden space-y-6 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-track]:transparent pr-2 -mr-2">
+              
+              <div className="flex flex-col">
+                {!isCollapsed && <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3 px-3 whitespace-nowrap">Main Menu</p>}
+                <div className={`flex flex-col space-y-1 bg-white/[0.02] border border-white/5 rounded-2xl ${isCollapsed ? 'p-1.5' : 'p-2'}`}>
+                  {renderNavItems(visibleGeneralItems)}
                 </div>
-              ))}
+              </div>
+
+              <div className="flex flex-col space-y-3 mt-2">
+                {!isCollapsed ? (
+                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1 px-3 whitespace-nowrap">BDOEA Systems</p>
+                ) : (
+                  <div className="h-px bg-white/10 w-6 mx-auto mt-2 mb-1" />
+                )}
+
+                {visibleSystemItems.map((item, idx) => (
+                  <div key={idx} className={`flex flex-col bg-white/[0.02] border border-white/5 rounded-2xl ${isCollapsed ? 'p-1.5' : 'p-2'}`}>
+                    {renderNavItems([item])}
+                  </div>
+                ))}
+              </div>
+            </nav>
+
+            <div className="mt-4 pt-4 border-t border-white/10 flex flex-col gap-3">
+              
+              <div className={`border border-white/10 flex items-center shadow-sm transition-all ${isCollapsed ? 'p-1.5 rounded-full justify-center w-full aspect-square bg-transparent' : 'p-3 rounded-2xl justify-between bg-white/5'}`}>
+                <div className={`flex items-center gap-3 overflow-hidden ${isCollapsed ? 'justify-center w-full h-full' : ''}`}>
+                  <div className={`rounded-full bg-gray-200 border border-white/10 flex-shrink-0 ${isCollapsed ? 'w-full h-full' : 'w-10 h-10'}`} title={session?.user?.email?.split('@')[0] || "VEN"} />
+
+                  {!isCollapsed && (
+                    <div className="overflow-hidden">
+                      <p className="text-[9px] tracking-widest uppercase m-0 leading-tight font-black text-bdoea-yellow">
+                        {currentUserRole}
+                      </p>
+                      <p className="text-sm font-bold truncate leading-tight mt-0.5 whitespace-nowrap">{session?.user?.email?.split('@')[0] || "VEN"}</p>
+                    </div>
+                  )}
+                </div>
+
+                {!isCollapsed && (
+                  <button 
+                    onClick={triggerLogout}
+                    className="p-2 hover:bg-red-500/10 rounded-xl transition-colors text-gray-400 hover:text-red-400 flex-shrink-0"
+                    title="Sign Out"
+                  >
+                    <LogOut size={18} strokeWidth={2.5} />
+                  </button>
+                )}
+              </div>
+
+              {isCollapsed && (
+                <div className="flex justify-center">
+                  <button
+                    onClick={triggerLogout}
+                    className="transition-all flex items-center justify-center text-gray-400 hover:text-red-400 hover:bg-red-500/10 w-full aspect-square rounded-2xl"
+                    title="Sign Out"
+                  >
+                    <LogOut size={20} strokeWidth={2} className="flex-shrink-0" />
+                  </button>
+                </div>
+              )}
             </div>
-
-          </nav>
-
-          {/* BOTTOM: Logout Container */}
-          <div className={`mt-4 pt-4 border-t border-white/10 flex ${isCollapsed ? 'justify-center' : 'justify-start'}`}>
-            <button
-              onClick={() => signOut({ callbackUrl: '/login' })}
-              className={`transition-all flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 ${isCollapsed ? 'w-full aspect-square rounded-2xl' : 'h-11 w-11 rounded-xl'
-                }`}
-              title="Log out"
-            >
-              <LogOut size={20} strokeWidth={2} className="flex-shrink-0" />
-            </button>
           </div>
-
-        </div>
-      )}
-    </aside>
+        )}
+      </aside>
+    </>
   );
 }

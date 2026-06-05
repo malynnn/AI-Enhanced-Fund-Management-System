@@ -1,14 +1,23 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import { Plus, Edit2, Power, Save, X, Hash, ShieldAlert, Search, Filter, Layers, CreditCard } from 'lucide-react';
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, Tooltip, ResponsiveContainer } from 'recharts';
 import Header from '@/components/Header';
 import ActionModal from '@/components/ActionModal';
 
-// --- MOCK DATABASE ---
-const initialAccounts = [
+interface Account {
+  id: number;
+  code: string;
+  name: string;
+  type: string;
+  fund: string;
+  status: string;
+}
+
+// --- MOCK DATABASE (Fallback if API fails) ---
+const initialAccounts: Account[] = [
   { id: 1, code: '1010', name: 'General Cash Fund', type: 'Asset', fund: 'General Fund', status: 'Active' },
   { id: 2, code: '1100', name: 'Loan Receivables', type: 'Asset', fund: 'Loans', status: 'Active' },
   { id: 3, code: '2010', name: 'Union Accounts Payable', type: 'Liability', fund: 'Union Fund', status: 'Active' },
@@ -18,14 +27,17 @@ const initialAccounts = [
   { id: 7, code: '4010', name: 'Membership Dues Revenue', type: 'Income', fund: 'General Fund', status: 'Active' },
 ];
 
+const CHART_COLORS = ['#04152d', '#10b981', '#facc15', '#8b5cf6', '#ef4444'];
+
 export default function AdminChartOfAccountsPage() {
   const { data: session } = useSession();
   const role = (session?.user as any)?.role || 'Superadmin';
 
-  const [accounts, setAccounts] = useState(initialAccounts);
+  const [accounts, setAccounts] = useState<Account[]>(initialAccounts);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState({ code: '', name: '', type: 'Asset', fund: 'General Fund', status: 'Active' });
+  const [isLoading, setIsLoading] = useState(true);
 
   // Filters
   const [searchTerm, setSearchTerm] = useState('');
@@ -43,9 +55,7 @@ export default function AdminChartOfAccountsPage() {
     resultMsg?: string;
   }>({ isOpen: false, title: '', message: '', status: 'idle' });
 
-  // ==========================================
-  // 1. STRICT ROLE GATEKEEPER
-  // ==========================================
+  // STRICT ROLE GATEKEEPER
   const isAdmin = role === 'Superadmin' || role === 'Officer/Admin';
 
   const fetchAccounts = async () => {
@@ -110,10 +120,13 @@ export default function AdminChartOfAccountsPage() {
         typeMap[a.type] = (typeMap[a.type] || 0) + 1;
       }
     });
-    return Object.keys(typeMap).map(key => ({ name: key, value: typeMap[key] }));
+    let colorIndex = 0;
+    return Object.keys(typeMap).map(key => ({ 
+      name: key, 
+      value: typeMap[key],
+      fill: CHART_COLORS[colorIndex++ % CHART_COLORS.length]
+    }));
   }, [accounts]);
-
-  const CHART_COLORS = ['#04152d', '#10b981', '#facc15', '#8b5cf6', '#ef4444'];
 
   // ==========================================
   // 3. HANDLERS (CRUD & MODALS)
@@ -128,27 +141,54 @@ export default function AdminChartOfAccountsPage() {
     });
   };
 
-  const executeModalAction = () => {
+  const executeModalAction = async () => {
     setModal(prev => ({ ...prev, status: 'loading' }));
+    const { id, currentStatus } = modal.payload;
     
-    // Simulate API call
-    setTimeout(() => {
-      const { id, currentStatus } = modal.payload;
-      setAccounts(accounts.map(acc => 
-        acc.id === id ? { ...acc, status: currentStatus === 'Active' ? 'Inactive' : 'Active' } : acc
-      ));
-      setModal(prev => ({ ...prev, status: 'success', resultMsg: `Account successfully ${currentStatus === 'Active' ? 'deactivated' : 'activated'}.` }));
-    }, 800);
+    try {
+      const res = await fetch(`/api/finance/accounts/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: currentStatus === 'Active' ? 'Inactive' : 'Active' })
+      });
+
+      if (res.ok) {
+        setAccounts(accounts.map(a => a.id === id ? { ...a, status: currentStatus === 'Active' ? 'Inactive' : 'Active' } : a));
+        setModal(prev => ({ ...prev, status: 'success', resultMsg: `Account successfully ${currentStatus === 'Active' ? 'deactivated' : 'activated'}.` }));
+      } else {
+        setModal(prev => ({ ...prev, status: 'error', resultMsg: 'Failed to update account status.' }));
+      }
+    } catch (error) {
+      setModal(prev => ({ ...prev, status: 'error', resultMsg: 'Network error occurred.' }));
+    }
   };
 
-  const handleSaveForm = (e: React.FormEvent) => {
+  const handleSaveForm = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (editingId) {
-      setAccounts(accounts.map(acc => acc.id === editingId ? { ...acc, ...formData } : acc));
-    } else {
-      setAccounts([...accounts, { id: Date.now(), ...formData }]);
+    try {
+      const url = editingId ? `/api/finance/accounts/${editingId}` : '/api/finance/accounts';
+      const method = editingId ? 'PUT' : 'POST';
+      
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      
+      if (res.ok) {
+        const saved = await res.json();
+        if (editingId) {
+          setAccounts(accounts.map(a => a.id === editingId ? saved : a));
+        } else {
+          setAccounts([...accounts, saved]);
+        }
+        setIsFormOpen(false);
+      } else {
+        alert('Failed to save account');
+      }
+    } catch (err) {
+      alert('Network error');
     }
-    setIsFormOpen(false);
   };
 
   const openForm = (acc?: Account) => {
@@ -192,7 +232,9 @@ export default function AdminChartOfAccountsPage() {
               </div>
               <div>
                 <p className="block text-xs font-black text-gray-500 uppercase tracking-[0.12em] mb-0.5">Total Accounts</p>
-                <p className="text-3xl font-black text-[#04152d]">{accounts.length}</p>
+                <p className="text-3xl font-black text-[#04152d]">
+                  {isLoading ? '...' : accounts.length}
+                </p>
               </div>
             </div>
           </div>
@@ -204,23 +246,22 @@ export default function AdminChartOfAccountsPage() {
               </div>
               <div>
                 <p className="block text-xs font-black text-emerald-600 uppercase tracking-[0.12em] mb-0.5">Active Accounts</p>
-                <p className="text-3xl font-black text-[#04152d]">{activeCount}</p>
+                <p className="text-3xl font-black text-[#04152d]">
+                  {isLoading ? '...' : activeCount}
+                </p>
               </div>
             </div>
           </div>
 
           {/* Distribution Chart */}
           <div className="bg-white rounded-2xl p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 flex items-center justify-center animate-slide-up" style={{ animationDelay: '0.15s' }}>
-            {chartData.length > 0 ? (
+            {chartData.length > 0 && !isLoading ? (
               <div className="w-full h-[80px] flex items-center justify-between">
                 <div className="h-[80px] w-[80px]">
-                  <ResponsiveContainer width="100%" height="100%">
+                  {/* FIXED: minWidth and minHeight added to prevent Recharts warning */}
+                  <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
                     <PieChart>
-                      <Pie data={chartData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={25} outerRadius={38} paddingAngle={3}>
-                        {chartData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
-                        ))}
-                      </Pie>
+                      <Pie data={chartData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={25} outerRadius={38} paddingAngle={3} />
                       <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', fontSize: '12px', fontWeight: 'bold' }} itemStyle={{ color: '#04152d' }} />
                     </PieChart>
                   </ResponsiveContainer>
@@ -238,7 +279,7 @@ export default function AdminChartOfAccountsPage() {
                 </div>
               </div>
             ) : (
-              <p className="text-xs font-bold text-gray-400">No Data</p>
+              <p className="text-xs font-bold text-gray-400">{isLoading ? 'Loading...' : 'No Data'}</p>
             )}
           </div>
         </div>
@@ -300,7 +341,9 @@ export default function AdminChartOfAccountsPage() {
           <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-white/50">
             <div className="flex items-center gap-3">
               <h2 className="text-xl font-black text-[#04152d]">Ledger Accounts</h2>
-              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600 shadow-[inset_0_0_0_1.5px_rgba(107,114,128,0.2)] font-mono">{filteredAccounts.length} Records</span>
+              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600 shadow-[inset_0_0_0_1.5px_rgba(107,114,128,0.2)] font-mono">
+                {isLoading ? '...' : filteredAccounts.length} Records
+              </span>
             </div>
             <button 
               onClick={() => openForm()}
@@ -323,7 +366,9 @@ export default function AdminChartOfAccountsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {filteredAccounts.map((acc) => (
+                {isLoading ? (
+                  <tr><td colSpan={6} className="px-6 py-16 text-center text-gray-400 font-medium">Loading ledger accounts...</td></tr>
+                ) : filteredAccounts.map((acc) => (
                   <tr 
                     key={acc.id} 
                     className={`transition-colors duration-100 ${acc.status === 'Inactive' ? 'bg-gray-50/70 opacity-60 grayscale hover:bg-gray-100/70' : 'hover:bg-[#e8edf8]/60'}`}
@@ -363,7 +408,7 @@ export default function AdminChartOfAccountsPage() {
                     </td>
                   </tr>
                 ))}
-                {filteredAccounts.length === 0 && (
+                {!isLoading && filteredAccounts.length === 0 && (
                   <tr><td colSpan={6} className="px-6 py-16 text-center text-gray-400 font-medium">No accounts found matching your filters.</td></tr>
                 )}
               </tbody>

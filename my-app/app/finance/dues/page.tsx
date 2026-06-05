@@ -1,14 +1,21 @@
 "use client";
 
-import { useState, useMemo } from 'react';
-import { Search, AlertTriangle, CheckCircle2, Send, Filter, UploadCloud, Terminal, RefreshCw, Calendar, CreditCard, FileText, BarChart3, Printer } from 'lucide-react';
+// --- REPLACE YOUR CURRENT IMPORTS WITH THIS EXACT BLOCK ---
+import { useState, useEffect, useMemo } from 'react';
+import { 
+  Search, AlertTriangle, CheckCircle2, Send, Filter, UploadCloud, 
+  Terminal, RefreshCw, Calendar, CreditCard, FileText, BarChart3, Printer 
+} from 'lucide-react';
 import Header from '@/components/Header'; 
-import ActionModal from '@/components/ActionModal'; // Imported our new modal component
+import ActionModal from '@/components/ActionModal';
+// -----------------------------------------------------------
 
+// ... rest of your code remains exactly the same
 // --- INITIAL DATA (UNTOUCHED) ---
 const standardDuesAmount = 500.00;
 
 export default function DuesCollectionPage() {
+  const [isPosting, setIsPosting] = useState<string | null>(null);
   const [duesRecords, setDuesRecords] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -257,9 +264,8 @@ export default function DuesCollectionPage() {
         confirmText="Confirm & Post"
       />
 
-      <div className="print:hidden">
-        <Header />
-      </div>
+      <Header />
+
 
       <main className="p-4 md:p-8 max-w-[1600px] w-full mx-auto space-y-8 flex-1 print:p-0 print:m-0 print:max-w-none">
         
@@ -468,9 +474,13 @@ export default function DuesCollectionPage() {
                   </span>
                 </div>
                 <div className="flex-1 overflow-y-auto space-y-3 pr-2 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full">
+                  {/* Replace your current webhookLogs.map with this: */}
                   {webhookLogs.map((log, index) => (
                     <div key={index} className="text-xs text-gray-300 font-mono whitespace-pre-wrap leading-relaxed">
-                      <span className="text-blue-400">[{log.timestamp}]</span> <span className="text-[#facc15]">{log.type}</span>
+                      <span className="text-blue-400">
+                        [{typeof window === 'undefined' ? '...' : log.timestamp}]
+                      </span> 
+                      <span className="text-[#facc15]">{log.type}</span>
                     </div>
                   ))}
                 </div>

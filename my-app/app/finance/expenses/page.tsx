@@ -1,16 +1,11 @@
 "use client";
 
-import { useState } from 'react';
-import { 
-  Receipt, 
-  Wallet, 
-  AlertTriangle, 
-  Upload, 
-  CheckCircle2, 
-  ArrowUpRight, 
-  ArrowDownRight,
-  Calculator
-} from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Wallet, Search, Filter, Layers, ArrowUpRight, ArrowDownRight, Plus, Receipt } from 'lucide-react';
+import { PieChart, Pie, Tooltip, ResponsiveContainer } from 'recharts';
+import Header from '@/components/Header'; 
+import ActionModal from '@/components/ActionModal';
+import ExpenseVoucherModal from '@/components/ExpenseVoucherModal';
 
 // --- MOCK DATA ---
 const initialBudgetCategories = [
@@ -20,9 +15,9 @@ const initialBudgetCategories = [
 ];
 
 const initialPettyCashLedger = [
-  { id: 1, date: '2026-06-01', desc: 'Replenishment from Gen Fund', type: 'REPLENISHMENT', amount: 5000, balanceAfter: 5000 },
-  { id: 2, date: '2026-06-02', desc: 'Disbursement: Bond paper', type: 'DISBURSEMENT', amount: 150, balanceAfter: 4850 },
-  { id: 3, date: '2026-06-03', desc: 'Disbursement: Taxi fare', type: 'DISBURSEMENT', amount: 350, balanceAfter: 4500 },
+  { id: 1, date: '2026-06-01', desc: 'Replenishment from Gen Fund', type: 'REPLENISHMENT', amount: 5000, balanceAfter: 5000, categoryId: null },
+  { id: 2, date: '2026-06-02', desc: 'Disbursement: Bond paper', type: 'DISBURSEMENT', amount: 150, balanceAfter: 4850, categoryId: 'BC-001' },
+  { id: 3, date: '2026-06-03', desc: 'Disbursement: Taxi fare', type: 'DISBURSEMENT', amount: 350, balanceAfter: 4500, categoryId: 'BC-002' },
 ];
 
 export default function ExpensesAndPettyCashPage() {
@@ -30,307 +25,269 @@ export default function ExpensesAndPettyCashPage() {
   const [pettyCashLedger, setPettyCashLedger] = useState(initialPettyCashLedger);
   const [pettyCashBalance, setPettyCashBalance] = useState(4500);
 
-  // Form State
-  const [voucherNo, setVoucherNo] = useState(`EV-${Date.now().toString().slice(-6)}`);
-  const [payee, setPayee] = useState('');
-  const [purpose, setPurpose] = useState('');
-  const [amount, setAmount] = useState<number | ''>('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [fileName, setFileName] = useState<string | null>(null);
+  // Modal States
+  const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
+  const [actionModal, setActionModal] = useState<{
+    isOpen: boolean; title: string; message: string; status: 'idle' | 'loading' | 'success' | 'error'; resultMsg?: string;
+  }>({ isOpen: false, title: '', message: '', status: 'idle' });
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  // Filters
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterType, setFilterType] = useState('ALL');
+  const [filterCategory, setFilterCategory] = useState('ALL');
 
-  // Derived state for budget warning
-  const activeCategory = budgetCategories.find(c => c.id === selectedCategory);
-  const projectedSpent = activeCategory ? activeCategory.spent + (Number(amount) || 0) : 0;
-  const utilizationPercent = activeCategory ? (projectedSpent / activeCategory.budget) * 100 : 0;
-  const isApproachingBudget = utilizationPercent >= 80 && utilizationPercent <= 100;
-  const isExceedingBudget = utilizationPercent > 100;
+  // --- DERIVED DATA & FILTERS ---
+  const filteredLedger = useMemo(() => {
+    return pettyCashLedger.filter(tx => {
+      const matchSearch = tx.desc.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchType = filterType === 'ALL' || tx.type === filterType;
+      const matchCategory = filterCategory === 'ALL' || tx.categoryId === filterCategory;
+      return matchSearch && matchType && matchCategory;
+    });
+  }, [pettyCashLedger, searchTerm, filterType, filterCategory]);
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFileName(e.target.files[0].name);
-    }
+  const CHART_COLORS = ['#04152d', '#3b82f6', '#facc15', '#10b981', '#ef4444'];
+
+  const chartData = useMemo(() => {
+    let colorIndex = 0;
+    return budgetCategories
+      .filter(cat => cat.spent > 0)
+      .map(cat => ({ 
+        name: cat.name, 
+        value: cat.spent,
+        fill: CHART_COLORS[colorIndex++ % CHART_COLORS.length]
+      }));
+  }, [budgetCategories]);
+
+  const totalDisbursed = pettyCashLedger.filter(t => t.type === 'DISBURSEMENT').reduce((sum, t) => sum + t.amount, 0);
+
+  // --- HANDLERS ---
+  const triggerReplenish = () => {
+    setActionModal({
+      isOpen: true,
+      title: 'Replenish Petty Cash',
+      message: `You are about to request a standard ₱5,000.00 replenishment from the General Fund to the Petty Cash Ledger. Proceed?`,
+      status: 'idle'
+    });
   };
 
-  const handleSubmitVoucher = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!amount || !selectedCategory) return;
-
-    setIsSubmitting(true);
-
+  const handleExecuteReplenish = () => {
+    setActionModal(prev => ({ ...prev, status: 'loading' }));
     setTimeout(() => {
-      // 1. Update budget spent amount
-      setBudgetCategories(prev => prev.map(cat => 
-        cat.id === selectedCategory 
-          ? { ...cat, spent: cat.spent + Number(amount) } 
-          : cat
-      ));
-
-      // 2. Add to Petty Cash Ledger if it's a small amount (e.g., < 1000)
-      // Usually, expenses can be from bank or petty cash. For this user story, 
-      // let's assume all recorded expenses here draw from petty cash to demonstrate the sub-ledger update.
-      const newBalance = pettyCashBalance - Number(amount);
+      const addAmount = 5000;
+      const newBalance = pettyCashBalance + addAmount;
       setPettyCashBalance(newBalance);
-      
       setPettyCashLedger(prev => [{
         id: Date.now(),
         date: new Date().toISOString().split('T')[0],
-        desc: `Expense: ${purpose} (EV: ${voucherNo})`,
-        type: 'DISBURSEMENT',
-        amount: Number(amount),
-        balanceAfter: newBalance
+        desc: `Replenishment from Gen Fund`,
+        type: 'REPLENISHMENT',
+        amount: addAmount,
+        balanceAfter: newBalance,
+        categoryId: null
       }, ...prev]);
-
-      alert(`✅ Success: Expense Voucher ${voucherNo} posted successfully!`);
-      
-      // Reset form
-      setVoucherNo(`EV-${Date.now().toString().slice(-6)}`);
-      setPayee('');
-      setPurpose('');
-      setAmount('');
-      setSelectedCategory('');
-      setFileName(null);
-      setIsSubmitting(false);
+      setActionModal(prev => ({ ...prev, status: 'success', resultMsg: 'Petty Cash successfully replenished.' }));
     }, 800);
   };
 
+  const handlePostExpense = (data: { voucherNo: string; payee: string; purpose: string; amount: number; categoryId: string }) => {
+    const newBalance = pettyCashBalance - data.amount;
+    setPettyCashBalance(newBalance);
+    setBudgetCategories(prev => prev.map(cat => cat.id === data.categoryId ? { ...cat, spent: cat.spent + data.amount } : cat));
+    
+    setPettyCashLedger(prev => [{
+      id: Date.now(),
+      date: new Date().toISOString().split('T')[0],
+      desc: `Expense: ${data.purpose} (EV: ${data.voucherNo})`,
+      type: 'DISBURSEMENT',
+      amount: data.amount,
+      balanceAfter: newBalance,
+      categoryId: data.categoryId
+    }, ...prev]);
+
+    setIsExpenseModalOpen(false);
+  };
+
   return (
-    <div className="p-8 min-h-screen pb-12 flex flex-col gap-6 bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-transparent relative">
       
-      {/* Header */}
-      <div className="flex justify-between items-end flex-shrink-0">
-        <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Expenses & Petty Cash</h1>
-          <p className="text-sm text-gray-500 mt-1 font-medium">Record pre-approved expenses and manage the petty cash sub-ledger.</p>
-        </div>
-      </div>
+      <ActionModal 
+        isOpen={actionModal.isOpen}
+        title={actionModal.title}
+        message={actionModal.message}
+        status={actionModal.status}
+        resultMsg={actionModal.resultMsg}
+        onConfirm={handleExecuteReplenish}
+        onClose={() => setActionModal({ ...actionModal, isOpen: false })}
+        confirmText="Confirm Action"
+      />
 
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-        
-        {/* LEFT COLUMN: EXPENSE VOUCHER FORM */}
-        <div className="xl:col-span-5 flex flex-col gap-6">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="bg-gray-900 p-5 text-white flex items-center gap-3">
-              <Receipt size={20} className="text-gray-300" />
-              <h2 className="text-lg font-bold">Expense Voucher Form</h2>
+      <ExpenseVoucherModal 
+        isOpen={isExpenseModalOpen}
+        onClose={() => setIsExpenseModalOpen(false)}
+        budgetCategories={budgetCategories}
+        onSubmit={handlePostExpense}
+      />
+
+      <Header />
+
+      <main className="p-4 md:p-8 max-w-[1600px] w-full mx-auto space-y-6 flex-1 animate-fade-in">
+
+        {/* Analytics Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="bg-[#f8faff] rounded-2xl p-6 shadow-[inset_0_0_0_1.5px_rgba(219,234,254,0.5),0_4px_12px_rgba(0,0,0,0.03)] border border-blue-50 flex flex-col justify-center relative overflow-hidden animate-slide-up" style={{ animationDelay: '0.05s' }}>
+            <Wallet size={120} strokeWidth={1} className="absolute -right-6 -bottom-6 text-blue-100 opacity-50" />
+            <div className="relative z-10">
+              <p className="block text-[10px] font-black text-blue-500 uppercase tracking-[0.12em] mb-1">Active Petty Cash</p>
+              <p className="text-4xl font-black text-[#04152d] tracking-tight">₱{pettyCashBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
             </div>
-            
-            <form onSubmit={handleSubmitVoucher} className="p-6 space-y-5">
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Voucher Number</label>
-                  <input 
-                    type="text" 
-                    value={voucherNo}
-                    disabled
-                    className="w-full bg-gray-100 border-none rounded-lg text-sm font-mono text-gray-600 px-4 py-2.5"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Payee</label>
-                  <input 
-                    type="text" 
-                    value={payee}
-                    onChange={(e) => setPayee(e.target.value)}
-                    required
-                    placeholder="E.g., Juan Dela Cruz"
-                    className="w-full bg-white border border-gray-300 rounded-lg text-sm px-4 py-2.5 focus:ring-2 focus:ring-black focus:border-black outline-none transition-all"
-                  />
-                </div>
-              </div>
+          </div>
 
-              <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Purpose of Expense</label>
-                <input 
-                  type="text" 
-                  value={purpose}
-                  onChange={(e) => setPurpose(e.target.value)}
-                  required
-                  placeholder="E.g., Monthly Office Supplies"
-                  className="w-full bg-white border border-gray-300 rounded-lg text-sm px-4 py-2.5 focus:ring-2 focus:ring-black focus:border-black outline-none transition-all"
-                />
-              </div>
+          <div className="bg-white rounded-2xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 flex flex-col justify-center animate-slide-up" style={{ animationDelay: '0.1s' }}>
+            <p className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.12em] mb-1">Total Disbursed</p>
+            <p className="text-3xl font-black text-[#04152d]">₱{totalDisbursed.toLocaleString()}</p>
+            <p className="text-xs font-bold text-gray-400 mt-2">Current active ledger scope</p>
+          </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Amount (₱)</label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-2.5 text-gray-500 font-bold">₱</span>
-                    <input 
-                      type="number" 
-                      value={amount}
-                      onChange={(e) => setAmount(Number(e.target.value))}
-                      required
-                      min="1"
-                      className="w-full bg-white border border-gray-300 rounded-lg text-sm pl-8 pr-4 py-2.5 focus:ring-2 focus:ring-black focus:border-black outline-none transition-all"
-                    />
-                  </div>
+          {/* Recharts Analytics */}
+          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 flex items-center justify-center animate-slide-up" style={{ animationDelay: '0.15s' }}>
+            {chartData.length > 0 ? (
+              <div className="w-full h-[80px] flex items-center justify-between">
+                <div className="h-[80px] w-[80px]">
+                  {/* FIXED: minWidth and minHeight added here */}
+                  <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
+                    <PieChart>
+                      <Pie data={chartData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={25} outerRadius={38} paddingAngle={3} />
+                      <Tooltip 
+                        contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', fontSize: '12px', fontWeight: 'bold' }} 
+                        itemStyle={{ color: '#04152d' }} 
+                        formatter={(value: any) => `₱${Number(value).toLocaleString()}`}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
                 </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Account Code</label>
-                  <select 
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    required
-                    className="w-full bg-white border border-gray-300 rounded-lg text-sm px-4 py-2.5 focus:ring-2 focus:ring-black focus:border-black outline-none transition-all"
-                  >
-                    <option value="" disabled>Select Category...</option>
-                    {budgetCategories.map(cat => (
-                      <option key={cat.id} value={cat.id}>{cat.code} - {cat.name}</option>
+                <div className="flex flex-col gap-1.5 w-1/2">
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Spend by Category</p>
+                  <div className="grid grid-cols-1 gap-y-1">
+                    {chartData.slice(0, 3).map((d, idx) => (
+                      <div key={d.name} className="flex items-center gap-1.5 text-[10px] font-bold text-gray-600 truncate">
+                        <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: CHART_COLORS[idx % CHART_COLORS.length] }}></div>
+                        {d.name}
+                      </div>
                     ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* BUDGET UTILIZATION WARNING BANNER */}
-              {activeCategory && amount !== '' && (
-                <div className={`rounded-xl p-4 border flex items-start gap-3 transition-all ${
-                  isExceedingBudget 
-                    ? 'bg-red-50 border-red-200 text-red-800' 
-                    : isApproachingBudget 
-                      ? 'bg-yellow-50 border-yellow-200 text-yellow-800'
-                      : 'bg-green-50 border-green-200 text-green-800'
-                }`}>
-                  <Calculator size={20} className="mt-0.5 flex-shrink-0" />
-                  <div className="flex-1">
-                    <h4 className="text-sm font-bold flex justify-between items-center">
-                      Budget Utilization
-                      <span className="text-xs font-black">{utilizationPercent.toFixed(1)}%</span>
-                    </h4>
-                    <div className="w-full bg-white/50 rounded-full h-1.5 mt-2 mb-2 overflow-hidden">
-                      <div 
-                        className={`h-1.5 rounded-full ${isExceedingBudget ? 'bg-red-500' : isApproachingBudget ? 'bg-yellow-500' : 'bg-green-500'}`}
-                        style={{ width: `${Math.min(utilizationPercent, 100)}%` }}
-                      ></div>
-                    </div>
-                    <p className="text-xs font-medium">
-                      Projected Spent: ₱{projectedSpent.toLocaleString()} / ₱{activeCategory.budget.toLocaleString()}
-                    </p>
-                    {isExceedingBudget && (
-                      <p className="text-[10px] uppercase font-bold mt-2 flex items-center gap-1 text-red-600 bg-red-100 w-fit px-2 py-0.5 rounded">
-                        <AlertTriangle size={10} /> Budget Exceeded
-                      </p>
-                    )}
-                    {isApproachingBudget && (
-                      <p className="text-[10px] uppercase font-bold mt-2 flex items-center gap-1 text-yellow-700 bg-yellow-100 w-fit px-2 py-0.5 rounded">
-                        <AlertTriangle size={10} /> Approaching Limit
-                      </p>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Supporting Document</label>
-                <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:bg-gray-50 transition-colors cursor-pointer relative">
-                  <input 
-                    type="file" 
-                    onChange={handleFileUpload}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                    accept=".pdf,.jpg,.jpeg,.png"
-                  />
-                  <div className="flex flex-col items-center justify-center pointer-events-none">
-                    <Upload size={24} className="text-gray-400 mb-2" />
-                    {fileName ? (
-                      <p className="text-sm font-bold text-gray-900">{fileName}</p>
-                    ) : (
-                      <>
-                        <p className="text-sm font-bold text-gray-900">Click to upload or drag and drop</p>
-                        <p className="text-xs text-gray-500 mt-1">PDF, JPG, or PNG (Max 5MB)</p>
-                      </>
-                    )}
                   </div>
                 </div>
               </div>
-
-              <button 
-                type="submit"
-                disabled={isSubmitting || isExceedingBudget}
-                className="w-full bg-black text-white rounded-xl py-3.5 font-bold text-sm flex items-center justify-center gap-2 hover:bg-gray-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? 'Posting...' : <><CheckCircle2 size={18} /> Post Expense Voucher</>}
-              </button>
-
-            </form>
+            ) : (
+              <p className="text-xs font-bold text-gray-400">No Expense Data</p>
+            )}
           </div>
         </div>
 
-        {/* RIGHT COLUMN: PETTY CASH SUB-LEDGER */}
-        <div className="xl:col-span-7 flex flex-col gap-6">
+        {/* Filters Row */}
+        <div className="bg-white rounded-2xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 flex flex-wrap gap-4 items-center animate-slide-up" style={{ animationDelay: '0.2s' }}>
+          <div className="flex-1 min-w-[250px] relative">
+            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input 
+              type="text" placeholder="Search description..." 
+              value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full rounded-xl pl-11 pr-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#04152d] focus:ring-[3px] focus:ring-[#04152d]/10 outline-none transition-colors font-bold text-[#04152d]"
+            />
+          </div>
           
-          {/* Petty Cash Summary Card */}
-          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="bg-blue-100 p-3 rounded-xl text-blue-600">
-                <Wallet size={24} strokeWidth={2.5} />
-              </div>
-              <div>
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Petty Cash Balance</p>
-                <h3 className="text-3xl font-black text-gray-900 tracking-tight">₱{pettyCashBalance.toLocaleString()}</h3>
-              </div>
-            </div>
-            <button className="bg-gray-100 text-gray-900 px-4 py-2 rounded-lg text-xs font-bold hover:bg-gray-200 transition-colors">
-              + Replenish Fund
-            </button>
+          <div className="relative inline-block w-full sm:w-auto min-w-[160px]">
+            <Filter size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+            <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="w-full rounded-xl pl-11 pr-10 py-3 text-sm bg-white border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#04152d] outline-none font-bold text-[#04152d] appearance-none cursor-pointer">
+              <option value="ALL">All Types</option>
+              <option value="REPLENISHMENT">Replenishments</option>
+              <option value="DISBURSEMENT">Disbursements</option>
+            </select>
           </div>
 
-          {/* Ledger Table */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 flex-1 flex flex-col overflow-hidden">
-            <div className="p-5 border-b border-gray-100 flex justify-between items-center">
-              <h2 className="text-lg font-bold text-gray-900">Petty Cash Sub-Ledger</h2>
+          <div className="relative inline-block w-full sm:w-auto min-w-[200px]">
+            <Layers size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+            <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)} className="w-full rounded-xl pl-11 pr-10 py-3 text-sm bg-white border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#04152d] outline-none font-bold text-[#04152d] appearance-none cursor-pointer">
+              <option value="ALL">All Categories</option>
+              {budgetCategories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+          </div>
+        </div>
+
+        {/* Ledger Table Section */}
+        <div className="bg-white rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 flex-1 flex flex-col overflow-hidden animate-slide-up" style={{ animationDelay: '0.25s' }}>
+          
+          <div className="p-6 border-b border-gray-100 flex flex-wrap items-center justify-between gap-4 bg-white/50">
+            <div className="flex items-center gap-3">
+              <h2 className="text-xl font-black text-[#04152d]">Petty Cash Sub-Ledger</h2>
+              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600 shadow-[inset_0_0_0_1.5px_rgba(107,114,128,0.2)] font-mono">{filteredLedger.length} Records</span>
             </div>
             
-            <div className="overflow-x-auto flex-1">
-              <table className="w-full text-left text-sm">
-                <thead className="bg-gray-50 text-gray-500 font-bold uppercase text-[10px] tracking-widest border-b border-gray-100">
-                  <tr>
-                    <th className="px-5 py-3 whitespace-nowrap">Date</th>
-                    <th className="px-5 py-3 whitespace-nowrap">Description</th>
-                    <th className="px-5 py-3 whitespace-nowrap">Type</th>
-                    <th className="px-5 py-3 text-right whitespace-nowrap">Amount</th>
-                    <th className="px-5 py-3 text-right whitespace-nowrap">Running Bal.</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-50">
-                  {pettyCashLedger.map((tx) => (
-                    <tr key={tx.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-5 py-4 text-gray-500 font-medium whitespace-nowrap">{tx.date}</td>
-                      <td className="px-5 py-4 font-bold text-gray-900">{tx.desc}</td>
-                      <td className="px-5 py-4 whitespace-nowrap">
-                        {tx.type === 'REPLENISHMENT' ? (
-                          <span className="inline-flex items-center gap-1 text-green-700 font-bold text-[10px] uppercase bg-green-50 px-2.5 py-1 rounded-md border border-green-100">
-                            <ArrowUpRight size={12}/> In
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 text-red-700 font-bold text-[10px] uppercase bg-red-50 px-2.5 py-1 rounded-md border border-red-100">
-                            <ArrowDownRight size={12}/> Out
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-5 py-4 text-right font-black text-gray-900 whitespace-nowrap">
-                        {tx.type === 'DISBURSEMENT' ? '-' : ''} ₱{tx.amount.toLocaleString()}
-                      </td>
-                      <td className="px-5 py-4 text-right font-bold text-blue-600 whitespace-nowrap">
-                        ₱{tx.balanceAfter.toLocaleString()}
-                      </td>
-                    </tr>
-                  ))}
-                  {pettyCashLedger.length === 0 && (
-                    <tr>
-                      <td colSpan={5} className="px-5 py-12 text-center text-gray-400 font-medium">
-                        No transactions recorded.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+            <div className="flex items-center gap-3">
+              <button 
+                onClick={() => setIsExpenseModalOpen(true)}
+                className="inline-flex items-center justify-center gap-2 bg-[#04152d] text-white font-bold py-2.5 px-5 rounded-xl text-sm shadow-[0_6px_0_rgba(2,6,15,0.55),0_4px_18px_rgba(4,21,45,0.35)] hover:-translate-y-[1px] active:translate-y-[4px] active:shadow-[0_2px_0_rgba(2,6,15,0.55),0_2px_8px_rgba(4,21,45,0.25)] transition-all"
+              >
+                <Receipt size={16} /> Record Expense
+              </button>
+              <button 
+                onClick={triggerReplenish}
+                className="inline-flex items-center justify-center gap-2 bg-white text-[#04152d] border-[1.5px] border-[#dde3ee] font-bold py-2.5 px-5 rounded-xl text-sm shadow-[0_2px_0_rgba(221,227,238,1)] hover:-translate-y-[1px] active:translate-y-[2px] active:shadow-none transition-all"
+              >
+                <Plus size={16} /> Replenish
+              </button>
             </div>
           </div>
-
+          
+          <div className="overflow-x-auto w-full">
+            <table className="w-full text-left whitespace-nowrap min-w-[800px]">
+              <thead className="bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] sticky top-0 z-10">
+                <tr>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wide">Date</th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wide">Description</th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wide text-center">Type</th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wide text-right">Amount</th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wide text-right pr-6">Running Bal.</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {filteredLedger.map((tx) => (
+                  <tr key={tx.id} className="hover:bg-[#e8edf8]/60 transition-colors duration-100">
+                    <td className="px-6 py-5 text-sm text-gray-500 font-medium">
+                      {new Date(tx.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </td>
+                    <td className="px-6 py-5 font-medium text-[#04152d] text-sm">{tx.desc}</td>
+                    <td className="px-6 py-5 text-center">
+                      {tx.type === 'REPLENISHMENT' ? (
+                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-emerald-100 text-emerald-700 shadow-[inset_0_0_0_1.5px_rgba(5,150,105,0.3)]">
+                          <ArrowUpRight size={12}/> In
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-red-100 text-red-700 shadow-[inset_0_0_0_1.5px_rgba(220,38,38,0.3)]">
+                          <ArrowDownRight size={12}/> Out
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-5 text-right font-semibold text-[#04152d] text-sm">
+                      {tx.type === 'DISBURSEMENT' ? '-' : ''} ₱{tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    </td>
+                    <td className="px-6 py-5 text-right font-semibold text-blue-600 text-sm pr-6">
+                      ₱{tx.balanceAfter.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    </td>
+                  </tr>
+                ))}
+                {filteredLedger.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-16 text-center text-gray-400 font-medium text-sm">
+                      No transactions match your current filters.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+
+      </main>
     </div>
   );
 }
