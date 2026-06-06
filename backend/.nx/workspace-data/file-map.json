@@ -1,0 +1,461 @@
+{
+  "version": "6.0",
+  "nxVersion": "22.7.5",
+  "pathMappings": {},
+  "nxJsonPlugins": [],
+  "fileMap": {
+    "nonProjectFiles": [
+      {
+        "file": "docker-compose.yml",
+        "hash": "9479625589628538590"
+      },
+      {
+        "file": "nx.json",
+        "hash": "9102508907463567300"
+      },
+      {
+        "file": "package-lock.json",
+        "hash": "13575905076644657043"
+      },
+      {
+        "file": "package.json",
+        "hash": "2447444013166037052"
+      },
+      {
+        "file": "rabbitmq.conf",
+        "hash": "10047563874777393850"
+      },
+      {
+        "file": "rabbitmq_definitions.json",
+        "hash": "17663867833041577674"
+      }
+    ],
+    "projectFileMap": {
+      "expense-budget-svc": [
+        {
+          "file": "apps/expense-budget-svc/.prettierrc",
+          "hash": "14145419060237914883"
+        },
+        {
+          "file": "apps/expense-budget-svc/README.md",
+          "hash": "13123434361241207768"
+        },
+        {
+          "file": "apps/expense-budget-svc/eslint.config.mjs",
+          "hash": "17520456152920331010"
+        },
+        {
+          "file": "apps/expense-budget-svc/nest-cli.json",
+          "hash": "18272654682417215031"
+        },
+        {
+          "file": "apps/expense-budget-svc/package.json",
+          "hash": "2717950582396583462",
+          "deps": [
+            "npm:@eslint/eslintrc",
+            "npm:@eslint/js",
+            "npm:@nestjs/cli",
+            "npm:@nestjs/schematics",
+            "npm:@nestjs/testing",
+            "npm:@types/express",
+            "npm:@types/jest",
+            "npm:@types/node",
+            "npm:@types/supertest",
+            "npm:eslint",
+            "npm:eslint-config-prettier",
+            "npm:eslint-plugin-prettier",
+            "npm:globals",
+            "npm:jest",
+            "npm:prettier",
+            "npm:source-map-support",
+            "npm:supertest",
+            "npm:ts-jest",
+            "npm:ts-loader",
+            "npm:ts-node",
+            "npm:tsconfig-paths",
+            "npm:typescript",
+            "npm:typescript-eslint",
+            "npm:@nestjs/common",
+            "npm:@nestjs/core",
+            "npm:@nestjs/platform-express",
+            "npm:reflect-metadata",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "apps/expense-budget-svc/src/app.controller.spec.ts",
+          "hash": "3407876829745233448"
+        },
+        {
+          "file": "apps/expense-budget-svc/src/app.controller.ts",
+          "hash": "1345450293891055440"
+        },
+        {
+          "file": "apps/expense-budget-svc/src/app.module.ts",
+          "hash": "13868683768177464388"
+        },
+        {
+          "file": "apps/expense-budget-svc/src/app.service.ts",
+          "hash": "15275323873054081339"
+        },
+        {
+          "file": "apps/expense-budget-svc/src/main.ts",
+          "hash": "8143503177558657450"
+        },
+        {
+          "file": "apps/expense-budget-svc/test/app.e2e-spec.ts",
+          "hash": "2340802501280067852"
+        },
+        {
+          "file": "apps/expense-budget-svc/test/jest-e2e.json",
+          "hash": "10645908491471703423"
+        },
+        {
+          "file": "apps/expense-budget-svc/tsconfig.build.json",
+          "hash": "9666801268768259513"
+        },
+        {
+          "file": "apps/expense-budget-svc/tsconfig.json",
+          "hash": "4713859489925822506"
+        }
+      ],
+      "@backend/events": [
+        {
+          "file": "libs/events/package.json",
+          "hash": "18391230561512099944"
+        },
+        {
+          "file": "libs/events/src/disbursement.events.ts",
+          "hash": "1250974905463993426"
+        },
+        {
+          "file": "libs/events/src/dues.events.ts",
+          "hash": "7172979019491792049"
+        },
+        {
+          "file": "libs/events/src/expense.events.ts",
+          "hash": "17949514725709060170"
+        },
+        {
+          "file": "libs/events/src/index.ts",
+          "hash": "10828830527717214059"
+        },
+        {
+          "file": "libs/events/src/queues.ts",
+          "hash": "16257075562245155775"
+        },
+        {
+          "file": "libs/events/src/repayment.events.ts",
+          "hash": "18205842863550297298"
+        }
+      ],
+      "@bdoea-fs/auth": [
+        {
+          "file": "libs/auth/package.json",
+          "hash": "16395120429848894147",
+          "deps": [
+            "npm:@types/jsonwebtoken",
+            "npm:@nestjs/common@10.4.22",
+            "npm:@nestjs/core@10.4.22",
+            "npm:jsonwebtoken"
+          ]
+        },
+        {
+          "file": "libs/auth/src/index.ts",
+          "hash": "4424505685551187807"
+        },
+        {
+          "file": "libs/auth/src/jwt.guard.ts",
+          "hash": "17826584208029929452"
+        },
+        {
+          "file": "libs/auth/src/roles.decorator.ts",
+          "hash": "11745620449776234641"
+        }
+      ],
+      "disbursement-svc": [
+        {
+          "file": "apps/disbursement-svc/.prettierrc",
+          "hash": "14145419060237914883"
+        },
+        {
+          "file": "apps/disbursement-svc/README.md",
+          "hash": "13123434361241207768"
+        },
+        {
+          "file": "apps/disbursement-svc/eslint.config.mjs",
+          "hash": "17520456152920331010"
+        },
+        {
+          "file": "apps/disbursement-svc/nest-cli.json",
+          "hash": "18272654682417215031"
+        },
+        {
+          "file": "apps/disbursement-svc/package.json",
+          "hash": "9318178939963616875",
+          "deps": [
+            "npm:@eslint/eslintrc",
+            "npm:@eslint/js",
+            "npm:@nestjs/cli",
+            "npm:@nestjs/schematics",
+            "npm:@nestjs/testing",
+            "npm:@types/express",
+            "npm:@types/jest",
+            "npm:@types/node",
+            "npm:@types/supertest",
+            "npm:eslint",
+            "npm:eslint-config-prettier",
+            "npm:eslint-plugin-prettier",
+            "npm:globals",
+            "npm:jest",
+            "npm:prettier",
+            "npm:source-map-support",
+            "npm:supertest",
+            "npm:ts-jest",
+            "npm:ts-loader",
+            "npm:ts-node",
+            "npm:tsconfig-paths",
+            "npm:typescript",
+            "npm:typescript-eslint",
+            "npm:@nestjs/common",
+            "npm:@nestjs/core",
+            "npm:@nestjs/platform-express",
+            "npm:reflect-metadata",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "apps/disbursement-svc/src/app.controller.spec.ts",
+          "hash": "3407876829745233448"
+        },
+        {
+          "file": "apps/disbursement-svc/src/app.controller.ts",
+          "hash": "1345450293891055440"
+        },
+        {
+          "file": "apps/disbursement-svc/src/app.module.ts",
+          "hash": "13868683768177464388"
+        },
+        {
+          "file": "apps/disbursement-svc/src/app.service.ts",
+          "hash": "15275323873054081339"
+        },
+        {
+          "file": "apps/disbursement-svc/src/main.ts",
+          "hash": "8143503177558657450"
+        },
+        {
+          "file": "apps/disbursement-svc/test/app.e2e-spec.ts",
+          "hash": "2340802501280067852"
+        },
+        {
+          "file": "apps/disbursement-svc/test/jest-e2e.json",
+          "hash": "10645908491471703423"
+        },
+        {
+          "file": "apps/disbursement-svc/tsconfig.build.json",
+          "hash": "9666801268768259513"
+        },
+        {
+          "file": "apps/disbursement-svc/tsconfig.json",
+          "hash": "4713859489925822506"
+        }
+      ],
+      "ledger-accounts-svc": [
+        {
+          "file": "apps/ledger-accounts-svc/.prettierrc",
+          "hash": "14145419060237914883"
+        },
+        {
+          "file": "apps/ledger-accounts-svc/README.md",
+          "hash": "13123434361241207768"
+        },
+        {
+          "file": "apps/ledger-accounts-svc/eslint.config.mjs",
+          "hash": "17520456152920331010"
+        },
+        {
+          "file": "apps/ledger-accounts-svc/nest-cli.json",
+          "hash": "18272654682417215031"
+        },
+        {
+          "file": "apps/ledger-accounts-svc/package.json",
+          "hash": "13207069017944272659",
+          "deps": [
+            "npm:@eslint/eslintrc",
+            "npm:@eslint/js",
+            "npm:@nestjs/cli",
+            "npm:@nestjs/schematics",
+            "npm:@nestjs/testing",
+            "npm:@types/express",
+            "npm:@types/jest",
+            "npm:@types/node",
+            "npm:@types/supertest",
+            "npm:eslint",
+            "npm:eslint-config-prettier",
+            "npm:eslint-plugin-prettier",
+            "npm:globals",
+            "npm:jest",
+            "npm:prettier",
+            "npm:source-map-support",
+            "npm:supertest",
+            "npm:ts-jest",
+            "npm:ts-loader",
+            "npm:ts-node",
+            "npm:tsconfig-paths",
+            "npm:typescript",
+            "npm:typescript-eslint",
+            "npm:@nestjs/common",
+            "npm:@nestjs/core",
+            "npm:@nestjs/platform-express",
+            "npm:reflect-metadata",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "apps/ledger-accounts-svc/src/app.controller.spec.ts",
+          "hash": "3407876829745233448"
+        },
+        {
+          "file": "apps/ledger-accounts-svc/src/app.controller.ts",
+          "hash": "1345450293891055440"
+        },
+        {
+          "file": "apps/ledger-accounts-svc/src/app.module.ts",
+          "hash": "13868683768177464388"
+        },
+        {
+          "file": "apps/ledger-accounts-svc/src/app.service.ts",
+          "hash": "15275323873054081339"
+        },
+        {
+          "file": "apps/ledger-accounts-svc/src/main.ts",
+          "hash": "8143503177558657450"
+        },
+        {
+          "file": "apps/ledger-accounts-svc/test/app.e2e-spec.ts",
+          "hash": "2340802501280067852"
+        },
+        {
+          "file": "apps/ledger-accounts-svc/test/jest-e2e.json",
+          "hash": "10645908491471703423"
+        },
+        {
+          "file": "apps/ledger-accounts-svc/tsconfig.build.json",
+          "hash": "9666801268768259513"
+        },
+        {
+          "file": "apps/ledger-accounts-svc/tsconfig.json",
+          "hash": "4713859489925822506"
+        }
+      ],
+      "dues-collection-svc": [
+        {
+          "file": "apps/dues-collection-svc/.prettierrc",
+          "hash": "14145419060237914883"
+        },
+        {
+          "file": "apps/dues-collection-svc/README.md",
+          "hash": "13123434361241207768"
+        },
+        {
+          "file": "apps/dues-collection-svc/eslint.config.mjs",
+          "hash": "17520456152920331010"
+        },
+        {
+          "file": "apps/dues-collection-svc/nest-cli.json",
+          "hash": "18272654682417215031"
+        },
+        {
+          "file": "apps/dues-collection-svc/package.json",
+          "hash": "13694942597164722294",
+          "deps": [
+            "npm:@eslint/eslintrc",
+            "npm:@eslint/js",
+            "npm:@nestjs/cli",
+            "npm:@nestjs/schematics",
+            "npm:@nestjs/testing",
+            "npm:@types/express",
+            "npm:@types/jest",
+            "npm:@types/node",
+            "npm:@types/supertest",
+            "npm:eslint",
+            "npm:eslint-config-prettier",
+            "npm:eslint-plugin-prettier",
+            "npm:globals",
+            "npm:jest",
+            "npm:prettier",
+            "npm:source-map-support",
+            "npm:supertest",
+            "npm:ts-jest",
+            "npm:ts-loader",
+            "npm:ts-node",
+            "npm:tsconfig-paths",
+            "npm:typescript",
+            "npm:typescript-eslint",
+            "npm:@nestjs/common",
+            "npm:@nestjs/core",
+            "npm:@nestjs/platform-express",
+            "npm:reflect-metadata",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "apps/dues-collection-svc/src/app.controller.spec.ts",
+          "hash": "3407876829745233448"
+        },
+        {
+          "file": "apps/dues-collection-svc/src/app.controller.ts",
+          "hash": "1345450293891055440"
+        },
+        {
+          "file": "apps/dues-collection-svc/src/app.module.ts",
+          "hash": "13868683768177464388"
+        },
+        {
+          "file": "apps/dues-collection-svc/src/app.service.ts",
+          "hash": "15275323873054081339"
+        },
+        {
+          "file": "apps/dues-collection-svc/src/main.ts",
+          "hash": "8143503177558657450"
+        },
+        {
+          "file": "apps/dues-collection-svc/test/app.e2e-spec.ts",
+          "hash": "2340802501280067852"
+        },
+        {
+          "file": "apps/dues-collection-svc/test/jest-e2e.json",
+          "hash": "10645908491471703423"
+        },
+        {
+          "file": "apps/dues-collection-svc/tsconfig.build.json",
+          "hash": "9666801268768259513"
+        },
+        {
+          "file": "apps/dues-collection-svc/tsconfig.json",
+          "hash": "4713859489925822506"
+        }
+      ],
+      "@backend/prisma": [
+        {
+          "file": "libs/prisma/.env",
+          "hash": "17837891429981556655"
+        },
+        {
+          "file": "libs/prisma/package.json",
+          "hash": "3914631185185562115",
+          "deps": [
+            "npm:prisma",
+            "npm:@prisma/client"
+          ]
+        },
+        {
+          "file": "libs/prisma/schema.prisma",
+          "hash": "12226055419967103251"
+        }
+      ]
+    }
+  },
+  "externalNodesHash": "16423631143167781187"
+}

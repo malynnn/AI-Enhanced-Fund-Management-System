@@ -1,0 +1,1912 @@
+{
+  "apps/disbursement-svc": {
+    "root": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "name": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "tags": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "tags.npm:private": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.0": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.1": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.2": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.3": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.4": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.5": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.6": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.7": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.8": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.9": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.10": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.11": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.description": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.packageName": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.packageVersion": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.isInPackageManagerWorkspaces": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.executor": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.options": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.metadata": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.options.script": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.metadata.scriptContent": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.metadata.runCommand": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.format": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.format.executor": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.format.options": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.format.metadata": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.format.options.script": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.format.metadata.scriptContent": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.format.metadata.runCommand": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start.executor": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start.options": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start.metadata": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start.options.script": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start.metadata.scriptContent": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start.metadata.runCommand": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:dev": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:dev.executor": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:dev.options": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:dev.metadata": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:dev.options.script": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:dev.metadata.scriptContent": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:dev.metadata.runCommand": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:debug": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:debug.executor": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:debug.options": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:debug.metadata": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:debug.options.script": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:debug.metadata.scriptContent": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:debug.metadata.runCommand": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:prod": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:prod.executor": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:prod.options": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:prod.metadata": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:prod.options.script": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:prod.metadata.scriptContent": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:prod.metadata.runCommand": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.executor": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.options": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.metadata": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.options.script": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.metadata.scriptContent": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.metadata.runCommand": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.executor": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.options": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.metadata": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.options.script": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.metadata.scriptContent": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.metadata.runCommand": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch.executor": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch.options": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch.metadata": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch.options.script": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch.metadata.scriptContent": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch.metadata.runCommand": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:cov": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:cov.executor": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:cov.options": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:cov.metadata": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:cov.options.script": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:cov.metadata.scriptContent": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:cov.metadata.runCommand": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:debug": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:debug.executor": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:debug.options": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:debug.metadata": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:debug.options.script": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:debug.metadata.scriptContent": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:debug.metadata.runCommand": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:e2e": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:e2e.executor": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:e2e.options": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:e2e.metadata": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:e2e.options.script": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:e2e.metadata.scriptContent": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:e2e.metadata.runCommand": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ]
+  },
+  "apps/dues-collection-svc": {
+    "root": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "name": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "tags": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "tags.npm:private": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.0": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.1": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.2": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.3": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.4": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.5": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.6": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.7": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.8": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.9": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.10": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.11": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.description": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.packageName": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.packageVersion": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.isInPackageManagerWorkspaces": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.executor": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.options": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.metadata": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.options.script": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.metadata.scriptContent": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.metadata.runCommand": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.format": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.format.executor": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.format.options": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.format.metadata": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.format.options.script": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.format.metadata.scriptContent": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.format.metadata.runCommand": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start.executor": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start.options": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start.metadata": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start.options.script": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start.metadata.scriptContent": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start.metadata.runCommand": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:dev": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:dev.executor": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:dev.options": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:dev.metadata": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:dev.options.script": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:dev.metadata.scriptContent": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:dev.metadata.runCommand": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:debug": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:debug.executor": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:debug.options": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:debug.metadata": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:debug.options.script": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:debug.metadata.scriptContent": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:debug.metadata.runCommand": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:prod": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:prod.executor": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:prod.options": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:prod.metadata": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:prod.options.script": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:prod.metadata.scriptContent": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:prod.metadata.runCommand": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.executor": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.options": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.metadata": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.options.script": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.metadata.scriptContent": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.metadata.runCommand": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.executor": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.options": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.metadata": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.options.script": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.metadata.scriptContent": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.metadata.runCommand": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch.executor": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch.options": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch.metadata": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch.options.script": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch.metadata.scriptContent": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch.metadata.runCommand": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:cov": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:cov.executor": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:cov.options": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:cov.metadata": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:cov.options.script": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:cov.metadata.scriptContent": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:cov.metadata.runCommand": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:debug": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:debug.executor": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:debug.options": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:debug.metadata": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:debug.options.script": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:debug.metadata.scriptContent": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:debug.metadata.runCommand": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:e2e": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:e2e.executor": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:e2e.options": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:e2e.metadata": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:e2e.options.script": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:e2e.metadata.scriptContent": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:e2e.metadata.runCommand": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ]
+  },
+  "apps/expense-budget-svc": {
+    "root": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "name": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "tags": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "tags.npm:private": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.0": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.1": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.2": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.3": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.4": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.5": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.6": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.7": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.8": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.9": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.10": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.11": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.description": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.packageName": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.packageVersion": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.isInPackageManagerWorkspaces": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.executor": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.options": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.metadata": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.options.script": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.metadata.scriptContent": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.metadata.runCommand": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.format": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.format.executor": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.format.options": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.format.metadata": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.format.options.script": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.format.metadata.scriptContent": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.format.metadata.runCommand": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start.executor": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start.options": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start.metadata": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start.options.script": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start.metadata.scriptContent": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start.metadata.runCommand": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:dev": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:dev.executor": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:dev.options": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:dev.metadata": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:dev.options.script": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:dev.metadata.scriptContent": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:dev.metadata.runCommand": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:debug": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:debug.executor": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:debug.options": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:debug.metadata": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:debug.options.script": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:debug.metadata.scriptContent": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:debug.metadata.runCommand": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:prod": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:prod.executor": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:prod.options": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:prod.metadata": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:prod.options.script": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:prod.metadata.scriptContent": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:prod.metadata.runCommand": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.executor": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.options": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.metadata": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.options.script": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.metadata.scriptContent": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.metadata.runCommand": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.executor": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.options": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.metadata": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.options.script": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.metadata.scriptContent": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.metadata.runCommand": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch.executor": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch.options": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch.metadata": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch.options.script": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch.metadata.scriptContent": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch.metadata.runCommand": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:cov": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:cov.executor": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:cov.options": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:cov.metadata": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:cov.options.script": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:cov.metadata.scriptContent": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:cov.metadata.runCommand": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:debug": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:debug.executor": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:debug.options": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:debug.metadata": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:debug.options.script": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:debug.metadata.scriptContent": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:debug.metadata.runCommand": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:e2e": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:e2e.executor": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:e2e.options": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:e2e.metadata": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:e2e.options.script": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:e2e.metadata.scriptContent": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:e2e.metadata.runCommand": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ]
+  },
+  "apps/ledger-accounts-svc": {
+    "root": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "name": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "tags": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "tags.npm:private": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.0": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.1": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.2": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.3": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.4": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.5": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.6": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.7": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.8": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.9": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.10": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.11": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.description": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.packageName": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.packageVersion": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.isInPackageManagerWorkspaces": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.executor": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.options": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.metadata": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.options.script": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.metadata.scriptContent": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.metadata.runCommand": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.format": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.format.executor": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.format.options": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.format.metadata": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.format.options.script": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.format.metadata.scriptContent": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.format.metadata.runCommand": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start.executor": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start.options": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start.metadata": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start.options.script": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start.metadata.scriptContent": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start.metadata.runCommand": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:dev": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:dev.executor": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:dev.options": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:dev.metadata": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:dev.options.script": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:dev.metadata.scriptContent": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:dev.metadata.runCommand": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:debug": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:debug.executor": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:debug.options": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:debug.metadata": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:debug.options.script": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:debug.metadata.scriptContent": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:debug.metadata.runCommand": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:prod": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:prod.executor": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:prod.options": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:prod.metadata": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:prod.options.script": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:prod.metadata.scriptContent": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.start:prod.metadata.runCommand": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.executor": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.options": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.metadata": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.options.script": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.metadata.scriptContent": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.metadata.runCommand": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.executor": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.options": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.metadata": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.options.script": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.metadata.scriptContent": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.metadata.runCommand": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch.executor": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch.options": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch.metadata": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch.options.script": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch.metadata.scriptContent": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch.metadata.runCommand": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:cov": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:cov.executor": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:cov.options": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:cov.metadata": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:cov.options.script": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:cov.metadata.scriptContent": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:cov.metadata.runCommand": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:debug": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:debug.executor": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:debug.options": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:debug.metadata": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:debug.options.script": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:debug.metadata.scriptContent": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:debug.metadata.runCommand": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:e2e": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:e2e.executor": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:e2e.options": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:e2e.metadata": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:e2e.options.script": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:e2e.metadata.scriptContent": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:e2e.metadata.runCommand": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ]
+  },
+  "libs/auth": {
+    "root": [
+      "libs/auth/package.json",
+      "nx/core/package-json"
+    ],
+    "name": [
+      "libs/auth/package.json",
+      "nx/core/package-json"
+    ],
+    "tags": [
+      "libs/auth/package.json",
+      "nx/core/package-json"
+    ],
+    "tags.npm:private": [
+      "libs/auth/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups": [
+      "libs/auth/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js": [
+      "libs/auth/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.packageName": [
+      "libs/auth/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.packageVersion": [
+      "libs/auth/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.packageMain": [
+      "libs/auth/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.isInPackageManagerWorkspaces": [
+      "libs/auth/package.json",
+      "nx/core/package-json"
+    ],
+    "targets": [
+      "libs/auth/package.json",
+      "nx/core/package-json"
+    ]
+  },
+  "libs/events": {
+    "root": [
+      "libs/events/package.json",
+      "nx/core/package-json"
+    ],
+    "name": [
+      "libs/events/package.json",
+      "nx/core/package-json"
+    ],
+    "tags": [
+      "libs/events/package.json",
+      "nx/core/package-json"
+    ],
+    "tags.npm:private": [
+      "libs/events/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups": [
+      "libs/events/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js": [
+      "libs/events/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.packageName": [
+      "libs/events/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.packageVersion": [
+      "libs/events/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.packageMain": [
+      "libs/events/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.isInPackageManagerWorkspaces": [
+      "libs/events/package.json",
+      "nx/core/package-json"
+    ],
+    "targets": [
+      "libs/events/package.json",
+      "nx/core/package-json"
+    ]
+  },
+  "libs/prisma": {
+    "root": [
+      "libs/prisma/package.json",
+      "nx/core/package-json"
+    ],
+    "name": [
+      "libs/prisma/package.json",
+      "nx/core/package-json"
+    ],
+    "tags": [
+      "libs/prisma/package.json",
+      "nx/core/package-json"
+    ],
+    "tags.npm:private": [
+      "libs/prisma/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups": [
+      "libs/prisma/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts": [
+      "libs/prisma/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.0": [
+      "libs/prisma/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js": [
+      "libs/prisma/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.packageName": [
+      "libs/prisma/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.packageVersion": [
+      "libs/prisma/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.packageMain": [
+      "libs/prisma/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.isInPackageManagerWorkspaces": [
+      "libs/prisma/package.json",
+      "nx/core/package-json"
+    ],
+    "targets": [
+      "libs/prisma/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.generate": [
+      "libs/prisma/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.generate.executor": [
+      "libs/prisma/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.generate.options": [
+      "libs/prisma/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.generate.metadata": [
+      "libs/prisma/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.generate.options.script": [
+      "libs/prisma/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.generate.metadata.scriptContent": [
+      "libs/prisma/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.generate.metadata.runCommand": [
+      "libs/prisma/package.json",
+      "nx/core/package-json"
+    ]
+  }
+}

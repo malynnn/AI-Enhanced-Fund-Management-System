@@ -1,0 +1,35 @@
+{
+  "users": [
+    {
+      "name": "guest",
+      "password": "guest",
+      "tags": "administrator"
+    }
+  ],
+  "vhosts": [
+    {
+      "name": "/"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "guest",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "queues": [
+    { "name": "queue.dues", "vhost": "/", "durable": true, "auto_delete": false, "arguments": { "x-dead-letter-exchange": "", "x-dead-letter-routing-key": "dlq.queue.dues" } },
+    { "name": "dlq.queue.dues", "vhost": "/", "durable": true, "auto_delete": false, "arguments": {} },
+    { "name": "queue.disbursements", "vhost": "/", "durable": true, "auto_delete": false, "arguments": { "x-dead-letter-exchange": "", "x-dead-letter-routing-key": "dlq.queue.disbursements" } },
+    { "name": "dlq.queue.disbursements", "vhost": "/", "durable": true, "auto_delete": false, "arguments": {} },
+    { "name": "queue.repayments", "vhost": "/", "durable": true, "auto_delete": false, "arguments": { "x-dead-letter-exchange": "", "x-dead-letter-routing-key": "dlq.queue.repayments" } },
+    { "name": "dlq.queue.repayments", "vhost": "/", "durable": true, "auto_delete": false, "arguments": {} },
+    { "name": "queue.budget_alerts", "vhost": "/", "durable": true, "auto_delete": false, "arguments": { "x-dead-letter-exchange": "", "x-dead-letter-routing-key": "dlq.queue.budget_alerts" } },
+    { "name": "dlq.queue.budget_alerts", "vhost": "/", "durable": true, "auto_delete": false, "arguments": {} },
+    { "name": "queue.audit", "vhost": "/", "durable": true, "auto_delete": false, "arguments": { "x-dead-letter-exchange": "", "x-dead-letter-routing-key": "dlq.queue.audit" } },
+    { "name": "dlq.queue.audit", "vhost": "/", "durable": true, "auto_delete": false, "arguments": {} }
+  ]
+}

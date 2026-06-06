@@ -1,0 +1,17 @@
+{
+  "name": "backend-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "libs/*"
+  ],
+  "devDependencies": {
+    "nx": "22.7.5"
+  },
+  "dependencies": {
+    "@nestjs/microservices": "^11.1.24",
+    "amqp-connection-manager": "^5.0.0",
+    "amqplib": "^2.0.1"
+  }
+}
