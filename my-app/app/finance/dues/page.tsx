@@ -196,7 +196,8 @@ export default function DuesCollectionPage() {
     setIsPosting('__sim__'); // flag to indicate sending simulator
     
     try {
-      const response = await fetch('/api/webhooks/dues', {
+      const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3000';
+      const response = await fetch(`${gatewayUrl}/api/finance/dues/webhook`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

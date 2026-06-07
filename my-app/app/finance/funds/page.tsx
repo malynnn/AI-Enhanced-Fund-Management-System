@@ -1,6 +1,8 @@
 // app/finance/funds/page.tsx
 "use client";
 
+export const dynamic = 'force-dynamic';
+
 import { useState, useMemo, useEffect } from 'react';
 import { Briefcase, Search, Filter, Layers, ArrowRightLeft, ShieldAlert, PieChart as PieChartIcon } from 'lucide-react';
 import { PieChart, Pie, Tooltip, ResponsiveContainer } from 'recharts';

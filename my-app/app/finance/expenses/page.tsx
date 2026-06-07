@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = 'force-dynamic';
+
 import { useState, useMemo } from 'react';
 import { Wallet, Search, Filter, Layers, ArrowUpRight, ArrowDownRight, Plus, Receipt } from 'lucide-react';
 import { PieChart, Pie, Tooltip, ResponsiveContainer } from 'recharts';

@@ -21,8 +21,37 @@ let AccountsService = class AccountsService {
             orderBy: { code: 'asc' },
         });
     }
-    async findByCode(code) {
-        return this.prisma.chartOfAccount.findUnique({ where: { code } });
+    async findById(id) {
+        const account = await this.prisma.chartOfAccount.findUnique({
+            where: { id },
+        });
+        if (!account) {
+            throw new common_1.NotFoundException(`Account with id "${id}" not found`);
+        }
+        return account;
+    }
+    async create(dto) {
+        const existing = await this.prisma.chartOfAccount.findUnique({
+            where: { code: dto.code },
+        });
+        if (existing) {
+            throw new common_1.ConflictException(`Account with code "${dto.code}" already exists`);
+        }
+        return this.prisma.chartOfAccount.create({ data: dto });
+    }
+    async update(id, dto) {
+        await this.findById(id);
+        return this.prisma.chartOfAccount.update({
+            where: { id },
+            data: dto,
+        });
+    }
+    async softDelete(id) {
+        await this.findById(id);
+        return this.prisma.chartOfAccount.update({
+            where: { id },
+            data: { status: 'Inactive' },
+        });
     }
 };
 exports.AccountsService = AccountsService;

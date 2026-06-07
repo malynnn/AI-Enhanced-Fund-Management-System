@@ -16,23 +16,39 @@ let FundsService = class FundsService {
     constructor(prisma) {
         this.prisma = prisma;
     }
+    shape(fund) {
+        return {
+            id: fund.id,
+            name: fund.name,
+            code: fund.code,
+            currentBalance: fund.balance,
+            history: fund.transactions ?? [],
+        };
+    }
     async findAll() {
-        return this.prisma.fund.findMany({
+        const funds = await this.prisma.fund.findMany({
             orderBy: { name: 'asc' },
-            include: { transactions: { orderBy: { timestamp: 'desc' }, take: 10 } },
+            include: {
+                transactions: {
+                    orderBy: { timestamp: 'desc' },
+                },
+            },
         });
+        return funds.map((f) => this.shape(f));
     }
     async findById(id) {
-        return this.prisma.fund.findUnique({
+        const fund = await this.prisma.fund.findUnique({
             where: { id },
-            include: { transactions: { orderBy: { timestamp: 'desc' } } },
+            include: {
+                transactions: {
+                    orderBy: { timestamp: 'desc' },
+                },
+            },
         });
-    }
-    async findByCode(code) {
-        return this.prisma.fund.findUnique({
-            where: { code },
-            include: { transactions: { orderBy: { timestamp: 'desc' } } },
-        });
+        if (!fund) {
+            throw new common_1.NotFoundException(`Fund with id "${id}" not found`);
+        }
+        return this.shape(fund);
     }
 };
 exports.FundsService = FundsService;

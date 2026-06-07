@@ -1,9 +1,12 @@
 export interface BudgetUtilizationAlertEvent {
+  accountCode: string;
+  accountName: string;
+  approvedAmount: number;
+  totalSpent: number;
+  utilizationPercent: number;
+  triggeredAt: string; // ISO timestamp
+  // Legacy / extended fields
   voucherId?: string;
-  accountCode?: string;
-  accountName?: string;
-  approvedBudget?: number;
-  projectedTotal?: number;
   overage?: number;
-  warningMessage: string;
+  warningMessage?: string;
 }

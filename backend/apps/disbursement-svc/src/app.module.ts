@@ -1,26 +1,26 @@
 import { Module } from '@nestjs/common';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-import {
-  QUEUE_DUES,
-  QUEUE_DISBURSEMENTS,
-  QUEUE_REPAYMENTS,
-  QUEUE_BUDGET_ALERTS,
-  QUEUE_AUDIT,
-} from '@backend/events';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-
-const rabbitMqClients = ClientsModule.register([
-  { name: 'DUES_CLIENT', transport: Transport.RMQ, options: { urls: [process.env.RABBITMQ_URL || 'amqp://guest:guest@localhost:5672'], queue: QUEUE_DUES, queueOptions: { durable: true, arguments: { 'x-dead-letter-exchange': '', 'x-dead-letter-routing-key': `dlq.${QUEUE_DUES}` } } } },
-  { name: 'DISBURSEMENTS_CLIENT', transport: Transport.RMQ, options: { urls: [process.env.RABBITMQ_URL || 'amqp://guest:guest@localhost:5672'], queue: QUEUE_DISBURSEMENTS, queueOptions: { durable: true, arguments: { 'x-dead-letter-exchange': '', 'x-dead-letter-routing-key': `dlq.${QUEUE_DISBURSEMENTS}` } } } },
-  { name: 'REPAYMENTS_CLIENT', transport: Transport.RMQ, options: { urls: [process.env.RABBITMQ_URL || 'amqp://guest:guest@localhost:5672'], queue: QUEUE_REPAYMENTS, queueOptions: { durable: true, arguments: { 'x-dead-letter-exchange': '', 'x-dead-letter-routing-key': `dlq.${QUEUE_REPAYMENTS}` } } } },
-  { name: 'BUDGET_ALERTS_CLIENT', transport: Transport.RMQ, options: { urls: [process.env.RABBITMQ_URL || 'amqp://guest:guest@localhost:5672'], queue: QUEUE_BUDGET_ALERTS, queueOptions: { durable: true, arguments: { 'x-dead-letter-exchange': '', 'x-dead-letter-routing-key': `dlq.${QUEUE_BUDGET_ALERTS}` } } } },
-  { name: 'AUDIT_CLIENT', transport: Transport.RMQ, options: { urls: [process.env.RABBITMQ_URL || 'amqp://guest:guest@localhost:5672'], queue: QUEUE_AUDIT, queueOptions: { durable: true, arguments: { 'x-dead-letter-exchange': '', 'x-dead-letter-routing-key': `dlq.${QUEUE_AUDIT}` } } } },
-]);
+import { PrismaService } from './prisma.service';
+import { DisbursementsModule } from './disbursements/disbursements.module';
+import { RepaymentsModule } from './repayments/repayments.module';
+import { WriteOffsModule } from './write-offs/write-offs.module';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from '@bdoea-fs/auth';
 
 @Module({
-  imports: [rabbitMqClients],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    DisbursementsModule,
+    RepaymentsModule,
+    WriteOffsModule,
+  ],
+  providers: [
+    PrismaService,
+    {
+      provide: APP_GUARD,
+      useFactory: () => {
+        const { Reflector } = require('@nestjs/core');
+        return new JwtAuthGuard(new Reflector());
+      },
+    },
+  ],
 })
 export class AppModule {}

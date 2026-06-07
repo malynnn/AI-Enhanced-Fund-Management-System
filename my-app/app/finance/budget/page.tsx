@@ -1,7 +1,9 @@
 // app/finance/budget/page.tsx
 "use client";
 
-import { useState, useMemo } from 'react';
+export const dynamic = 'force-dynamic';
+
+import { useState, useMemo, Suspense } from 'react';
 import { Target, AlertTriangle, ArrowUpRight, TrendingDown, Settings2, CalendarDays } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import Header from '@/components/Header';
@@ -17,7 +19,7 @@ const initialCategories = [
   { id: 'CAT-005', name: 'Miscellaneous Expenses', budget: 50000, actual: 42500 }, 
 ];
 
-export default function BudgetMonitoringPage() {
+function BudgetMonitoringContent() {
   const [categories, setCategories] = useState(initialCategories);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   
@@ -264,3 +266,11 @@ export default function BudgetMonitoringPage() {
     </div>
   );
 }
+
+export default function BudgetMonitoringPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <BudgetMonitoringContent />
+    </Suspense>
+  );
+}

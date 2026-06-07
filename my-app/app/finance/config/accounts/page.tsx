@@ -1,6 +1,9 @@
+// app/finance/config/accounts/page.tsx
 "use client";
 
-import { useState, useEffect, useMemo } from 'react';
+export const dynamic = 'force-dynamic';
+
+import { useState, useEffect, useMemo, Suspense } from 'react';
 import { useSession } from 'next-auth/react';
 import { Plus, Edit2, Power, Save, X, Hash, ShieldAlert, Search, Filter, Layers, CreditCard } from 'lucide-react';
 import { PieChart, Pie, Tooltip, ResponsiveContainer } from 'recharts';
@@ -29,7 +32,7 @@ const initialAccounts: Account[] = [
 
 const CHART_COLORS = ['#04152d', '#10b981', '#facc15', '#8b5cf6', '#ef4444'];
 
-export default function AdminChartOfAccountsPage() {
+function AdminChartOfAccountsContent() {
   const { data: session } = useSession();
   const role = (session?.user as any)?.role || 'Superadmin';
 
@@ -83,7 +86,7 @@ export default function AdminChartOfAccountsPage() {
         <Header />
         <div className="flex-1 flex flex-col items-center justify-center p-8 animate-fade-in">
           <div className="bg-white p-10 rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 flex flex-col items-center max-w-md text-center">
-            <div className="bg-red-50 p-5 rounded-full text-red-500 mb-5 shadow-[inset_0_0_0_2px_rgba(220,38,38,0.2)]">
+            <div className="bg-red-50 p-5 rounded-full text-red-50 mb-5 shadow-[inset_0_0_0_2px_rgba(220,38,38,0.2)]">
               <ShieldAlert size={48} />
             </div>
             <h2 className="text-2xl font-black text-[#04152d]">Security Clearance Required</h2>
@@ -504,3 +507,11 @@ export default function AdminChartOfAccountsPage() {
     </div>
   );
 }
+
+export default function AdminChartOfAccountsPage() {
+  return (
+    <Suspense fallback={<div>Loading accounts...</div>}>
+      <AdminChartOfAccountsContent />
+    </Suspense>
+  );
+}

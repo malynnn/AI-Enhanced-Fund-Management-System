@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+export const dynamic = 'force-dynamic';
+
+import { useState, useMemo, Suspense } from 'react';
 import { Wallet, Clock, CheckCircle2, ShieldCheck, CreditCard, WalletCards, CircleDollarSign, ArrowRight, Activity } from 'lucide-react';
 import { PieChart, Pie, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import Header from '@/components/Header';
@@ -45,7 +47,7 @@ const loansOverview = { activeLoans: 42, totalReceivables: 1250000, pendingAppli
 
 const CHART_COLORS = ['#04152d', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444'];
 
-export default function TreasurerDashboardPage() {
+function TreasurerDashboardContent() {
   const [funds, setFunds] = useState(initialFunds);
   const [ledger, setLedger] = useState(initialLedger);
   const [pendingDisbursements, setPendingDisbursements] = useState(incomingWebhookQueue);
@@ -414,5 +416,13 @@ export default function TreasurerDashboardPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function TreasurerDashboardPage() {
+  return (
+    <Suspense fallback={<div>Loading dashboard...</div>}>
+      <TreasurerDashboardContent />
+    </Suspense>
   );
 }

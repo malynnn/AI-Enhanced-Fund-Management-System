@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import {
   QUEUE_DUES,
@@ -7,6 +8,7 @@ import {
   QUEUE_BUDGET_ALERTS,
   QUEUE_AUDIT,
 } from '@backend/events';
+import { JwtAuthGuard } from '@bdoea-fs/auth';
 import { PrismaService } from './prisma.service';
 import { AccountsModule } from './accounts/accounts.module';
 import { FundsModule } from './funds/funds.module';
@@ -21,6 +23,17 @@ const rabbitMqClients = ClientsModule.register([
 
 @Module({
   imports: [rabbitMqClients, AccountsModule, FundsModule],
-  providers: [PrismaService],
+  providers: [
+    PrismaService,
+    // Global JWT guard via factory — Reflector is instantiated manually
+    // so NestJS DI does not need to resolve it from any module scope.
+    {
+      provide: APP_GUARD,
+      useFactory: () => {
+        const { Reflector } = require('@nestjs/core');
+        return new JwtAuthGuard(new Reflector());
+      },
+    },
+  ],
 })
 export class AppModule {}

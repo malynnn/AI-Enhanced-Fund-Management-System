@@ -15,15 +15,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.FundsController = void 0;
 const common_1 = require("@nestjs/common");
 const funds_service_1 = require("./funds.service");
+const auth_1 = require("@bdoea-fs/auth");
 let FundsController = class FundsController {
     constructor(fundsService) {
         this.fundsService = fundsService;
     }
     findAll() {
         return this.fundsService.findAll();
-    }
-    findByCode(code) {
-        return this.fundsService.findByCode(code);
     }
     findOne(id) {
         return this.fundsService.findById(id);
@@ -32,19 +30,14 @@ let FundsController = class FundsController {
 exports.FundsController = FundsController;
 __decorate([
     (0, common_1.Get)(),
+    (0, auth_1.Roles)('Treasurer', 'Admin'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], FundsController.prototype, "findAll", null);
 __decorate([
-    (0, common_1.Get)('code/:code'),
-    __param(0, (0, common_1.Param)('code')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
-], FundsController.prototype, "findByCode", null);
-__decorate([
     (0, common_1.Get)(':id'),
+    (0, auth_1.Roles)('Treasurer', 'Admin'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),

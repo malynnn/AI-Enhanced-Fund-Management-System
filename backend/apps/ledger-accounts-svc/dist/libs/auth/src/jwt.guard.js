@@ -47,12 +47,18 @@ const common_1 = require("@nestjs/common");
 const core_1 = require("@nestjs/core");
 const jwt = __importStar(require("jsonwebtoken"));
 const roles_decorator_1 = require("./roles.decorator");
+const public_decorator_1 = require("./public.decorator");
 let JwtAuthGuard = class JwtAuthGuard {
-    reflector;
     constructor(reflector) {
         this.reflector = reflector;
     }
     canActivate(context) {
+        const isPublic = this.reflector.getAllAndOverride(public_decorator_1.IS_PUBLIC_KEY, [
+            context.getHandler(),
+            context.getClass(),
+        ]);
+        if (isPublic)
+            return true;
         const request = context.switchToHttp().getRequest();
         const authHeader = request.headers.authorization;
         if (!authHeader || !authHeader.startsWith('Bearer ')) {

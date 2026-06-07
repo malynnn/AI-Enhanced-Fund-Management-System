@@ -13,7 +13,13 @@
     "target": "ES2023",
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": "./",
+    "baseUrl": "../../",
+    "paths": {
+      "@backend/events": ["libs/events/src"],
+      "@backend/events/*": ["libs/events/src/*"],
+      "@bdoea-fs/auth": ["libs/auth/src"],
+      "@bdoea-fs/auth/*": ["libs/auth/src/*"]
+    },
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,

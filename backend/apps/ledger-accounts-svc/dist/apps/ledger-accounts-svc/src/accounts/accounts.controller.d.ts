@@ -1,4 +1,6 @@
 import { AccountsService } from './accounts.service';
+import { CreateAccountDto } from './dto/create-account.dto';
+import { UpdateAccountDto } from './dto/update-account.dto';
 export declare class AccountsController {
     private readonly accountsService;
     constructor(accountsService: AccountsService);
@@ -12,7 +14,37 @@ export declare class AccountsController {
         createdAt: Date;
         updatedAt: Date;
     }[]>;
-    findOne(code: string): Promise<{
+    findOne(id: string): Promise<{
+        fund: string;
+        id: string;
+        code: string;
+        name: string;
+        type: string;
+        status: string;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
+    create(dto: CreateAccountDto): Promise<{
+        fund: string;
+        id: string;
+        code: string;
+        name: string;
+        type: string;
+        status: string;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
+    update(id: string, dto: UpdateAccountDto): Promise<{
+        fund: string;
+        id: string;
+        code: string;
+        name: string;
+        type: string;
+        status: string;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
+    softDelete(id: string): Promise<{
         fund: string;
         id: string;
         code: string;

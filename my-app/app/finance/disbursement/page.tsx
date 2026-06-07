@@ -1,6 +1,8 @@
 // app/finance/disbursement/page.tsx
 "use client";
 
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect, useRef } from 'react';
 import { CheckCircle, Eye, Printer, X, FileText, Clock, Check, Send, AlertTriangle, Download, Loader, Ban } from 'lucide-react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';

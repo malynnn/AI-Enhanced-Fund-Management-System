@@ -8,8 +8,10 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
+const core_1 = require("@nestjs/core");
 const microservices_1 = require("@nestjs/microservices");
 const events_1 = require("@backend/events");
+const auth_1 = require("@bdoea-fs/auth");
 const prisma_service_1 = require("./prisma.service");
 const accounts_module_1 = require("./accounts/accounts.module");
 const funds_module_1 = require("./funds/funds.module");
@@ -26,7 +28,16 @@ exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [rabbitMqClients, accounts_module_1.AccountsModule, funds_module_1.FundsModule],
-        providers: [prisma_service_1.PrismaService],
+        providers: [
+            prisma_service_1.PrismaService,
+            {
+                provide: core_1.APP_GUARD,
+                useFactory: () => {
+                    const { Reflector } = require('@nestjs/core');
+                    return new auth_1.JwtAuthGuard(new Reflector());
+                },
+            },
+        ],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map
