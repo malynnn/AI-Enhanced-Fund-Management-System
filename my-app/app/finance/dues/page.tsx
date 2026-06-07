@@ -22,7 +22,8 @@ export default function DuesCollectionPage() {
   const fetchDuesRecords = async () => {
     try {
       setIsLoading(true);
-      const res = await fetch('/api/finance/dues');
+      const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3000';
+      const res = await fetch(`${gatewayUrl}/api/finance/dues`);
       if (res.ok) {
         const data = await res.json();
         setDuesRecords(data);
@@ -56,23 +57,37 @@ export default function DuesCollectionPage() {
     resultMsg?: string;
   }>({ isOpen: false, title: '', message: '', status: 'idle' });
 
-  // Webhook State
+  // Webhook State (Init empty/static to prevent hydration errors)
   const [webhookData, setWebhookData] = useState({
-    transaction_id: `TXN-MS-${Math.floor(100000 + Math.random() * 900000)}`,
-    date: new Date().toISOString().split('T')[0],
-    member_id: 'M-2026-' + Math.floor(100 + Math.random() * 900),
+    transaction_id: '',
+    date: '',
+    member_id: '',
     full_name: 'Dela Cruz, Juan',
     month_covered: 'May 2026',
     amount: '500.00',
     payment_method: 'Salary Deduction',
-    reference_number: `REF-${Math.floor(10000 + Math.random() * 90000)}`,
+    reference_number: '',
     fund_to_credit: 'GF'
   });
-  const [webhookLogs, setWebhookLogs] = useState<Array<{ timestamp: string; type: string; payload: any }>>([{
-    timestamp: new Date().toLocaleTimeString(),
-    type: 'SYSTEM_INFO',
-    payload: { status: 'ONLINE', message: 'Webhook Listener initialized.' }
-  }]);
+  
+  const [webhookLogs, setWebhookLogs] = useState<Array<{ timestamp: string; type: string; payload: any }>>([]);
+
+  // Fix hydration mismatch by setting dynamic default values only on client
+  useEffect(() => {
+    setWebhookData(prev => ({
+      ...prev,
+      transaction_id: `TXN-MS-${Math.floor(100000 + Math.random() * 900000)}`,
+      date: new Date().toISOString().split('T')[0],
+      member_id: 'M-2026-' + Math.floor(100 + Math.random() * 900),
+      reference_number: `REF-${Math.floor(10000 + Math.random() * 90000)}`,
+    }));
+    
+    setWebhookLogs([{
+      timestamp: new Date().toLocaleTimeString(),
+      type: 'SYSTEM_INFO',
+      payload: { status: 'ONLINE', message: 'Webhook Listener initialized.' }
+    }]);
+  }, []);
 
   // --- FILTERING LOGIC ---
   const filteredRecords = useMemo(() => {

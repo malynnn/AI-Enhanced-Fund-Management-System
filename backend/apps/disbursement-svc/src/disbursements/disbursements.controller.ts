@@ -1,8 +1,8 @@
-import { Controller, Logger, Get, Post, Param, Body } from '@nestjs/common';
+import { Controller, Logger, Get, Post, Param, Body, BadRequestException } from '@nestjs/common';
 import { Ctx, MessagePattern, Payload, RmqContext } from '@nestjs/microservices';
 import { DisbursementsService } from './disbursements.service';
 import { QUEUE_DISBURSEMENTS, LoanApprovedEvent } from '@backend/events';
-import { Roles } from '@bdoea-fs/auth';
+import { Roles, Public } from '@bdoea-fs/auth';
 
 @Controller('disbursements')
 export class DisbursementsController {
@@ -22,6 +22,19 @@ export class DisbursementsController {
   @Roles('Treasurer', 'Admin')
   confirm(@Param('id') id: string, @Body('authorizedBy') authorizedBy: string) {
     return this.disbursementsService.confirmDisbursement(id, authorizedBy);
+  }
+
+  @Public()
+  @Post('webhook')
+  async simulateWebhook(@Body() data: any) {
+    this.logger.log(`Received HTTP webhook simulation for loan ${data?.loanReference}`);
+    try {
+      await this.disbursementsService.processLoanApproved(data);
+      return { status: 'success', message: 'Webhook processed successfully' };
+    } catch (err) {
+      this.logger.error(`Webhook error: ${err.message}`);
+      throw new BadRequestException(err.message);
+    }
   }
 
   // ─── RabbitMQ Consumer ───────────────────────────────────────────────────

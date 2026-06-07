@@ -64,7 +64,8 @@ function AdminChartOfAccountsContent() {
   const fetchAccounts = async () => {
     try {
       setIsLoading(true);
-      const res = await fetch('/api/finance/accounts');
+      const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3000';
+      const res = await fetch(`${gatewayUrl}/api/finance/accounts`);
       if (res.ok) {
         const data = await res.json();
         setAccounts(data);

@@ -58,7 +58,8 @@ export default function DisbursementPage() {
   const fetchDisbursements = async () => {
     try {
       setIsLoading(true);
-      const res = await fetch('/api/finance/disbursements');
+      const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3000';
+      const res = await fetch(`${gatewayUrl}/api/finance/disbursements`);
       if (res.ok) {
         const data = await res.json();
         setDisbursements(data);
@@ -221,7 +222,8 @@ export default function DisbursementPage() {
     setActionModal(prev => ({ ...prev, status: 'loading' }));
     
     try {
-      const res = await fetch(`/api/finance/disbursements/${selectedForAction.id}/confirm`, {
+      const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3000';
+      const res = await fetch(`${gatewayUrl}/api/finance/disbursements/${selectedForAction.id}/confirm`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ authorizedBy: 'Treasurer Romalyn Amante' })
@@ -259,7 +261,8 @@ export default function DisbursementPage() {
     try {
       // Safely attempt the backend call if your backend supports /reject. 
       // If not, this acts as a safe fallback that updates the UI immediately.
-      await fetch(`/api/finance/disbursements/${selectedForAction.id}/reject`, {
+      const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3000';
+      await fetch(`${gatewayUrl}/api/finance/disbursements/${selectedForAction.id}/reject`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ reason: rejectReason, authorizedBy: 'Treasurer Romalyn Amante' })
@@ -290,7 +293,8 @@ export default function DisbursementPage() {
     setSimSuccessMsg(''); setSimErrMsg('');
 
     try {
-      const res = await fetch('/api/webhooks/disbursements', {
+      const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3000';
+      const res = await fetch(`${gatewayUrl}/api/finance/disbursements/webhook`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
