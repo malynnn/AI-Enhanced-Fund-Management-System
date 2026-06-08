@@ -1,19 +1,19 @@
 import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { PettyCashService } from './petty-cash.service';
-import { Roles } from '@bdoea-fs/auth';
+import { Public } from '@bdoea-fs/auth';
 
 @Controller('petty-cash')
 export class PettyCashController {
   constructor(private readonly pettyCashService: PettyCashService) {}
 
   @Get()
-  @Roles('Treasurer', 'Admin')
+  @Public()
   findAll() {
     return this.pettyCashService.findAll();
   }
 
   @Get(':id')
-  @Roles('Treasurer', 'Admin')
+  @Public()
   findOne(@Param('id') id: string) {
     return this.pettyCashService.findOne(id);
   }

@@ -1,6 +1,6 @@
 import { Controller, Get, Put, Body, Logger } from '@nestjs/common';
 import { RepaymentsService } from './repayments.service';
-import { Roles } from '@bdoea-fs/auth';
+import { Public } from '@bdoea-fs/auth';
 
 @Controller('loans/overpayments')
 export class OverpaymentsController {
@@ -9,7 +9,7 @@ export class OverpaymentsController {
   constructor(private readonly repaymentsService: RepaymentsService) {}
 
   @Get()
-  @Roles('Treasurer')
+  @Public()
   findOverpayments() {
     return this.repaymentsService.findOverpayments();
   }

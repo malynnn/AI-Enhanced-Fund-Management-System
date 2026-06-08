@@ -2,7 +2,7 @@ import { Controller, Logger, Get, Post, Param, Body, BadRequestException } from 
 import { Ctx, MessagePattern, Payload, RmqContext } from '@nestjs/microservices';
 import { DisbursementsService } from './disbursements.service';
 import { QUEUE_DISBURSEMENTS, LoanApprovedEvent } from '@backend/events';
-import { Roles, Public } from '@bdoea-fs/auth';
+import { Public } from '@bdoea-fs/auth';
 
 @Controller('disbursements')
 export class DisbursementsController {
@@ -13,13 +13,13 @@ export class DisbursementsController {
   // ─── HTTP Endpoints ───────────────────────────────────────────────────────
 
   @Get()
-  @Roles('Treasurer', 'Admin')
+  @Public()
   findAll() {
     return this.disbursementsService.findAll();
   }
 
   @Post(':id/confirm')
-  @Roles('Treasurer', 'Admin')
+  @Public()
   confirm(@Param('id') id: string, @Body('authorizedBy') authorizedBy: string) {
     return this.disbursementsService.confirmDisbursement(id, authorizedBy);
   }

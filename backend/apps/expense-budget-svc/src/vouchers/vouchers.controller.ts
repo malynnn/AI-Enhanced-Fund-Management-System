@@ -3,7 +3,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { VouchersService } from './vouchers.service';
 import { ReceiptService } from './receipt.service';
-import { Roles } from '@bdoea-fs/auth';
+import { Public } from '@bdoea-fs/auth';
 
 @Controller('vouchers')
 export class VouchersController {
@@ -13,7 +13,7 @@ export class VouchersController {
   ) {}
 
   @Get()
-  @Roles('Treasurer', 'Admin')
+  @Public()
   findAll(@Query('status') status?: string) {
     return this.vouchersService.findAll(status);
   }
@@ -40,7 +40,7 @@ export class VouchersController {
   }
 
   @Patch(':id/approve')
-  @Roles('Treasurer', 'Admin')
+  @Public()
   approveOrReject(
     @Param('id') id: string,
     @Body('decision') decision: 'APPROVED' | 'REJECTED',

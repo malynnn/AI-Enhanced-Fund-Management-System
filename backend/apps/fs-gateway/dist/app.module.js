@@ -24,51 +24,65 @@ let AppModule = class AppModule {
             .apply((0, http_proxy_middleware_1.createProxyMiddleware)({
             target: ledgerSvcUrl,
             changeOrigin: true,
-            pathRewrite: { '^/api/finance/accounts': '/accounts' },
+            pathRewrite: { '^/': '/accounts/' },
         }))
-            .forRoutes('/api/finance/accounts/*path');
+            .forRoutes('/api/finance/accounts', '/api/finance/accounts/*path');
+        consumer
+            .apply((0, http_proxy_middleware_1.createProxyMiddleware)({
+            target: ledgerSvcUrl,
+            changeOrigin: true,
+            pathRewrite: { '^/': '/funds/' },
+        }))
+            .forRoutes('/api/finance/funds', '/api/finance/funds/*path');
         consumer
             .apply((0, http_proxy_middleware_1.createProxyMiddleware)({
             target: duesSvcUrl,
             changeOrigin: true,
-            pathRewrite: { '^/api/finance/dues': '/dues' },
+            pathRewrite: { '^/': '/dues/' },
         }))
-            .forRoutes('/api/finance/dues/*path');
+            .forRoutes('/api/finance/dues', '/api/finance/dues/*path');
         consumer
             .apply((0, http_proxy_middleware_1.createProxyMiddleware)({
             target: disbursementSvcUrl,
             changeOrigin: true,
-            pathRewrite: { '^/api/finance/disbursements': '/disbursements' },
+            pathRewrite: { '^/': '/disbursements/' },
         }))
-            .forRoutes('/api/finance/disbursements/*path');
+            .forRoutes('/api/finance/disbursements', '/api/finance/disbursements/*path');
         consumer
             .apply((0, http_proxy_middleware_1.createProxyMiddleware)({
             target: disbursementSvcUrl,
             changeOrigin: true,
-            pathRewrite: { '^/api/finance/loans': '/loans' },
+            pathRewrite: { '^/': '/loans/' },
         }))
-            .forRoutes('/api/finance/loans/*path');
+            .forRoutes('/api/finance/loans', '/api/finance/loans/*path');
+        consumer
+            .apply((0, http_proxy_middleware_1.createProxyMiddleware)({
+            target: disbursementSvcUrl,
+            changeOrigin: true,
+            pathRewrite: { '^/': '/repayments/' },
+        }))
+            .forRoutes('/api/finance/repayments', '/api/finance/repayments/*path');
         consumer
             .apply((0, http_proxy_middleware_1.createProxyMiddleware)({
             target: expenseSvcUrl,
             changeOrigin: true,
-            pathRewrite: { '^/api/finance/expense-vouchers': '/vouchers' },
+            pathRewrite: { '^/': '/vouchers/' },
         }))
-            .forRoutes('/api/finance/expense-vouchers/*path');
+            .forRoutes('/api/finance/expense-vouchers', '/api/finance/expense-vouchers/*path');
         consumer
             .apply((0, http_proxy_middleware_1.createProxyMiddleware)({
             target: expenseSvcUrl,
             changeOrigin: true,
-            pathRewrite: { '^/api/finance/budget-categories': '/budget-categories' },
+            pathRewrite: { '^/': '/budget-categories/' },
         }))
-            .forRoutes('/api/finance/budget-categories/*path');
+            .forRoutes('/api/finance/budget-categories', '/api/finance/budget-categories/*path');
         consumer
             .apply((0, http_proxy_middleware_1.createProxyMiddleware)({
             target: expenseSvcUrl,
             changeOrigin: true,
-            pathRewrite: { '^/api/finance/petty-cash': '/petty-cash' },
+            pathRewrite: { '^/': '/petty-cash/' },
         }))
-            .forRoutes('/api/finance/petty-cash/*path');
+            .forRoutes('/api/finance/petty-cash', '/api/finance/petty-cash/*path');
     }
 };
 exports.AppModule = AppModule;

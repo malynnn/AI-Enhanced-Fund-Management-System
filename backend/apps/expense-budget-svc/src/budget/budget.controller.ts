@@ -1,19 +1,19 @@
 import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
 import { BudgetService } from './budget.service';
-import { Roles } from '@bdoea-fs/auth';
+import { Public } from '@bdoea-fs/auth';
 
 @Controller('budget-categories')
 export class BudgetController {
   constructor(private readonly budgetService: BudgetService) {}
 
   @Get()
-  @Roles('Treasurer', 'Admin')
+  @Public()
   findAll() {
     return this.budgetService.findAll();
   }
 
   @Get(':id')
-  @Roles('Treasurer', 'Admin')
+  @Public()
   findOne(@Param('id') id: string) {
     return this.budgetService.findOne(id);
   }

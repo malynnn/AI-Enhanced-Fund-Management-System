@@ -1,30 +1,21 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { FundsService } from './funds.service';
-import { Roles } from '@bdoea-fs/auth';
+import { Public } from '@bdoea-fs/auth';
 
 @Controller('funds')
 export class FundsController {
   constructor(private readonly fundsService: FundsService) {}
 
-  /**
-   * GET /funds
-   * Returns all funds with nested transaction history (newest first).
-   * Treasurer and Admin roles only — no public access.
-   */
+  /** GET /funds — returns all funds with nested transaction history */
   @Get()
-  @Roles('Treasurer', 'Admin')
+  @Public()
   findAll() {
     return this.fundsService.findAll();
   }
 
-  /**
-   * GET /funds/:id
-   * Returns a single fund with full history, or 404.
-   * Treasurer and Admin roles only.
-   * NOTE: No POST /funds — balances are updated only via internal RMQ events.
-   */
+  /** GET /funds/:id — returns a single fund with full history, or 404 */
   @Get(':id')
-  @Roles('Treasurer', 'Admin')
+  @Public()
   findOne(@Param('id') id: string) {
     return this.fundsService.findById(id);
   }

@@ -2,7 +2,7 @@ import { Controller, Logger, Get, Query, Patch, Param, Post, Body, BadRequestExc
 import { Ctx, MessagePattern, Payload, RmqContext } from '@nestjs/microservices';
 import { DuesService } from './dues.service';
 import { QUEUE_DUES, DuesPayrollConfirmedEvent } from '@backend/events';
-import { Roles, Public } from '@bdoea-fs/auth';
+import { Public } from '@bdoea-fs/auth';
 
 @Controller('dues')
 export class DuesController {
@@ -11,7 +11,7 @@ export class DuesController {
   constructor(private readonly duesService: DuesService) {}
 
   @Get()
-  @Roles('Treasurer', 'Admin')
+  @Public()
   findAll(@Query('status') status?: string) {
     return this.duesService.findAll(status);
   }
@@ -30,7 +30,7 @@ export class DuesController {
   }
 
   @Patch(':id/confirm')
-  @Roles('Treasurer', 'Admin')
+  @Public()
   confirmDues(@Param('id') id: string) {
     return this.duesService.confirmDues(id);
   }

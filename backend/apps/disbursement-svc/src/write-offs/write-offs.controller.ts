@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Body, Param, Logger } from '@nestjs/common';
 import { WriteOffsService } from './write-offs.service';
-import { Roles } from '@bdoea-fs/auth';
+import { Public } from '@bdoea-fs/auth';
 
 @Controller('loans/write-offs')
 export class WriteOffsController {
@@ -9,7 +9,7 @@ export class WriteOffsController {
   constructor(private readonly writeOffsService: WriteOffsService) {}
 
   @Get()
-  @Roles('Treasurer', 'Admin')
+  @Public()
   findAll() {
     return this.writeOffsService.findAll();
   }

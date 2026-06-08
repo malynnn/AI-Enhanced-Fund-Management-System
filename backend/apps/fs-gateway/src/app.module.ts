@@ -17,16 +17,27 @@ export class AppModule implements NestModule {
     this.logger.log(`Proxy config: disbursementSvcUrl=${disbursementSvcUrl}`);
     this.logger.log(`Proxy config: expenseSvcUrl=${expenseSvcUrl}`);
 
-    // ledger-accounts-svc
+    // ledger-accounts-svc (Accounts)
     consumer
       .apply(
         createProxyMiddleware({
           target: ledgerSvcUrl,
           changeOrigin: true,
-          pathRewrite: { '^/api/finance/accounts': '/accounts' },
+          pathRewrite: { '^/': '/accounts/' },
         }),
       )
-      .forRoutes('/api/finance/accounts/*path');
+      .forRoutes('/api/finance/accounts', '/api/finance/accounts/*path');
+
+    // ledger-accounts-svc (Funds)
+    consumer
+      .apply(
+        createProxyMiddleware({
+          target: ledgerSvcUrl,
+          changeOrigin: true,
+          pathRewrite: { '^/': '/funds/' },
+        }),
+      )
+      .forRoutes('/api/finance/funds', '/api/finance/funds/*path');
 
     // dues-collection-svc
     consumer
@@ -34,10 +45,10 @@ export class AppModule implements NestModule {
         createProxyMiddleware({
           target: duesSvcUrl,
           changeOrigin: true,
-          pathRewrite: { '^/api/finance/dues': '/dues' },
+          pathRewrite: { '^/': '/dues/' },
         }),
       )
-      .forRoutes('/api/finance/dues/*path');
+      .forRoutes('/api/finance/dues', '/api/finance/dues/*path');
 
     // disbursement-svc (Disbursements)
     consumer
@@ -45,10 +56,10 @@ export class AppModule implements NestModule {
         createProxyMiddleware({
           target: disbursementSvcUrl,
           changeOrigin: true,
-          pathRewrite: { '^/api/finance/disbursements': '/disbursements' },
+          pathRewrite: { '^/': '/disbursements/' },
         }),
       )
-      .forRoutes('/api/finance/disbursements/*path');
+      .forRoutes('/api/finance/disbursements', '/api/finance/disbursements/*path');
 
     // disbursement-svc (Loans)
     consumer
@@ -56,10 +67,21 @@ export class AppModule implements NestModule {
         createProxyMiddleware({
           target: disbursementSvcUrl,
           changeOrigin: true,
-          pathRewrite: { '^/api/finance/loans': '/loans' },
+          pathRewrite: { '^/': '/loans/' },
         }),
       )
-      .forRoutes('/api/finance/loans/*path');
+      .forRoutes('/api/finance/loans', '/api/finance/loans/*path');
+
+    // disbursement-svc (Repayments)
+    consumer
+      .apply(
+        createProxyMiddleware({
+          target: disbursementSvcUrl,
+          changeOrigin: true,
+          pathRewrite: { '^/': '/repayments/' },
+        }),
+      )
+      .forRoutes('/api/finance/repayments', '/api/finance/repayments/*path');
 
     // expense-budget-svc (Expense Vouchers) -> maps to /vouchers
     consumer
@@ -67,10 +89,10 @@ export class AppModule implements NestModule {
         createProxyMiddleware({
           target: expenseSvcUrl,
           changeOrigin: true,
-          pathRewrite: { '^/api/finance/expense-vouchers': '/vouchers' },
+          pathRewrite: { '^/': '/vouchers/' },
         }),
       )
-      .forRoutes('/api/finance/expense-vouchers/*path');
+      .forRoutes('/api/finance/expense-vouchers', '/api/finance/expense-vouchers/*path');
 
     // expense-budget-svc (Budget Categories) -> maps to /budget-categories
     consumer
@@ -78,10 +100,10 @@ export class AppModule implements NestModule {
         createProxyMiddleware({
           target: expenseSvcUrl,
           changeOrigin: true,
-          pathRewrite: { '^/api/finance/budget-categories': '/budget-categories' },
+          pathRewrite: { '^/': '/budget-categories/' },
         }),
       )
-      .forRoutes('/api/finance/budget-categories/*path');
+      .forRoutes('/api/finance/budget-categories', '/api/finance/budget-categories/*path');
 
     // expense-budget-svc (Petty Cash) -> maps to /petty-cash
     consumer
@@ -89,10 +111,10 @@ export class AppModule implements NestModule {
         createProxyMiddleware({
           target: expenseSvcUrl,
           changeOrigin: true,
-          pathRewrite: { '^/api/finance/petty-cash': '/petty-cash' },
+          pathRewrite: { '^/': '/petty-cash/' },
         }),
       )
-      .forRoutes('/api/finance/petty-cash/*path');
+      .forRoutes('/api/finance/petty-cash', '/api/finance/petty-cash/*path');
   }
 }
 
