@@ -5,8 +5,8 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo, Suspense } from 'react';
 import { useSession } from 'next-auth/react';
-import { Plus, Edit2, Power, Save, X, Hash, ShieldAlert, Search, Filter, Layers, CreditCard } from 'lucide-react';
-import { PieChart, Pie, Tooltip, ResponsiveContainer } from 'recharts';
+import { Plus, Edit2, Power, Save, X, Hash, ShieldAlert, Search, Filter, Layers, CreditCard, Trash2 } from 'lucide-react';
+import { PieChart, Pie, Tooltip } from 'recharts';
 import Header from '@/components/Header';
 import ActionModal from '@/components/ActionModal';
 
@@ -140,30 +140,59 @@ function AdminChartOfAccountsContent() {
       isOpen: true,
       title: currentStatus === 'Active' ? 'Deactivate Account' : 'Activate Account',
       message: `Are you sure you want to ${currentStatus === 'Active' ? 'deactivate' : 'activate'} this ledger account? This may impact fund mappings if used in active transactions.`,
-      payload: { id, currentStatus },
+      payload: { actionType: 'toggle', id, currentStatus },
+      status: 'idle'
+    });
+  };
+
+  const triggerDeleteAccount = (id: number, name: string) => {
+    setModal({
+      isOpen: true,
+      title: 'Delete Account',
+      message: `Are you sure you want to permanently delete the account "${name}"? This action cannot be undone and will fail if there are existing transactions tied to it.`,
+      payload: { actionType: 'delete', id },
       status: 'idle'
     });
   };
 
   const executeModalAction = async () => {
     setModal(prev => ({ ...prev, status: 'loading' }));
-    const { id, currentStatus } = modal.payload;
+    const { actionType, id, currentStatus } = modal.payload;
     
-    try {
-      const res = await fetch(`/api/finance/accounts/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: currentStatus === 'Active' ? 'Inactive' : 'Active' })
-      });
+    if (actionType === 'toggle') {
+      try {
+        const res = await fetch(`/api/finance/accounts/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: currentStatus === 'Active' ? 'Inactive' : 'Active' })
+        });
 
-      if (res.ok) {
-        setAccounts(accounts.map(a => a.id === id ? { ...a, status: currentStatus === 'Active' ? 'Inactive' : 'Active' } : a));
-        setModal(prev => ({ ...prev, status: 'success', resultMsg: `Account successfully ${currentStatus === 'Active' ? 'deactivated' : 'activated'}.` }));
-      } else {
-        setModal(prev => ({ ...prev, status: 'error', resultMsg: 'Failed to update account status.' }));
+        if (res.ok) {
+          setAccounts(accounts.map(a => a.id === id ? { ...a, status: currentStatus === 'Active' ? 'Inactive' : 'Active' } : a));
+          setModal(prev => ({ ...prev, status: 'success', resultMsg: `Account successfully ${currentStatus === 'Active' ? 'deactivated' : 'activated'}.` }));
+        } else {
+          setModal(prev => ({ ...prev, status: 'error', resultMsg: 'Failed to update account status.' }));
+        }
+      } catch (error) {
+        setModal(prev => ({ ...prev, status: 'error', resultMsg: 'Network error occurred.' }));
       }
-    } catch (error) {
-      setModal(prev => ({ ...prev, status: 'error', resultMsg: 'Network error occurred.' }));
+    } 
+    
+    else if (actionType === 'delete') {
+      try {
+        const res = await fetch(`/api/finance/accounts/${id}`, {
+          method: 'DELETE'
+        });
+
+        if (res.ok) {
+          setAccounts(accounts.filter(a => a.id !== id));
+          setModal(prev => ({ ...prev, status: 'success', resultMsg: 'Account successfully deleted.' }));
+        } else {
+          setModal(prev => ({ ...prev, status: 'error', resultMsg: 'Failed to delete account. It might be tied to existing transactions.' }));
+        }
+      } catch (error) {
+        setModal(prev => ({ ...prev, status: 'error', resultMsg: 'Network error occurred while trying to delete.' }));
+      }
     }
   };
 
@@ -262,13 +291,10 @@ function AdminChartOfAccountsContent() {
             {chartData.length > 0 && !isLoading ? (
               <div className="w-full h-[80px] flex items-center justify-between">
                 <div className="h-[80px] w-[80px]">
-                  {/* FIXED: minWidth and minHeight added to prevent Recharts warning */}
-                  <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
-                    <PieChart>
-                      <Pie data={chartData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={25} outerRadius={38} paddingAngle={3} />
-                      <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', fontSize: '12px', fontWeight: 'bold' }} itemStyle={{ color: '#04152d' }} />
-                    </PieChart>
-                  </ResponsiveContainer>
+                  <PieChart width={80} height={80}>
+                    <Pie data={chartData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={25} outerRadius={38} paddingAngle={3} />
+                    <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', fontSize: '12px', fontWeight: 'bold' }} itemStyle={{ color: '#04152d' }} />
+                  </PieChart>
                 </div>
                 <div className="flex flex-col gap-1.5 w-1/2">
                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">By Account Type</p>
@@ -393,7 +419,7 @@ function AdminChartOfAccountsContent() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right pr-6">
-                      <div className="flex items-center justify-end gap-2">
+                      <div className="flex items-center justify-end gap-1.5">
                         <button 
                           onClick={() => openForm(acc)} 
                           className="inline-flex items-center justify-center gap-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 font-medium p-2 rounded-xl transition-all duration-150" 
@@ -407,6 +433,13 @@ function AdminChartOfAccountsContent() {
                           title={acc.status === 'Active' ? "Deactivate" : "Activate"}
                         >
                           <Power size={16}/>
+                        </button>
+                        <button 
+                          onClick={() => triggerDeleteAccount(acc.id, acc.name)}
+                          className="inline-flex items-center justify-center gap-2 text-gray-400 hover:text-red-600 hover:bg-red-50 font-medium p-2 rounded-xl transition-all duration-150" 
+                          title="Delete Account"
+                        >
+                          <Trash2 size={16}/>
                         </button>
                       </div>
                     </td>
@@ -515,4 +548,4 @@ export default function AdminChartOfAccountsPage() {
       <AdminChartOfAccountsContent />
     </Suspense>
   );
-}
+}
