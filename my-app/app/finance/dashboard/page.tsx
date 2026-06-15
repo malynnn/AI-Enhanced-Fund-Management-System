@@ -2,61 +2,48 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useState, useMemo, Suspense } from 'react';
-import { Wallet, Clock, CheckCircle2, ShieldCheck, CreditCard, WalletCards, CircleDollarSign, ArrowRight, Activity } from 'lucide-react';
+import { useState, useMemo, Suspense, useEffect } from 'react';
+import { Wallet, Clock, CheckCircle2, ShieldCheck, CreditCard, WalletCards, CircleDollarSign, ArrowRight, Activity, Loader2 } from 'lucide-react';
 import { PieChart, Pie, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import Header from '@/components/Header';
 import ActionModal from '@/components/ActionModal';
 
-// --- MOCK DATABASE ---
-const initialFunds = [
-  { id: 'GF', name: 'General Fund', balance: 1812350, txCount: 248 },
-  { id: 'UF', name: 'Union Fund', balance: 4520900, txCount: 112 },
-  { id: 'LN', name: 'Loans', balance: 1468000, txCount: 45 },
-  { id: 'FA', name: 'Foreign Assistance', balance: 2500000, txCount: 30 },
-  { id: 'DA', name: 'Death Assistance', balance: 850000, txCount: 20 },
-];
-
-const initialLedger = [
-  { id: 1, fundId: 'GF', date: '2026-04-22', desc: 'Member Dues Batch Remittance', type: 'Credit', amount: 15000, ref: 'REF-8812' },
-  { id: 2, fundId: 'LN', date: '2026-04-26', desc: 'Disbursement: VINLUAN, VEN', type: 'Debit', amount: 30000, ref: 'LN-2026-071' },
-  { id: 3, fundId: 'GF', date: '2026-04-20', desc: 'Office Supplies Vendor Payment', type: 'Debit', amount: 4500, ref: 'REF-8809' },
-  { id: 4, fundId: 'UF', date: '2026-04-18', desc: 'Union Assembly Expense', type: 'Debit', amount: 12000, ref: 'UN-2026-004' },
-  { id: 5, fundId: 'FA', date: '2026-04-15', desc: 'Foreign Grant Received', type: 'Credit', amount: 500000, ref: 'FG-8801' },
-  { id: 6, fundId: 'DA', date: '2026-04-10', desc: 'Death Claim Benefit Release', type: 'Debit', amount: 20000, ref: 'DC-2026-012' },
-];
-
-const incomingWebhookQueue = [
-  { 
-    disbursement_txn_id: 'DISB-2026-9921', 
-    loan_ref: 'LN-2026-088', 
-    member_id: 'M-2023-112',
-    member_name: 'DELA CRUZ, JUAN',
-    amount: 50000, 
-    date: '2026-05-11', 
-    payment_method: 'Bank Transfer', 
-    fund_to_debit: 'Loans', 
-    fund_id: 'LN',
-    authorised_by: 'LAS_SYSTEM_AUTO' 
-  },
-];
-
-// Mock Overviews for Dashboard
-const duesOverview = { collectedThisMonth: 385000, targetThisMonth: 450000, collectionRate: 85.5, unpaidMembers: 24 };
-const loansOverview = { activeLoans: 42, totalReceivables: 1250000, pendingApplications: 3 };
-
 const CHART_COLORS = ['#04152d', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444'];
 
 function TreasurerDashboardContent() {
-  const [funds, setFunds] = useState(initialFunds);
-  const [ledger, setLedger] = useState(initialLedger);
-  const [pendingDisbursements, setPendingDisbursements] = useState(incomingWebhookQueue);
-  const [selectedFund, setSelectedFund] = useState(initialFunds[0]);
+  const [funds, setFunds] = useState<any[]>([]);
+  const [ledger, setLedger] = useState<any[]>([]);
+  const [pendingDisbursements, setPendingDisbursements] = useState<any[]>([]);
+  const [selectedFund, setSelectedFund] = useState<any>(null);
+  const [duesOverview, setDuesOverview] = useState({ collectedThisMonth: 0, targetThisMonth: 0, collectionRate: 0, unpaidMembers: 0 });
+  const [loansOverview, setLoansOverview] = useState({ activeLoans: 0, totalReceivables: 0, pendingApplications: 0 });
+  const [isLoading, setIsLoading] = useState(true);
   
   // --- MODAL STATE ---
   const [actionModal, setActionModal] = useState<{
     isOpen: boolean; title: string; message: string; status: 'idle' | 'loading' | 'success' | 'error'; resultMsg?: string; payload?: any;
   }>({ isOpen: false, title: '', message: '', status: 'idle' });
+
+  useEffect(() => {
+    const fetchDashboard = async () => {
+      try {
+        const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
+        const res = await fetch(`${gatewayUrl}/api/finance/dashboard`);
+        const data = await res.json();
+        setFunds(data.funds || []);
+        setLedger(data.ledger || []);
+        setPendingDisbursements(data.incomingWebhookQueue || []);
+        if (data.duesOverview) setDuesOverview(data.duesOverview);
+        if (data.loansOverview) setLoansOverview(data.loansOverview);
+        if (data.funds && data.funds.length > 0) setSelectedFund(data.funds[0]);
+      } catch (err) {
+        console.error('Failed to fetch dashboard data', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchDashboard();
+  }, []);
 
   // Prepare chart data with `fill` injected to fix Recharts warning
   const chartData = useMemo(() => {
@@ -106,7 +93,7 @@ function TreasurerDashboardContent() {
     }, 1200);
   };
 
-  const activeTransactions = ledger.filter(tx => tx.fundId === selectedFund.id);
+  const activeTransactions = selectedFund ? ledger.filter(tx => tx.fundId === selectedFund.id) : [];
   const totalLiquidity = funds.reduce((acc, curr) => acc + curr.balance, 0);
 
   const fundStyles: Record<string, string> = {
@@ -134,8 +121,15 @@ function TreasurerDashboardContent() {
       <Header />
 
       <div className="p-4 md:p-6 max-w-[1600px] w-full mx-auto space-y-6 animate-fade-in flex-1">
-
-        {/* STATIC TOP FUND CONTAINERS */}
+        
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center h-64 text-gray-400">
+            <Loader2 className="w-8 h-8 animate-spin mb-4" />
+            <p>Loading Dashboard...</p>
+          </div>
+        ) : (
+          <>
+            {/* STATIC TOP FUND CONTAINERS */}
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           {funds.map((fund) => (
             <div key={fund.id} className={`relative isolate overflow-hidden rounded-[20px] p-5 shadow-sm ${fundStyles[fund.id]}`}>
@@ -279,7 +273,7 @@ function TreasurerDashboardContent() {
                   <div className="flex items-center gap-3 relative">
                     <div className="relative inline-block w-full sm:w-auto">
                       <select
-                        value={selectedFund.id}
+                        value={selectedFund?.id || ''}
                         onChange={(e) => {
                           const target = funds.find(f => f.id === e.target.value);
                           if (target) setSelectedFund(target);
@@ -414,6 +408,8 @@ function TreasurerDashboardContent() {
 
           </div>
         </div>
+        </>
+        )}
       </div>
     </div>
   );

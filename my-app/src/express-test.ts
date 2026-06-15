@@ -12,7 +12,7 @@ app.get('/api/protected', fsSSOAuthMiddleware, (req: Request, res: Response) => 
   });
 });
 
-const PORT = 3001;
+const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`\n✅ Test Server is running!`);
   console.log(`➡ Pwede mo nang i-test sa Postman: http://localhost:${PORT}/api/protected\n`);

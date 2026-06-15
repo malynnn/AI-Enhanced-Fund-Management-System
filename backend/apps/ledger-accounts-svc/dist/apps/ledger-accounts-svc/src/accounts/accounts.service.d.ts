@@ -9,8 +9,8 @@ export declare class AccountsService {
         id: string;
         code: string;
         name: string;
-        type: string;
-        status: string;
+        type: import(".prisma/client").$Enums.AccountType;
+        status: import(".prisma/client").$Enums.AccountStatus;
         createdAt: Date;
         updatedAt: Date;
     }[]>;
@@ -19,8 +19,8 @@ export declare class AccountsService {
         id: string;
         code: string;
         name: string;
-        type: string;
-        status: string;
+        type: import(".prisma/client").$Enums.AccountType;
+        status: import(".prisma/client").$Enums.AccountStatus;
         createdAt: Date;
         updatedAt: Date;
     }>;
@@ -29,8 +29,8 @@ export declare class AccountsService {
         id: string;
         code: string;
         name: string;
-        type: string;
-        status: string;
+        type: import(".prisma/client").$Enums.AccountType;
+        status: import(".prisma/client").$Enums.AccountStatus;
         createdAt: Date;
         updatedAt: Date;
     }>;
@@ -39,8 +39,8 @@ export declare class AccountsService {
         id: string;
         code: string;
         name: string;
-        type: string;
-        status: string;
+        type: import(".prisma/client").$Enums.AccountType;
+        status: import(".prisma/client").$Enums.AccountStatus;
         createdAt: Date;
         updatedAt: Date;
     }>;
@@ -49,8 +49,8 @@ export declare class AccountsService {
         id: string;
         code: string;
         name: string;
-        type: string;
-        status: string;
+        type: import(".prisma/client").$Enums.AccountType;
+        status: import(".prisma/client").$Enums.AccountStatus;
         createdAt: Date;
         updatedAt: Date;
     }>;

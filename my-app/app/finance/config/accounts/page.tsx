@@ -35,6 +35,7 @@ const CHART_COLORS = ['#04152d', '#10b981', '#facc15', '#8b5cf6', '#ef4444'];
 function AdminChartOfAccountsContent() {
   const { data: session } = useSession();
   const role = (session?.user as any)?.role || 'Superadmin';
+  const accessToken = (session as any)?.accessToken;
 
   const [accounts, setAccounts] = useState<Account[]>(initialAccounts);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -161,9 +162,13 @@ function AdminChartOfAccountsContent() {
     
     if (actionType === 'toggle') {
       try {
-        const res = await fetch(`/api/finance/accounts/${id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
+        const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
+        const res = await fetch(`${gatewayUrl}/api/finance/accounts/${id}`, {
+          method: 'PUT',
+          headers: { 
+            'Content-Type': 'application/json',
+            ...(accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {})
+          },
           body: JSON.stringify({ status: currentStatus === 'Active' ? 'Inactive' : 'Active' })
         });
 
@@ -180,8 +185,12 @@ function AdminChartOfAccountsContent() {
     
     else if (actionType === 'delete') {
       try {
-        const res = await fetch(`/api/finance/accounts/${id}`, {
-          method: 'DELETE'
+        const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
+        const res = await fetch(`${gatewayUrl}/api/finance/accounts/${id}`, {
+          method: 'DELETE',
+          headers: {
+            ...(accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {})
+          }
         });
 
         if (res.ok) {
@@ -199,12 +208,16 @@ function AdminChartOfAccountsContent() {
   const handleSaveForm = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const url = editingId ? `/api/finance/accounts/${editingId}` : '/api/finance/accounts';
+      const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
+      const url = editingId ? `${gatewayUrl}/api/finance/accounts/${editingId}` : `${gatewayUrl}/api/finance/accounts`;
       const method = editingId ? 'PUT' : 'POST';
       
       const res = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...(accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {})
+        },
         body: JSON.stringify(formData)
       });
       

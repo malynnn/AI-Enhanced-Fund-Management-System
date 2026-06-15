@@ -34,22 +34,30 @@ export class AccountsController {
 
   /** POST /accounts — Admin only; 409 if code already exists */
   @Post()
-  @Roles('Admin')
+  @Roles('Superadmin', 'Officer/Admin', 'Admin')
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() dto: CreateAccountDto) {
-    return this.accountsService.create(dto);
+  async create(@Body() dto: CreateAccountDto) {
+    try {
+      return await this.accountsService.create(dto);
+    } catch (err) {
+      return {
+        error: 'Error occurred in create',
+        message: err.message,
+        stack: err.stack
+      };
+    }
   }
 
   /** PUT /accounts/:id — Admin only; updates name, type, fund, or status */
   @Put(':id')
-  @Roles('Admin')
+  @Roles('Superadmin', 'Officer/Admin', 'Admin')
   update(@Param('id') id: string, @Body() dto: UpdateAccountDto) {
     return this.accountsService.update(id, dto);
   }
 
-  /** DELETE /accounts/:id — Admin only; soft-deletes (status → Inactive) */
+  /** DELETE /accounts/:id — Admin only; soft-deletes (status → Archived) */
   @Delete(':id')
-  @Roles('Admin')
+  @Roles('Superadmin', 'Officer/Admin', 'Admin')
   softDelete(@Param('id') id: string) {
     return this.accountsService.softDelete(id);
   }

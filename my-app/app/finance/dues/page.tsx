@@ -57,37 +57,7 @@ export default function DuesCollectionPage() {
     resultMsg?: string;
   }>({ isOpen: false, title: '', message: '', status: 'idle' });
 
-  // Webhook State (Init empty/static to prevent hydration errors)
-  const [webhookData, setWebhookData] = useState({
-    transaction_id: '',
-    date: '',
-    member_id: '',
-    full_name: 'Dela Cruz, Juan',
-    month_covered: 'May 2026',
-    amount: '500.00',
-    payment_method: 'Salary Deduction',
-    reference_number: '',
-    fund_to_credit: 'GF'
-  });
-  
-  const [webhookLogs, setWebhookLogs] = useState<Array<{ timestamp: string; type: string; payload: any }>>([]);
 
-  // Fix hydration mismatch by setting dynamic default values only on client
-  useEffect(() => {
-    setWebhookData(prev => ({
-      ...prev,
-      transaction_id: `TXN-MS-${Math.floor(100000 + Math.random() * 900000)}`,
-      date: new Date().toISOString().split('T')[0],
-      member_id: 'M-2026-' + Math.floor(100 + Math.random() * 900),
-      reference_number: `REF-${Math.floor(10000 + Math.random() * 90000)}`,
-    }));
-    
-    setWebhookLogs([{
-      timestamp: new Date().toLocaleTimeString(),
-      type: 'SYSTEM_INFO',
-      payload: { status: 'ONLINE', message: 'Webhook Listener initialized.' }
-    }]);
-  }, []);
 
   // --- FILTERING LOGIC ---
   const filteredRecords = useMemo(() => {
@@ -161,7 +131,7 @@ export default function DuesCollectionPage() {
     if (!record) return;
 
     try {
-      const response = await fetch('/api/mock/ms-callback', {
+      const response = await fetch(`/api/mock/ms-callback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -206,64 +176,7 @@ export default function DuesCollectionPage() {
   };
 
 
-  const triggerWebhookSimulation = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsPosting('__sim__'); // flag to indicate sending simulator
-    
-    try {
-      const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3000';
-      const response = await fetch(`${gatewayUrl}/api/finance/dues/webhook`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          transactionId: webhookData.transaction_id,
-          date: webhookData.date,
-          memberId: webhookData.member_id,
-          fullName: webhookData.full_name,
-          monthCovered: webhookData.month_covered,
-          amount: parseFloat(webhookData.amount),
-          paymentMethod: webhookData.payment_method,
-          referenceNumber: webhookData.reference_number,
-          fundCredited: webhookData.fund_to_credit
-        })
-      });
 
-      const responseData = await response.json();
-
-      setWebhookLogs(prev => [
-        {
-          timestamp: new Date().toLocaleTimeString(),
-          type: response.ok ? 'WEBHOOK_SUCCESS (201)' : `WEBHOOK_ERROR (${response.status})`,
-          payload: responseData
-        },
-        ...prev
-      ]);
-
-      if (response.ok) {
-        // Fetch fresh records to reflect new database state
-        fetchDuesRecords();
-        
-        // Reset form to random next
-        setWebhookData(prev => ({
-          ...prev,
-          transaction_id: `TXN-MS-${Math.floor(100000 + Math.random() * 900000)}`,
-          reference_number: `REF-${Math.floor(10000 + Math.random() * 90000)}`,
-        }));
-      }
-
-    } catch (err: any) {
-      setWebhookLogs(prev => [
-        {
-          timestamp: new Date().toLocaleTimeString(),
-          type: 'NETWORK_ERROR',
-          payload: err.message
-        },
-        ...prev
-      ]);
-    } finally {
-      setIsPosting(null);
-    }
-  };
 
   return (
     <div className="flex flex-col min-h-screen bg-transparent print:bg-white relative">
@@ -462,47 +375,7 @@ export default function DuesCollectionPage() {
               </div>
             </div>
 
-            {/* BOTTOM COMPONENT: SIMULATOR & CONSOLE UNDERNEATH TABLE */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-4">
-              
-              <div className="bg-white rounded-2xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 h-full">
-                <div className="mb-6 border-b border-gray-100 pb-4">
-                  <h2 className="text-xs font-black text-gray-400 uppercase tracking-[0.15em] mb-2 flex items-center gap-2">
-                    <span className="text-[#8b5cf6]">{`>_`}</span> Webhook Simulator
-                  </h2>
-                  <p className="text-gray-500 text-xs leading-relaxed font-medium">
-                    Inject test payloads into the collection queue.
-                  </p>
-                </div>
 
-                <form onSubmit={triggerWebhookSimulation}>
-                  <button type="submit" className="w-full inline-flex items-center justify-center gap-2 bg-[#8b5cf6] hover:bg-[#7c3aed] text-white font-bold py-3 px-6 rounded-xl text-sm shadow-[0_6px_0_rgba(109,40,217,0.45),0_4px_18px_rgba(139,92,246,0.4)] hover:-translate-y-[1px] active:translate-y-[4px] active:shadow-[0_2px_0_rgba(109,40,217,0.45),0_2px_8px_rgba(139,92,246,0.25)] transition-all">
-                    <RefreshCw size={16} /> Send Random Event
-                  </button>
-                </form>
-              </div>
-
-              <div className="lg:col-span-2 bg-[#04152d] rounded-2xl text-green-400 p-6 font-mono text-xs flex flex-col shadow-2xl h-[250px] border border-[#071c3a]">
-                <div className="flex justify-between items-center mb-4 flex-shrink-0 border-b border-[#0f2a52] pb-4">
-                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
-                    Traffic Console
-                  </span>
-                </div>
-                <div className="flex-1 overflow-y-auto space-y-3 pr-2 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full">
-                  {/* Replace your current webhookLogs.map with this: */}
-                  {webhookLogs.map((log, index) => (
-                    <div key={index} className="text-xs text-gray-300 font-mono whitespace-pre-wrap leading-relaxed">
-                      <span className="text-blue-400">
-                        [{typeof window === 'undefined' ? '...' : log.timestamp}]
-                      </span> 
-                      <span className="text-[#facc15]">{log.type}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-            </div>
 
           </div>
         )}

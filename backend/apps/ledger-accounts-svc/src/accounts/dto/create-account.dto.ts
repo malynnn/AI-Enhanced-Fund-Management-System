@@ -1,6 +1,8 @@
+import { AccountType } from '@prisma/client';
+
 export class CreateAccountDto {
   code: string;
   name: string;
-  type: string;  // Asset | Liability | Equity | Income | Expense
+  type: AccountType;
   fund: string;
 }

@@ -18,10 +18,18 @@ export default function FundManagementPage() {
   const fetchRealFundsData = async () => {
     try {
       setIsLoading(true);
-      const res = await fetch('/api/finance/funds');
+      const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
+      const res = await fetch(`${gatewayUrl}/api/finance/funds`);
       if (res.ok) {
         const data = await res.json();
-        setFunds(data);
+        const mappedData = data.map((f: any) => ({
+          id: f.code || f.id,
+          name: f.name,
+          type: (f.code === 'GF' || f.code === 'UF') ? 'Operational' : 'Restricted',
+          status: 'Active',
+          balance: Number(f.currentBalance ?? f.balance ?? 0)
+        }));
+        setFunds(mappedData);
       } else {
         console.error("Failed to fetch funds data from backend.");
       }
@@ -91,7 +99,8 @@ export default function FundManagementPage() {
 
     try {
       // 2. Send actual data to backend
-      const res = await fetch('/api/finance/funds/transfer', {
+      const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
+      const res = await fetch(`${gatewayUrl}/api/finance/funds/transfer`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -114,7 +123,12 @@ export default function FundManagementPage() {
           resultMsg: `Successfully transferred ₱${data.amount.toLocaleString()} based on ${data.notes}.`
         });
       } else {
-        const errData = await res.json();
+        let errData;
+        try {
+          errData = await res.json();
+        } catch {
+          errData = { error: 'An unknown server error occurred. Please try again.' };
+        }
         setActionModal({
           isOpen: true,
           title: 'Transfer Failed',

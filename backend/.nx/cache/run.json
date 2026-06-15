@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx build ledger-accounts-svc",
+    "startTime": "2026-06-14T21:35:17.802Z",
+    "endTime": "2026-06-14T21:35:26.158Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "ledger-accounts-svc:build",
+      "target": "build",
+      "projectName": "ledger-accounts-svc",
+      "hash": "6385088837741868648",
+      "startTime": "2026-06-14T21:35:17.827Z",
+      "endTime": "2026-06-14T21:35:26.135Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    }
+  ]
+}

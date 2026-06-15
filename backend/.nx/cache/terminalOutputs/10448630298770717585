@@ -1,0 +1,39 @@
+
+> ledger-accounts-svc@0.0.1 build
+> nest build
+
+[96msrc/accounts/accounts.service.ts[0m:[93m47[0m:[93m48[0m - [91merror[0m[90m TS2322: [0mType 'CreateAccountDto' is not assignable to type '(Without<ChartOfAccountCreateInput, ChartOfAccountUncheckedCreateInput> & ChartOfAccountUncheckedCreateInput) | (Without<...> & ChartOfAccountCreateInput)'.
+  Type 'CreateAccountDto' is not assignable to type 'Without<ChartOfAccountUncheckedCreateInput, ChartOfAccountCreateInput> & ChartOfAccountCreateInput'.
+    Type 'CreateAccountDto' is not assignable to type 'ChartOfAccountCreateInput'.
+      Types of property 'type' are incompatible.
+        Type 'string' is not assignable to type 'AccountType'.
+
+[7m47[0m     return this.prisma.chartOfAccount.create({ data: dto });
+[7m  [0m [91m                                               ~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m12058[0m:[93m5[0m
+    [7m12058[0m     data: XOR<ChartOfAccountCreateInput, ChartOfAccountUncheckedCreateInput>
+    [7m     [0m [96m    ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ select?: ChartOfAccountSelect<DefaultArgs>; include?: ChartOfAccountInclude<DefaultArgs>; data: (Without<...> & ChartOfAccountUncheckedCreateInput) | (Without<...> & ChartOfAccountCreateInput); }'
+[96msrc/accounts/accounts.service.ts[0m:[93m55[0m:[93m7[0m - [91merror[0m[90m TS2322: [0mType 'UpdateAccountDto' is not assignable to type '(Without<ChartOfAccountUpdateInput, ChartOfAccountUncheckedUpdateInput> & ChartOfAccountUncheckedUpdateInput) | (Without<...> & ChartOfAccountUpdateInput)'.
+  Type 'UpdateAccountDto' is not assignable to type 'Without<ChartOfAccountUncheckedUpdateInput, ChartOfAccountUpdateInput> & ChartOfAccountUpdateInput'.
+    Types of property 'type' are incompatible.
+      Type 'string' is not assignable to type 'AccountType | EnumAccountTypeFieldUpdateOperationsInput'.
+
+[7m55[0m       data: dto,
+[7m  [0m [91m      ~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m12102[0m:[93m5[0m
+    [7m12102[0m     data: XOR<ChartOfAccountUpdateInput, ChartOfAccountUncheckedUpdateInput>
+    [7m     [0m [96m    ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ select?: ChartOfAccountSelect<DefaultArgs>; include?: ChartOfAccountInclude<DefaultArgs>; data: (Without<...> & ChartOfAccountUncheckedUpdateInput) | (Without<...> & ChartOfAccountUpdateInput); where: ChartOfAccountWhereUniqueInput; }'
+
+Found 2 error(s).
+
+npm error Lifecycle script `build` failed with error:
+npm error code 1
+npm error path C:\Users\Angel Aubrey\Documents\stone-cap\Finance-System_Capstone-1\backend\apps\ledger-accounts-svc
+npm error workspace ledger-accounts-svc@0.0.1
+npm error location C:\Users\Angel Aubrey\Documents\stone-cap\Finance-System_Capstone-1\backend\apps\ledger-accounts-svc
+npm error command failed
+npm error command C:\windows\system32\cmd.exe /d /s /c nest build

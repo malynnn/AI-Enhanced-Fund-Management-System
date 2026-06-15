@@ -73,18 +73,7 @@ export default function LoansDashboard() {
     resultMsg?: string;
   }>({ isOpen: false, title: '', message: '', actionType: null, status: 'idle' });
 
-  // --- FORMS ---
-  const [simulatorForm, setSimulatorForm] = useState({
-    loanReference: 'LN-2026-071',
-    memberId: 'M-101',
-    memberName: 'Ven Vinluan',
-    amount: '10500',
-    autoSplit: true,
-    principalAmount: '10000',
-    serviceFeeAmount: '500',
-    paymentMethod: 'GCASH',
-    referenceNumber: 'GC-98273'
-  });
+
 
   const [writeOffForm, setWriteOffForm] = useState({
     loanReference: 'LN-2026-092',
@@ -99,10 +88,11 @@ export default function LoansDashboard() {
   const loadData = async () => {
     try {
       setLoading(true);
+      const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
       const [fundsRes, repaymentsRes, writeOffsRes] = await Promise.all([
-        fetch('/api/finance/funds'),
-        fetch('/api/webhooks/repayments'),
-        fetch('/api/finance/loans/write-off')
+        fetch(`${gatewayUrl}/api/finance/funds`),
+        fetch(`${gatewayUrl}/api/webhooks/repayments`),
+        fetch(`${gatewayUrl}/api/finance/loans/write-off`)
       ]);
 
       if (fundsRes.ok) setFunds(await fundsRes.json());
@@ -125,43 +115,7 @@ export default function LoansDashboard() {
     setTimeout(() => setNotification(null), 5000);
   };
 
-  const handleSimFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setSimulatorForm(prev => {
-      const updated = { ...prev, [name]: value };
-      if (name === 'amount' && prev.autoSplit) {
-        const amt = parseFloat(value) || 0;
-        updated.principalAmount = (amt * 0.95).toFixed(2);
-        updated.serviceFeeAmount = (amt * 0.05).toFixed(2);
-      }
-      return updated;
-    });
-  };
 
-  const toggleAutoSplit = () => {
-    setSimulatorForm(prev => {
-      const auto = !prev.autoSplit;
-      const updated = { ...prev, autoSplit: auto };
-      if (auto) {
-        const amt = parseFloat(prev.amount) || 0;
-        updated.principalAmount = (amt * 0.95).toFixed(2);
-        updated.serviceFeeAmount = (amt * 0.05).toFixed(2);
-      }
-      return updated;
-    });
-  };
-
-  // --- MODAL TRIGGERS ---
-  const triggerRepaymentWebhook = (e: React.FormEvent) => {
-    e.preventDefault();
-    setModal({
-      isOpen: true,
-      title: 'Confirm Webhook Simulation',
-      message: `You are about to inject a mock repayment payload of ₱${simulatorForm.amount} for ${simulatorForm.loanReference}. Proceed?`,
-      actionType: 'simulateWebhook',
-      status: 'idle'
-    });
-  };
 
   const triggerResolveOverpayment = (repaymentId: string, decision: 'ADVANCE_CREDIT' | 'REFUND') => {
     setModal({
@@ -199,36 +153,12 @@ export default function LoansDashboard() {
   // --- EXECUTE API LOGIC VIA MODAL ---
   const executeModalAction = async () => {
     setModal(prev => ({ ...prev, status: 'loading' }));
+    const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
     
     try {
-      if (modal.actionType === 'simulateWebhook') {
-        const res = await fetch('/api/webhooks/repayments', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            loanReference: simulatorForm.loanReference,
-            memberId: simulatorForm.memberId,
-            memberName: simulatorForm.memberName,
-            amount: parseFloat(simulatorForm.amount),
-            principalAmount: parseFloat(simulatorForm.principalAmount),
-            serviceFeeAmount: parseFloat(simulatorForm.serviceFeeAmount),
-            paymentMethod: simulatorForm.paymentMethod,
-            referenceNumber: simulatorForm.referenceNumber
-          })
-        });
-        const data = await res.json();
-        if (res.ok && data.success) {
-          await loadData();
-          setActiveTab('repayments');
-          setModal(prev => ({ ...prev, status: 'success', resultMsg: 'Webhook fired successfully. Ledger updated.' }));
-        } else {
-          setModal(prev => ({ ...prev, status: 'error', resultMsg: data.error || 'Failed to submit repayment.' }));
-        }
-      }
-
-      else if (modal.actionType === 'overpayment') {
+      if (modal.actionType === 'overpayment') {
         const { repaymentId, decision } = modal.payload;
-        const res = await fetch('/api/finance/loans/overpayment', {
+        const res = await fetch(`${gatewayUrl}/api/finance/loans/overpayment`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ repaymentId, decision, authorizedBy: 'Treasurer Romalyn' })
@@ -243,7 +173,7 @@ export default function LoansDashboard() {
       } 
       
       else if (modal.actionType === 'requestWriteOff') {
-        const res = await fetch('/api/finance/loans/write-off', {
+        const res = await fetch(`${gatewayUrl}/api/finance/loans/write-off`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -267,7 +197,7 @@ export default function LoansDashboard() {
 
       else if (modal.actionType === 'processWriteOff') {
         const { id, status } = modal.payload;
-        const res = await fetch('/api/finance/loans/write-off', {
+        const res = await fetch(`${gatewayUrl}/api/finance/loans/write-off`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ id, status, authorizedBy: 'Treasurer Workflow' })
@@ -623,63 +553,7 @@ export default function LoansDashboard() {
             </div>
           )}
 
-          {/* GLOBAL SIMULATOR FORM - Always fixed at bottom to provide table breathing room */}
-          <div className="w-full bg-white rounded-2xl p-8 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 mt-12 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-            <div className="mb-8 border-b border-gray-100 pb-4">
-              <h2 className="text-xs font-black text-gray-400 uppercase tracking-[0.15em] mb-2 flex items-center gap-2">
-                <span className="text-[#8b5cf6]">{`>_`}</span> MS Webhook Simulator
-              </h2>
-              <p className="text-gray-500 text-sm leading-relaxed font-medium">
-                Inject test payload into the loans collection queue to test Ledger processing.
-              </p>
-            </div>
-            
-            <form onSubmit={triggerRepaymentWebhook} className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-              
-              <div className="xl:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Loan Reference ID</label>
-                  <input type="text" name="loanReference" value={simulatorForm.loanReference} onChange={handleSimFormChange} className="w-full rounded-xl px-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#04152d] focus:ring-[3px] focus:ring-[#04152d]/10 outline-none transition-colors font-mono font-bold text-[#04152d]" required />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-black text-[#04152d] uppercase tracking-[0.12em] mb-1.5">Amount Remitted (₱)</label>
-                  <input type="number" name="amount" value={simulatorForm.amount} onChange={handleSimFormChange} className="w-full rounded-xl px-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#04152d] focus:ring-[3px] focus:ring-[#04152d]/10 outline-none transition-colors font-mono font-black text-[#04152d] text-lg" required />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Member ID</label>
-                  <input type="text" name="memberId" value={simulatorForm.memberId} onChange={handleSimFormChange} className="w-full rounded-xl px-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#04152d] focus:ring-[3px] focus:ring-[#04152d]/10 outline-none transition-colors font-mono font-bold text-[#04152d]" required />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Member Name</label>
-                  <input type="text" name="memberName" value={simulatorForm.memberName} onChange={handleSimFormChange} className="w-full rounded-xl px-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#04152d] focus:ring-[3px] focus:ring-[#04152d]/10 outline-none transition-colors font-bold text-[#04152d]" required />
-                </div>
-              </div>
 
-              <div className="xl:col-span-1 bg-[#f8faff] border border-blue-100 p-6 rounded-2xl flex flex-col justify-between">
-                <div>
-                  <label className="font-black text-xs text-[#04152d] flex items-center gap-3 mb-6 cursor-pointer select-none border-b border-blue-100 pb-4">
-                    <input type="checkbox" checked={simulatorForm.autoSplit} onChange={toggleAutoSplit} className="w-4 h-4 rounded border-gray-300 text-[#04152d] focus:ring-[#04152d]" /> 
-                    Auto-calculate splits (95% / 5%)
-                  </label>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Principal (₱)</label>
-                      <input type="number" name="principalAmount" value={simulatorForm.principalAmount} onChange={handleSimFormChange} disabled={simulatorForm.autoSplit} className="w-full rounded-xl px-3 py-2 text-sm bg-white border border-[#dde3ee] font-mono font-bold text-[#04152d] outline-none disabled:bg-gray-100 disabled:text-gray-500" />
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Service Fee (₱)</label>
-                      <input type="number" name="serviceFeeAmount" value={simulatorForm.serviceFeeAmount} onChange={handleSimFormChange} disabled={simulatorForm.autoSplit} className="w-full rounded-xl px-3 py-2 text-sm bg-white border border-[#dde3ee] font-mono font-bold text-[#04152d] outline-none disabled:bg-gray-100 disabled:text-gray-500" />
-                    </div>
-                  </div>
-                </div>
-                
-                <button type="button" onClick={triggerRepaymentWebhook} disabled={modal.status === 'loading'} className="w-full inline-flex items-center justify-center gap-2 bg-[#8b5cf6] hover:bg-[#7c3aed] text-white font-black py-3.5 px-6 rounded-xl text-sm shadow-[0_6px_0_rgba(109,40,217,0.45),0_4px_18px_rgba(139,92,246,0.4)] hover:-translate-y-[1px] active:translate-y-[4px] active:shadow-[0_2px_0_rgba(109,40,217,0.45),0_2px_8px_rgba(139,92,246,0.25)] transition-all mt-8">
-                  <Send size={16} /> Trigger Webhook Event
-                </button>
-              </div>
-
-            </form>
-          </div>
 
         </div>
       </main>

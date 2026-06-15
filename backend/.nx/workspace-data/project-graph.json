@@ -64,7 +64,7 @@
               "script": "start"
             },
             "metadata": {
-              "scriptContent": "nest start",
+              "scriptContent": "node -r tsconfig-paths/register -r ts-node/register src/main.ts",
               "runCommand": "npm run start"
             },
             "configurations": {},
@@ -76,7 +76,7 @@
               "script": "start:dev"
             },
             "metadata": {
-              "scriptContent": "nest start --watch",
+              "scriptContent": "nodemon --watch src --ext ts --exec \"node -r tsconfig-paths/register -r ts-node/register src/main.ts\"",
               "runCommand": "npm run start:dev"
             },
             "configurations": {},
@@ -100,7 +100,7 @@
               "script": "start:prod"
             },
             "metadata": {
-              "scriptContent": "node dist/main",
+              "scriptContent": "node -r tsconfig-paths/register dist/main",
               "runCommand": "npm run start:prod"
             },
             "configurations": {},
@@ -246,7 +246,7 @@
               "script": "start"
             },
             "metadata": {
-              "scriptContent": "nest start",
+              "scriptContent": "node -r tsconfig-paths/register -r ts-node/register src/main.ts",
               "runCommand": "npm run start"
             },
             "configurations": {},
@@ -258,7 +258,7 @@
               "script": "start:dev"
             },
             "metadata": {
-              "scriptContent": "nest start --watch",
+              "scriptContent": "nodemon --watch src --ext ts --exec \"node -r tsconfig-paths/register -r ts-node/register src/main.ts\"",
               "runCommand": "npm run start:dev"
             },
             "configurations": {},
@@ -282,7 +282,7 @@
               "script": "start:prod"
             },
             "metadata": {
-              "scriptContent": "node dist/main",
+              "scriptContent": "node -r tsconfig-paths/register dist/main",
               "runCommand": "npm run start:prod"
             },
             "configurations": {},
@@ -440,7 +440,7 @@
               "script": "start:dev"
             },
             "metadata": {
-              "scriptContent": "nest start --watch",
+              "scriptContent": "nodemon --watch src --ext ts --exec \"node -r tsconfig-paths/register -r ts-node/register src/main.ts\"",
               "runCommand": "npm run start:dev"
             },
             "configurations": {},
@@ -575,6 +575,188 @@
           "description": "",
           "js": {
             "packageName": "disbursement-svc",
+            "packageVersion": "0.0.1",
+            "isInPackageManagerWorkspaces": true
+          }
+        },
+        "targets": {
+          "build": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "build"
+            },
+            "metadata": {
+              "scriptContent": "nest build",
+              "runCommand": "npm run build"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "format": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "format"
+            },
+            "metadata": {
+              "scriptContent": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+              "runCommand": "npm run format"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "start": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "start"
+            },
+            "metadata": {
+              "scriptContent": "node -r tsconfig-paths/register -r ts-node/register src/main.ts",
+              "runCommand": "npm run start"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "start:dev": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "start:dev"
+            },
+            "metadata": {
+              "scriptContent": "nodemon --watch src --ext ts --exec \"node -r tsconfig-paths/register -r ts-node/register src/main.ts\"",
+              "runCommand": "npm run start:dev"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "start:debug": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "start:debug"
+            },
+            "metadata": {
+              "scriptContent": "nest start --debug --watch",
+              "runCommand": "npm run start:debug"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "start:prod": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "start:prod"
+            },
+            "metadata": {
+              "scriptContent": "node -r tsconfig-paths/register dist/main",
+              "runCommand": "npm run start:prod"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "lint": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "lint"
+            },
+            "metadata": {
+              "scriptContent": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+              "runCommand": "npm run lint"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "test": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "test"
+            },
+            "metadata": {
+              "scriptContent": "jest",
+              "runCommand": "npm run test"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "test:watch": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "test:watch"
+            },
+            "metadata": {
+              "scriptContent": "jest --watch",
+              "runCommand": "npm run test:watch"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "test:cov": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "test:cov"
+            },
+            "metadata": {
+              "scriptContent": "jest --coverage",
+              "runCommand": "npm run test:cov"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "test:debug": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "test:debug"
+            },
+            "metadata": {
+              "scriptContent": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+              "runCommand": "npm run test:debug"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "test:e2e": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "test:e2e"
+            },
+            "metadata": {
+              "scriptContent": "jest --config ./test/jest-e2e.json",
+              "runCommand": "npm run test:e2e"
+            },
+            "configurations": {},
+            "parallelism": true
+          }
+        },
+        "implicitDependencies": []
+      }
+    },
+    "fs-gateway": {
+      "name": "fs-gateway",
+      "type": "app",
+      "data": {
+        "root": "apps/fs-gateway",
+        "name": "fs-gateway",
+        "tags": [
+          "npm:private"
+        ],
+        "metadata": {
+          "targetGroups": {
+            "NPM Scripts": [
+              "build",
+              "format",
+              "start",
+              "start:dev",
+              "start:debug",
+              "start:prod",
+              "lint",
+              "test",
+              "test:watch",
+              "test:cov",
+              "test:debug",
+              "test:e2e"
+            ]
+          },
+          "description": "",
+          "js": {
+            "packageName": "fs-gateway",
             "packageVersion": "0.0.1",
             "isInPackageManagerWorkspaces": true
           }
@@ -813,6 +995,42 @@
     }
   },
   "externalNodes": {
+    "npm:amqp-connection-manager@4.1.15": {
+      "type": "npm",
+      "name": "npm:amqp-connection-manager@4.1.15",
+      "data": {
+        "version": "4.1.15",
+        "packageName": "amqp-connection-manager",
+        "hash": "sha512-YGi8MuO2K4u0qC4b1qAKVIK8CdBJF+PpEZpHKxmrL3x61pU1sAb2SHzQl7ypoqr6oECIfVqtG9DGdOZxaUq1Wg=="
+      }
+    },
+    "npm:amqp-connection-manager": {
+      "type": "npm",
+      "name": "npm:amqp-connection-manager",
+      "data": {
+        "version": "5.0.0",
+        "packageName": "amqp-connection-manager",
+        "hash": "sha512-88yQzqa5RSBgnLl504XjvCQJ7d+osskdwvg35Lwm1LRbfLjNU9p7SQUMSP82BB7mseiq9tIUPJ3HE3eXQbpjEw=="
+      }
+    },
+    "npm:amqplib@0.10.9": {
+      "type": "npm",
+      "name": "npm:amqplib@0.10.9",
+      "data": {
+        "version": "0.10.9",
+        "packageName": "amqplib",
+        "hash": "sha512-jwSftI4QjS3mizvnSnOrPGYiUnm1vI2OP1iXeOUz5pb74Ua0nbf6nPyyTzuiCLEE3fMpaJORXh2K/TQ08H5xGA=="
+      }
+    },
+    "npm:amqplib": {
+      "type": "npm",
+      "name": "npm:amqplib",
+      "data": {
+        "version": "2.0.1",
+        "packageName": "amqplib",
+        "hash": "sha512-a3P2MgfCf9nzVis12VxWEn0dS6hcqve7dlEAhXDtIWR27BlhtMkILOc+H9aeHjDi6i6r94dYKc2Kx2OFe3avvg=="
+      }
+    },
     "npm:@nestjs/common@10.4.22": {
       "type": "npm",
       "name": "npm:@nestjs/common@10.4.22",
@@ -3162,6 +3380,15 @@
         "hash": "sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA=="
       }
     },
+    "npm:@types/multer": {
+      "type": "npm",
+      "name": "npm:@types/multer",
+      "data": {
+        "version": "2.1.0",
+        "packageName": "@types/multer",
+        "hash": "sha512-zYZb0+nJhOHtPpGDb3vqPjwpdeGlGC157VpkqNQL+UU2qwoacoQ7MpsAmUptI/0Oa127X32JzWDqQVEXp2RcIA=="
+      }
+    },
     "npm:@types/node": {
       "type": "npm",
       "name": "npm:@types/node",
@@ -3801,24 +4028,6 @@
         "hash": "sha512-HEHNfbars9v4pgpW6SO1KSPkfoS0xVOM/9UzkJltjlsHZmJasxg8aXkuZa7SMf8vKGIBhpUsPluQSqhJFCqebw=="
       }
     },
-    "npm:amqp-connection-manager": {
-      "type": "npm",
-      "name": "npm:amqp-connection-manager",
-      "data": {
-        "version": "5.0.0",
-        "packageName": "amqp-connection-manager",
-        "hash": "sha512-88yQzqa5RSBgnLl504XjvCQJ7d+osskdwvg35Lwm1LRbfLjNU9p7SQUMSP82BB7mseiq9tIUPJ3HE3eXQbpjEw=="
-      }
-    },
-    "npm:amqplib": {
-      "type": "npm",
-      "name": "npm:amqplib",
-      "data": {
-        "version": "2.0.1",
-        "packageName": "amqplib",
-        "hash": "sha512-a3P2MgfCf9nzVis12VxWEn0dS6hcqve7dlEAhXDtIWR27BlhtMkILOc+H9aeHjDi6i6r94dYKc2Kx2OFe3avvg=="
-      }
-    },
     "npm:ansi-colors": {
       "type": "npm",
       "name": "npm:ansi-colors",
@@ -3990,6 +4199,15 @@
         "hash": "sha512-IMDedajPifLnHNY0X9n8hKxRTQ6/eTHwr5bDo04WnuqxyKw6LYtQywCuuqPZwhl3aBXMvQpJov42GLCwRRdQzw=="
       }
     },
+    "npm:binary-extensions": {
+      "type": "npm",
+      "name": "npm:binary-extensions",
+      "data": {
+        "version": "2.3.0",
+        "packageName": "binary-extensions",
+        "hash": "sha512-Ceh+7ox5qe7LJuLHoY0feh3pHuUDHAcRUeyL2VYghZwfpkNIy/+8Ocg0a3UuSoYzavmylwuLWQOf3hl0jjMMIw=="
+      }
+    },
     "npm:bl": {
       "type": "npm",
       "name": "npm:bl",
@@ -4069,6 +4287,15 @@
         "version": "1.1.2",
         "packageName": "buffer-from",
         "hash": "sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ=="
+      }
+    },
+    "npm:buffer-more-ints": {
+      "type": "npm",
+      "name": "npm:buffer-more-ints",
+      "data": {
+        "version": "1.0.0",
+        "packageName": "buffer-more-ints",
+        "hash": "sha512-EMetuGFz5SLsT0QTnXzINh4Ksr+oo4i+UGTXEshiGCQWnsgSs7ZhJ8fzlwQ+OzEMs0MpDAMr1hxnblp5a4vcHg=="
       }
     },
     "npm:busboy": {
@@ -4177,6 +4404,15 @@
         "version": "4.0.3",
         "packageName": "chokidar",
         "hash": "sha512-Qgzu8kfBvo+cA4962jnP1KkS6Dop5NS6g7R5LFYJr4b8Ub94PPQXUksCw9PvXoeXPRRddRNC5C1JQUR2SMGtnA=="
+      }
+    },
+    "npm:chokidar@3.6.0": {
+      "type": "npm",
+      "name": "npm:chokidar@3.6.0",
+      "data": {
+        "version": "3.6.0",
+        "packageName": "chokidar",
+        "hash": "sha512-7VT13fmjotKpGipCW9JEQAusEPE+Ei8nl6/g4FBAmIm0GOOLMua9NDDo/DWp0ZAxCr3cPq5ZpBqmPAQgDda2Pw=="
       }
     },
     "npm:chrome-trace-event": {
@@ -5214,6 +5450,15 @@
         "hash": "sha512-XxwI8EOhVQgWp6iDL+3b0r86f4d6AX6zSU55HfB4ydCEuXLXc5FcYeOu+nnGftS4TEju/11rt4KJPTMgbfmv4A=="
       }
     },
+    "npm:glob-parent@5.1.2": {
+      "type": "npm",
+      "name": "npm:glob-parent@5.1.2",
+      "data": {
+        "version": "5.1.2",
+        "packageName": "glob-parent",
+        "hash": "sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow=="
+      }
+    },
     "npm:glob-to-regexp": {
       "type": "npm",
       "name": "npm:glob-to-regexp",
@@ -5277,6 +5522,15 @@
         "hash": "sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ=="
       }
     },
+    "npm:has-flag@3.0.0": {
+      "type": "npm",
+      "name": "npm:has-flag@3.0.0",
+      "data": {
+        "version": "3.0.0",
+        "packageName": "has-flag",
+        "hash": "sha512-sKJf1+ceQBr4SMkvQnBDNDtf4TXpVhVGateu0t918bl30FnbE2m4vNLX+VWe/dpjlb+HugGYzW7uQXH98HPEYw=="
+      }
+    },
     "npm:has-symbols": {
       "type": "npm",
       "name": "npm:has-symbols",
@@ -5322,6 +5576,24 @@
         "hash": "sha512-4FbRdAX+bSdmo4AUFuS0WNiPz8NgFt+r8ThgNWmlrjQjt1Q7ZR9+zTlce2859x4KSXrwIsaeTqDoKQmtP8pLmQ=="
       }
     },
+    "npm:http-proxy-middleware": {
+      "type": "npm",
+      "name": "npm:http-proxy-middleware",
+      "data": {
+        "version": "4.1.0",
+        "packageName": "http-proxy-middleware",
+        "hash": "sha512-XUOAjKncPZjsrgDTTem+CUED6A+piUAKTOwBM8g1gAublBX/GdxTHP8mO+og1EW1evYP8wd0G2c111tExwo/jw=="
+      }
+    },
+    "npm:httpxy": {
+      "type": "npm",
+      "name": "npm:httpxy",
+      "data": {
+        "version": "0.5.3",
+        "packageName": "httpxy",
+        "hash": "sha512-SMS9V6Sn7VWaS11lYhoAr0ceoaiolTWf4jYdJn0NJhCdKMu9R2H9Fh0LBDWBHQF6HRLI1PmaePYsjanSpE5PEw=="
+      }
+    },
     "npm:human-signals": {
       "type": "npm",
       "name": "npm:human-signals",
@@ -5347,6 +5619,15 @@
         "version": "1.2.1",
         "packageName": "ieee754",
         "hash": "sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA=="
+      }
+    },
+    "npm:ignore-by-default": {
+      "type": "npm",
+      "name": "npm:ignore-by-default",
+      "data": {
+        "version": "1.0.1",
+        "packageName": "ignore-by-default",
+        "hash": "sha512-Ius2VYcGNk7T90CppJqcIkS5ooHUZyIQK+ClZfMfMNFEF9VSE73Fq+906u/CWu92x4gzZMWOwfFYckPObzdEbA=="
       }
     },
     "npm:import-fresh": {
@@ -5412,6 +5693,15 @@
         "hash": "sha512-zz06S8t0ozoDXMG+ube26zeCTNXcKIPJZJi8hBrF4idCLms4CG9QtK7qBl1boi5ODzFpjswb5JPmHCbMpjaYzg=="
       }
     },
+    "npm:is-binary-path": {
+      "type": "npm",
+      "name": "npm:is-binary-path",
+      "data": {
+        "version": "2.1.0",
+        "packageName": "is-binary-path",
+        "hash": "sha512-ZMERYes6pDydyuGidse7OsHxtbI7WVeUEozgR/g7rd0xUimYNlvZRE/K2MgZTjWy725IfelLeVcEM97mmtRGXw=="
+      }
+    },
     "npm:is-docker": {
       "type": "npm",
       "name": "npm:is-docker",
@@ -5473,6 +5763,15 @@
         "version": "7.0.0",
         "packageName": "is-number",
         "hash": "sha512-41Cifkg6e8TylSpdtTpeLVMqvSBEVzTttHvERD741+pnZ8ANv0004MRL43QKPDlK9cGvNp6NZWZUBlbGXYxxng=="
+      }
+    },
+    "npm:is-plain-obj": {
+      "type": "npm",
+      "name": "npm:is-plain-obj",
+      "data": {
+        "version": "4.1.0",
+        "packageName": "is-plain-obj",
+        "hash": "sha512-+Pgi+vMuUNkJyExiMBt5IlFoMyKnr5zhJ4Uspz58WOhBF5QoIZkFyNHIbBAtHwzVAgk5RtndVNsDRN61/mmDqg=="
       }
     },
     "npm:is-promise": {
@@ -5860,6 +6159,15 @@
         "version": "8.1.1",
         "packageName": "supports-color",
         "hash": "sha512-MpUEN2OodtUzxvKQl72cUF7RQ5EiHsGvSsVG0ia9c5RbWGL2CI4C7EpPS8UTBIplnlzZiNuV56w+FuNxy3ty2Q=="
+      }
+    },
+    "npm:supports-color@5.5.0": {
+      "type": "npm",
+      "name": "npm:supports-color@5.5.0",
+      "data": {
+        "version": "5.5.0",
+        "packageName": "supports-color",
+        "hash": "sha512-QjVjwdXIt408MIiAqCX4oUKsgU2EqAGzs2Ppkm4aQYbjm+ZEWEcW4SfFNTr4uMNZma0ey4f5lgLrkB0aX0QMow=="
       }
     },
     "npm:supports-color": {
@@ -6384,6 +6692,33 @@
         "hash": "sha512-Uzmd6LXpouKo8EUK68IjH4+E01w/hXyV3R3g/geCJo+rXLNfh1xucB+LOzYEOQPSiUK3h/xZf0cQGcSsmyL2Og=="
       }
     },
+    "npm:nodemon": {
+      "type": "npm",
+      "name": "npm:nodemon",
+      "data": {
+        "version": "3.1.14",
+        "packageName": "nodemon",
+        "hash": "sha512-jakjZi93UtB3jHMWsXL68FXSAosbLfY0In5gtKq3niLSkrWznrVBzXFNOEMJUfc9+Ke7SHWoAZsiMkNP3vq6Jw=="
+      }
+    },
+    "npm:readdirp@3.6.0": {
+      "type": "npm",
+      "name": "npm:readdirp@3.6.0",
+      "data": {
+        "version": "3.6.0",
+        "packageName": "readdirp",
+        "hash": "sha512-hOS089on8RduqdbhvQ5Z37A0ESjsqz6qnRcffsMU3495FuTdqSm+7bhJ29JvIOsBDEEnan5DPu9t3To9VRlMzA=="
+      }
+    },
+    "npm:readdirp": {
+      "type": "npm",
+      "name": "npm:readdirp",
+      "data": {
+        "version": "4.1.2",
+        "packageName": "readdirp",
+        "hash": "sha512-GDhwkLfywWL2s6vEjyhri+eXmfH6j1L7JE27WhqLeYzoh/A3DBaYGEj2H/HFZCn/kMfim73FXxEJTw06WtxQwg=="
+      }
+    },
     "npm:normalize-path": {
       "type": "npm",
       "name": "npm:normalize-path",
@@ -6663,6 +6998,15 @@
         "hash": "sha512-cJ+oHTW1VAEa8cJslgmUZrc+sjRKgAKl3Zyse6+PV38hZe/V6Z14TbCuXcan9F9ghlz4QrFr2c92TNF82UkYHA=="
       }
     },
+    "npm:pstree.remy": {
+      "type": "npm",
+      "name": "npm:pstree.remy",
+      "data": {
+        "version": "1.1.8",
+        "packageName": "pstree.remy",
+        "hash": "sha512-77DZwxQmxKnu3aR542U+X8FypNzbfJ+C5XQDk3uWjWxn6151aIMGthWYRXTqT1E5oJvg+ljaa2OJi+VfvCOQ8w=="
+      }
+    },
     "npm:punycode": {
       "type": "npm",
       "name": "npm:punycode",
@@ -6688,6 +7032,15 @@
         "version": "6.15.2",
         "packageName": "qs",
         "hash": "sha512-Rzq0KEyX/w/tEybncDgdkZrJgVUsUMk3xjh3t5bv3S1HTAtg+uOYt72+ZfwiQwKdysThkTBdL/rTi6HDmX9Ddw=="
+      }
+    },
+    "npm:querystringify": {
+      "type": "npm",
+      "name": "npm:querystringify",
+      "data": {
+        "version": "2.2.0",
+        "packageName": "querystringify",
+        "hash": "sha512-FIqgj2EUvTa7R50u0rGsyTftzjYmv/a3hO345bZNrqabNqjtgiDMgmo4mkUjd+nzU5oF3dClKqFIPUKybUyqoQ=="
       }
     },
     "npm:range-parser": {
@@ -6735,15 +7088,6 @@
         "hash": "sha512-9u/sniCrY3D5WdsERHzHE4G2YCXqoG5FTHUiCC4SIbr6XcLZBY05ya9EKjYek9O5xOAwjGq+1JdGBAS7Q9ScoA=="
       }
     },
-    "npm:readdirp": {
-      "type": "npm",
-      "name": "npm:readdirp",
-      "data": {
-        "version": "4.1.2",
-        "packageName": "readdirp",
-        "hash": "sha512-GDhwkLfywWL2s6vEjyhri+eXmfH6j1L7JE27WhqLeYzoh/A3DBaYGEj2H/HFZCn/kMfim73FXxEJTw06WtxQwg=="
-      }
-    },
     "npm:reflect-metadata": {
       "type": "npm",
       "name": "npm:reflect-metadata",
@@ -6769,6 +7113,15 @@
         "version": "2.0.2",
         "packageName": "require-from-string",
         "hash": "sha512-Xf0nWe6RseziFMu+Ap9biiUbmplq6S9/p+7w7YXP/JBHhrUDDUhwa+vANyubuqfZWTveU//DYVGsDG7RKL/vEw=="
+      }
+    },
+    "npm:requires-port": {
+      "type": "npm",
+      "name": "npm:requires-port",
+      "data": {
+        "version": "1.0.0",
+        "packageName": "requires-port",
+        "hash": "sha512-KigOCHcocU3XODJxsu8i/j8T9tzT4adHiecwORRQ0ZZFcp7ahwXuRU1m+yuO90C5ZUyGeGfocHDI14M3L3yDAQ=="
       }
     },
     "npm:resolve-cwd": {
@@ -6904,6 +7257,15 @@
         "version": "1.0.2",
         "packageName": "side-channel-weakmap",
         "hash": "sha512-WPS/HvHQTYnHisLo9McqBHOJk2FkHO/tlpvldyrnem4aeQp4hai3gythswg6p01oSoTl58rcpiFAjF2br2Ak2A=="
+      }
+    },
+    "npm:simple-update-notifier": {
+      "type": "npm",
+      "name": "npm:simple-update-notifier",
+      "data": {
+        "version": "2.0.0",
+        "packageName": "simple-update-notifier",
+        "hash": "sha512-a2B9Y0KlNXl9u/vsW6sTIu9vGEpfKu2wRV6l1H3XEas/0gUIzGzBoP/IouTcUQbm9JWZLH3COxyn03TYlFax6w=="
       }
     },
     "npm:slash": {
@@ -7158,6 +7520,15 @@
         "hash": "sha512-dRXchy+C0IgK8WPC6xvCHFRIWYUbqqdEIKPaKo/AcTUNzwLTK6AH7RjdLWsEZcAN/TBdtfUw3PYEgPr5VPr6ww=="
       }
     },
+    "npm:touch": {
+      "type": "npm",
+      "name": "npm:touch",
+      "data": {
+        "version": "3.1.1",
+        "packageName": "touch",
+        "hash": "sha512-r0eojU4bI8MnHr8c5bNo7lJDdI2qXlWWJk6a9EAFG7vbhTjElYhBVS3/miuE0uOuoLdb8Mc/rVfsmm6eo5o9GA=="
+      }
+    },
     "npm:tr46": {
       "type": "npm",
       "name": "npm:tr46",
@@ -7329,6 +7700,15 @@
         "hash": "sha512-rvKSBiC5zqCCiDZ9kAOszZcDvdAHwwIKJG33Ykj43OKcWsnmcBRL09YTU4nOeHZ8Y2a7l1MgTd08SBe9A8Qj6A=="
       }
     },
+    "npm:undefsafe": {
+      "type": "npm",
+      "name": "npm:undefsafe",
+      "data": {
+        "version": "2.0.5",
+        "packageName": "undefsafe",
+        "hash": "sha512-WxONCrssBM8TSPRqN5EmsjVrsv4A8X12J4ArBiiayv3DyyG3ZlIg6yysuuSYdZsVz3TKcTg2fd//Ujd4CHV1iA=="
+      }
+    },
     "npm:undici-types": {
       "type": "npm",
       "name": "npm:undici-types",
@@ -7381,6 +7761,15 @@
         "version": "4.4.1",
         "packageName": "uri-js",
         "hash": "sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg=="
+      }
+    },
+    "npm:url-parse": {
+      "type": "npm",
+      "name": "npm:url-parse",
+      "data": {
+        "version": "1.5.10",
+        "packageName": "url-parse",
+        "hash": "sha512-WypcfiRhfeUP9vvF0j6rw0J3hrWrw6iZv3+22h6iRMJ/8z1Tj6XfLP4DsUix5MhMPnXpiHDoKyoZ/bdCkwBCiQ=="
       }
     },
     "npm:util-deprecate": {
@@ -7683,6 +8072,11 @@
       },
       {
         "source": "dues-collection-svc",
+        "target": "npm:nodemon",
+        "type": "static"
+      },
+      {
+        "source": "dues-collection-svc",
         "target": "npm:prettier",
         "type": "static"
       },
@@ -7739,6 +8133,11 @@
       {
         "source": "dues-collection-svc",
         "target": "npm:@nestjs/platform-express",
+        "type": "static"
+      },
+      {
+        "source": "dues-collection-svc",
+        "target": "npm:dotenv",
         "type": "static"
       },
       {
@@ -7825,6 +8224,11 @@
       },
       {
         "source": "ledger-accounts-svc",
+        "target": "npm:nodemon",
+        "type": "static"
+      },
+      {
+        "source": "ledger-accounts-svc",
         "target": "npm:prettier",
         "type": "static"
       },
@@ -7881,6 +8285,16 @@
       {
         "source": "ledger-accounts-svc",
         "target": "npm:@nestjs/platform-express",
+        "type": "static"
+      },
+      {
+        "source": "ledger-accounts-svc",
+        "target": "npm:@prisma/client",
+        "type": "static"
+      },
+      {
+        "source": "ledger-accounts-svc",
+        "target": "npm:dotenv",
         "type": "static"
       },
       {
@@ -8022,7 +8436,47 @@
       },
       {
         "source": "expense-budget-svc",
+        "target": "npm:@nestjs/microservices",
+        "type": "static"
+      },
+      {
+        "source": "expense-budget-svc",
         "target": "npm:@nestjs/platform-express",
+        "type": "static"
+      },
+      {
+        "source": "expense-budget-svc",
+        "target": "npm:@prisma/client",
+        "type": "static"
+      },
+      {
+        "source": "expense-budget-svc",
+        "target": "npm:@types/multer",
+        "type": "static"
+      },
+      {
+        "source": "expense-budget-svc",
+        "target": "npm:amqp-connection-manager",
+        "type": "static"
+      },
+      {
+        "source": "expense-budget-svc",
+        "target": "npm:amqplib",
+        "type": "static"
+      },
+      {
+        "source": "expense-budget-svc",
+        "target": "npm:dotenv",
+        "type": "static"
+      },
+      {
+        "source": "expense-budget-svc",
+        "target": "npm:multer",
+        "type": "static"
+      },
+      {
+        "source": "expense-budget-svc",
+        "target": "npm:nodemon",
         "type": "static"
       },
       {
@@ -8109,6 +8563,11 @@
       },
       {
         "source": "disbursement-svc",
+        "target": "npm:nodemon",
+        "type": "static"
+      },
+      {
+        "source": "disbursement-svc",
         "target": "npm:prettier",
         "type": "static"
       },
@@ -8164,7 +8623,27 @@
       },
       {
         "source": "disbursement-svc",
+        "target": "npm:@nestjs/microservices",
+        "type": "static"
+      },
+      {
+        "source": "disbursement-svc",
         "target": "npm:@nestjs/platform-express",
+        "type": "static"
+      },
+      {
+        "source": "disbursement-svc",
+        "target": "npm:amqp-connection-manager@4.1.15",
+        "type": "static"
+      },
+      {
+        "source": "disbursement-svc",
+        "target": "npm:amqplib@0.10.9",
+        "type": "static"
+      },
+      {
+        "source": "disbursement-svc",
+        "target": "npm:dotenv",
         "type": "static"
       },
       {
@@ -8174,6 +8653,158 @@
       },
       {
         "source": "disbursement-svc",
+        "target": "npm:rxjs",
+        "type": "static"
+      }
+    ],
+    "fs-gateway": [
+      {
+        "source": "fs-gateway",
+        "target": "npm:@eslint/eslintrc",
+        "type": "static"
+      },
+      {
+        "source": "fs-gateway",
+        "target": "npm:@eslint/js",
+        "type": "static"
+      },
+      {
+        "source": "fs-gateway",
+        "target": "npm:@nestjs/cli",
+        "type": "static"
+      },
+      {
+        "source": "fs-gateway",
+        "target": "npm:@nestjs/schematics",
+        "type": "static"
+      },
+      {
+        "source": "fs-gateway",
+        "target": "npm:@nestjs/testing",
+        "type": "static"
+      },
+      {
+        "source": "fs-gateway",
+        "target": "npm:@types/express",
+        "type": "static"
+      },
+      {
+        "source": "fs-gateway",
+        "target": "npm:@types/jest",
+        "type": "static"
+      },
+      {
+        "source": "fs-gateway",
+        "target": "npm:@types/node",
+        "type": "static"
+      },
+      {
+        "source": "fs-gateway",
+        "target": "npm:@types/supertest",
+        "type": "static"
+      },
+      {
+        "source": "fs-gateway",
+        "target": "npm:eslint",
+        "type": "static"
+      },
+      {
+        "source": "fs-gateway",
+        "target": "npm:eslint-config-prettier",
+        "type": "static"
+      },
+      {
+        "source": "fs-gateway",
+        "target": "npm:eslint-plugin-prettier",
+        "type": "static"
+      },
+      {
+        "source": "fs-gateway",
+        "target": "npm:globals",
+        "type": "static"
+      },
+      {
+        "source": "fs-gateway",
+        "target": "npm:jest",
+        "type": "static"
+      },
+      {
+        "source": "fs-gateway",
+        "target": "npm:prettier",
+        "type": "static"
+      },
+      {
+        "source": "fs-gateway",
+        "target": "npm:source-map-support",
+        "type": "static"
+      },
+      {
+        "source": "fs-gateway",
+        "target": "npm:supertest",
+        "type": "static"
+      },
+      {
+        "source": "fs-gateway",
+        "target": "npm:ts-jest",
+        "type": "static"
+      },
+      {
+        "source": "fs-gateway",
+        "target": "npm:ts-loader",
+        "type": "static"
+      },
+      {
+        "source": "fs-gateway",
+        "target": "npm:ts-node",
+        "type": "static"
+      },
+      {
+        "source": "fs-gateway",
+        "target": "npm:tsconfig-paths",
+        "type": "static"
+      },
+      {
+        "source": "fs-gateway",
+        "target": "npm:typescript",
+        "type": "static"
+      },
+      {
+        "source": "fs-gateway",
+        "target": "npm:typescript-eslint",
+        "type": "static"
+      },
+      {
+        "source": "fs-gateway",
+        "target": "npm:@nestjs/common",
+        "type": "static"
+      },
+      {
+        "source": "fs-gateway",
+        "target": "npm:@nestjs/core",
+        "type": "static"
+      },
+      {
+        "source": "fs-gateway",
+        "target": "npm:@nestjs/platform-express",
+        "type": "static"
+      },
+      {
+        "source": "fs-gateway",
+        "target": "npm:dotenv",
+        "type": "static"
+      },
+      {
+        "source": "fs-gateway",
+        "target": "npm:http-proxy-middleware",
+        "type": "static"
+      },
+      {
+        "source": "fs-gateway",
+        "target": "npm:reflect-metadata",
+        "type": "static"
+      },
+      {
+        "source": "fs-gateway",
         "target": "npm:rxjs",
         "type": "static"
       }
@@ -8210,6 +8841,30 @@
       {
         "source": "@bdoea-fs/auth",
         "target": "npm:jsonwebtoken",
+        "type": "static"
+      }
+    ],
+    "npm:amqp-connection-manager@4.1.15": [
+      {
+        "source": "npm:amqp-connection-manager@4.1.15",
+        "target": "npm:amqplib@0.10.9",
+        "type": "static"
+      },
+      {
+        "source": "npm:amqp-connection-manager@4.1.15",
+        "target": "npm:promise-breaker",
+        "type": "static"
+      }
+    ],
+    "npm:amqplib@0.10.9": [
+      {
+        "source": "npm:amqplib@0.10.9",
+        "target": "npm:buffer-more-ints",
+        "type": "static"
+      },
+      {
+        "source": "npm:amqplib@0.10.9",
+        "target": "npm:url-parse",
         "type": "static"
       }
     ],
@@ -11306,6 +11961,13 @@
         "type": "static"
       }
     ],
+    "npm:@types/multer": [
+      {
+        "source": "npm:@types/multer",
+        "target": "npm:@types/express",
+        "type": "static"
+      }
+    ],
     "npm:@types/node": [
       {
         "source": "npm:@types/node",
@@ -13543,6 +14205,33 @@
         "type": "static"
       }
     ],
+    "npm:http-proxy-middleware": [
+      {
+        "source": "npm:http-proxy-middleware",
+        "target": "npm:debug",
+        "type": "static"
+      },
+      {
+        "source": "npm:http-proxy-middleware",
+        "target": "npm:httpxy",
+        "type": "static"
+      },
+      {
+        "source": "npm:http-proxy-middleware",
+        "target": "npm:is-glob",
+        "type": "static"
+      },
+      {
+        "source": "npm:http-proxy-middleware",
+        "target": "npm:is-plain-obj",
+        "type": "static"
+      },
+      {
+        "source": "npm:http-proxy-middleware",
+        "target": "npm:micromatch",
+        "type": "static"
+      }
+    ],
     "npm:iconv-lite": [
       {
         "source": "npm:iconv-lite",
@@ -13583,6 +14272,13 @@
       {
         "source": "npm:inflight",
         "target": "npm:wrappy",
+        "type": "static"
+      }
+    ],
+    "npm:is-binary-path": [
+      {
+        "source": "npm:is-binary-path",
+        "target": "npm:binary-extensions",
         "type": "static"
       }
     ],
@@ -15049,6 +15745,121 @@
         "type": "static"
       }
     ],
+    "npm:nodemon": [
+      {
+        "source": "npm:nodemon",
+        "target": "npm:chokidar@3.6.0",
+        "type": "static"
+      },
+      {
+        "source": "npm:nodemon",
+        "target": "npm:debug",
+        "type": "static"
+      },
+      {
+        "source": "npm:nodemon",
+        "target": "npm:ignore-by-default",
+        "type": "static"
+      },
+      {
+        "source": "npm:nodemon",
+        "target": "npm:minimatch",
+        "type": "static"
+      },
+      {
+        "source": "npm:nodemon",
+        "target": "npm:pstree.remy",
+        "type": "static"
+      },
+      {
+        "source": "npm:nodemon",
+        "target": "npm:semver",
+        "type": "static"
+      },
+      {
+        "source": "npm:nodemon",
+        "target": "npm:simple-update-notifier",
+        "type": "static"
+      },
+      {
+        "source": "npm:nodemon",
+        "target": "npm:supports-color@5.5.0",
+        "type": "static"
+      },
+      {
+        "source": "npm:nodemon",
+        "target": "npm:touch",
+        "type": "static"
+      },
+      {
+        "source": "npm:nodemon",
+        "target": "npm:undefsafe",
+        "type": "static"
+      }
+    ],
+    "npm:chokidar@3.6.0": [
+      {
+        "source": "npm:chokidar@3.6.0",
+        "target": "npm:anymatch",
+        "type": "static"
+      },
+      {
+        "source": "npm:chokidar@3.6.0",
+        "target": "npm:braces",
+        "type": "static"
+      },
+      {
+        "source": "npm:chokidar@3.6.0",
+        "target": "npm:glob-parent@5.1.2",
+        "type": "static"
+      },
+      {
+        "source": "npm:chokidar@3.6.0",
+        "target": "npm:is-binary-path",
+        "type": "static"
+      },
+      {
+        "source": "npm:chokidar@3.6.0",
+        "target": "npm:is-glob",
+        "type": "static"
+      },
+      {
+        "source": "npm:chokidar@3.6.0",
+        "target": "npm:normalize-path",
+        "type": "static"
+      },
+      {
+        "source": "npm:chokidar@3.6.0",
+        "target": "npm:readdirp@3.6.0",
+        "type": "static"
+      },
+      {
+        "source": "npm:chokidar@3.6.0",
+        "target": "npm:fsevents",
+        "type": "static"
+      }
+    ],
+    "npm:glob-parent@5.1.2": [
+      {
+        "source": "npm:glob-parent@5.1.2",
+        "target": "npm:is-glob",
+        "type": "static"
+      }
+    ],
+    "npm:readdirp@3.6.0": [
+      {
+        "source": "npm:readdirp@3.6.0",
+        "target": "npm:picomatch@2.3.2",
+        "type": "static"
+      }
+    ],
+    "npm:supports-color@5.5.0": [
+      {
+        "source": "npm:supports-color@5.5.0",
+        "target": "npm:has-flag@3.0.0",
+        "type": "static"
+      }
+    ],
     "npm:npm-run-path": [
       {
         "source": "npm:npm-run-path",
@@ -16175,6 +16986,13 @@
         "type": "static"
       }
     ],
+    "npm:simple-update-notifier": [
+      {
+        "source": "npm:simple-update-notifier",
+        "target": "npm:semver",
+        "type": "static"
+      }
+    ],
     "npm:source-map-support": [
       {
         "source": "npm:source-map-support",
@@ -16970,6 +17788,18 @@
         "type": "static"
       }
     ],
+    "npm:url-parse": [
+      {
+        "source": "npm:url-parse",
+        "target": "npm:querystringify",
+        "type": "static"
+      },
+      {
+        "source": "npm:url-parse",
+        "target": "npm:requires-port",
+        "type": "static"
+      }
+    ],
     "npm:v8-to-istanbul": [
       {
         "source": "npm:v8-to-istanbul",
@@ -17235,5 +18065,5 @@
   },
   "version": "6.0",
   "errors": [],
-  "computedAt": 1780771650786
+  "computedAt": 1781472987171
 }

@@ -16,18 +16,7 @@ export class DuesController {
     return this.duesService.findAll(status);
   }
 
-  @Public()
-  @Post('webhook')
-  async simulateWebhook(@Body() data: any) {
-    this.logger.log(`Received HTTP webhook simulation for ${data?.transactionId}`);
-    try {
-      await this.duesService.processDuesEvent(data);
-      return { status: 'success', message: 'Webhook processed successfully' };
-    } catch (err) {
-      this.logger.error(`Webhook error: ${err.message}`);
-      throw new BadRequestException(err.message);
-    }
-  }
+
 
   @Patch(':id/confirm')
   @Public()

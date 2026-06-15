@@ -11,9 +11,14 @@ import { UpdateAccountDto } from './dto/update-account.dto';
 export class AccountsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  /** GET /accounts — all records ordered by code */
+  /** GET /accounts — all records ordered by code, excluding Archived/Deleted */
   async findAll() {
     return this.prisma.chartOfAccount.findMany({
+      where: {
+        status: {
+          notIn: ['Archived', 'Deleted'],
+        },
+      },
       orderBy: { code: 'asc' },
     });
   }
@@ -51,12 +56,12 @@ export class AccountsService {
     });
   }
 
-  /** DELETE /accounts/:id — soft-delete by setting status to Inactive */
+  /** DELETE /accounts/:id — soft-delete by setting status to Archived */
   async softDelete(id: string) {
     await this.findById(id); // throws 404 if not found
     return this.prisma.chartOfAccount.update({
       where: { id },
-      data: { status: 'Inactive' },
+      data: { status: 'Archived' },
     });
   }
 }

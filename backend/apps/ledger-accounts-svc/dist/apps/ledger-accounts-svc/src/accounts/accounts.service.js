@@ -18,6 +18,11 @@ let AccountsService = class AccountsService {
     }
     async findAll() {
         return this.prisma.chartOfAccount.findMany({
+            where: {
+                status: {
+                    notIn: ['Archived', 'Deleted'],
+                },
+            },
             orderBy: { code: 'asc' },
         });
     }
@@ -50,7 +55,7 @@ let AccountsService = class AccountsService {
         await this.findById(id);
         return this.prisma.chartOfAccount.update({
             where: { id },
-            data: { status: 'Inactive' },
+            data: { status: 'Archived' },
         });
     }
 };

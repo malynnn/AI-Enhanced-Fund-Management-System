@@ -1,5 +1,6 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import * as jwt from "jsonwebtoken";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -30,13 +31,20 @@ export const authOptions: NextAuthOptions = {
           mockRole = "User";
         }
 
+        const payload = {
+          userId: `mock-id-${Math.floor(Math.random() * 1000)}`,
+          email: credentials.username,
+          role: mockRole
+        };
+        const accessToken = jwt.sign(payload, "your_jwt_secret_here", { expiresIn: '1h' });
+
         // Return a fake user session
         return {
-          id: `mock-id-${Math.floor(Math.random() * 1000)}`,
+          id: payload.userId,
           name: credentials.username.split('@')[0].toUpperCase(), // Uses part of the email as the name
           email: credentials.username,
           role: mockRole,
-          accessToken: "mock-jwt-token-12345"
+          accessToken
         };
       }
     })

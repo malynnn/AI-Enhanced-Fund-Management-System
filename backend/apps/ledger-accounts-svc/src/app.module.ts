@@ -12,6 +12,7 @@ import { JwtAuthGuard } from '@bdoea-fs/auth';
 import { PrismaService } from './prisma.service';
 import { AccountsModule } from './accounts/accounts.module';
 import { FundsModule } from './funds/funds.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 const rabbitMqClients = ClientsModule.register([
   { name: 'DUES_CLIENT', transport: Transport.RMQ, options: { urls: [process.env.RABBITMQ_URL || 'amqp://guest:guest@localhost:5672'], queue: QUEUE_DUES, queueOptions: { durable: true, arguments: { 'x-dead-letter-exchange': '', 'x-dead-letter-routing-key': `dlq.${QUEUE_DUES}` } } } },
@@ -22,7 +23,7 @@ const rabbitMqClients = ClientsModule.register([
 ]);
 
 @Module({
-  imports: [rabbitMqClients, AccountsModule, FundsModule],
+  imports: [rabbitMqClients, AccountsModule, FundsModule, DashboardModule],
   providers: [
     PrismaService,
     // Global JWT guard via factory — Reflector is instantiated manually

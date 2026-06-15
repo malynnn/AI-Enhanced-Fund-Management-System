@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,226 +7,316 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ===================================================
+// ENUMS
+// ===================================================
+
+enum SystemRole {
+  USER
+  ADMIN
+  TREASURER
+  PRESIDENT
+}
+
+enum ActionType {
+  POST
+  PUT
+  DELETE
+}
+
+enum FundTxType {
+  DEPOSIT
+  WITHDRAWAL
+  LOAN_DISBURSEMENT
+  CORRECTING_ENTRY
+}
+
+enum PaymentMethod {
+  BANK_TRANSFER
+  CHECK
+  CASH
+  SALARY_DEDUCTION
+}
+
+enum DisbursementStatus {
+  PENDING
+  APPROVED
+  COMPLETED
+  REJECTED
+}
+
+enum RepaymentStatus {
+  PROCESSED
+  OVERPAYMENT_PENDING
+  OVERPAYMENT_CREDITED
+  OVERPAYMENT_REFUNDED
+}
+
+enum TreasurerDecision {
+  NONE
+  ADVANCE_CREDIT
+  REFUND
+}
+
+enum WriteOffStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum DuesStatus {
+  PENDING
+  CONFIRMED
+}
+
+enum AccountType {
+  Asset
+  Liability
+  Equity
+  Income
+  Expense
+}
+
+enum AccountStatus {
+  Active
+  Inactive
+  Archived
+  Deleted
+}
+
+enum VoucherStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  POSTED
+}
+
+enum PettyCashType {
+  REPLENISHMENT
+  DISBURSEMENT
+  OPENING_BALANCE
+  RECONCILIATION
+}
+
+// ===================================================
+// MODELS
+// ===================================================
+
 model User {
-  id             String          @id @default(uuid())
-  email          String          @unique
-  password       String
-  role           String          @default("USER") // USER, ADMIN, TREASURER, PRESIDENT
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  id        String     @id @default(uuid())
+  email     String     @unique
+  password  String
+  role      SystemRole @default(USER)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 
   auditLogs      FSAuditLog[]
   reportSignoffs ReportSignoff[]
 }
 
 model FSAuditLog {
-  id             String    @id @default(uuid())
+  id             String     @id @default(uuid())
   user_id        String?
-  action_type    String    // POST, PUT, DELETE
+  action_type    ActionType
   table_name     String
   record_id      String
   old_value_json Json?
   new_value_json Json?
   ip_address     String?
-  timestamp      DateTime  @default(now())
+  timestamp      DateTime   @default(now())
 
-  user User? @relation(fields: [user_id], references: [id])
+  user User? @relation(fields: [user_id], references: [id], onDelete: Restrict)
 
   @@map("fs_audit_log")
 }
 
 model ReportSignoff {
-  id          String   @id @default(uuid())
+  id          String     @id @default(uuid())
   report_id   String
   user_id     String
-  role        String   // e.g., TREASURER, PRESIDENT
+  role        SystemRole
   digital_sig String
-  signed_at   DateTime @default(now())
+  signed_at   DateTime   @default(now())
 
-  user User @relation(fields: [user_id], references: [id])
+  user User @relation(fields: [user_id], references: [id], onDelete: Restrict)
 
   @@map("report_signoffs")
 }
 
-// ===================================================
-//      ADDED FOR USER STORY FS-004: FUND LEDGER SYSTEM
-// ===================================================
-
 model Fund {
-  id            String                @id @default(uuid())
-  name          String                @unique // e.g., "General Fund", "Loan Capital Fund"
-  code          String                @unique // e.g., "GEN", "LOAN"
-  balance       Float                 @default(0.0) // Real-time balance tracker
-  createdAt     DateTime              @default(now())
-  updatedAt     DateTime              @updatedAt
+  id        String   @id @default(uuid())
+  name      String   @unique
+  code      String   @unique
+  balance   Decimal  @default(0.00) @db.Decimal(12, 2)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   transactions  FundTransaction[]
-  disbursements DisbursementRequest[] // <-- Merged successfully here
+  disbursements DisbursementRequest[]
 
   @@map("funds")
 }
 
+// Append-only ledger
 model FundTransaction {
-  id          String   @id @default(uuid())
-  fundId      String   @map("fund_id")
-  fund        Fund     @relation(fields: [fundId], references: [id], onDelete: Cascade)
-  amount      Float    // Positive for deposits, Negative for disbursements
-  type        String   // e.g., "DEPOSIT", "WITHDRAWAL", "LOAN_DISBURSEMENT"
-  description String   // Narrative describing the activity context
-  referenceId String?  @map("reference_id") // Links directly to specific internal system records
-  timestamp   DateTime @default(now()) @map("timestamp")
+  id          String     @id @default(uuid())
+  fundId      String     @map("fund_id")
+  amount      Decimal    @db.Decimal(12, 2)
+  type        FundTxType
+  description String
+  referenceId String?    @map("reference_id")
+  timestamp   DateTime   @default(now()) @map("timestamp")
+
+  // Hardened referential integrity: no cascading deletes
+  fund Fund @relation(fields: [fundId], references: [id], onDelete: Restrict)
 
   @@index([fundId])
   @@map("fund_transactions")
 }
 
 model DisbursementRequest {
-  id             String   @id @default(uuid())
-  loanReference  String   @unique @map("loan_reference")
-  memberId       String   @map("member_id")
-  memberName     String   @map("member_name")
-  amount         Float
-  paymentMethod  String   @map("payment_method") // e.g., "BANK_TRANSFER", "CHECK"
-  bankAccount    String   @map("bank_account")   // Task 4: Bank account tracking
-  paymentDetails String?  @map("payment_details") // Task 4: Additional details
-  status         String   @default("PENDING")    // Task 2: Tracking pending vs completed
-  authorizedBy   String?  @map("authorized_by")   // Task 3: Officer signature name/role
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
+  id             String             @id @default(uuid())
+  loanReference  String             @unique @map("loan_reference")
+  memberId       String             @map("member_id")
+  memberName     String             @map("member_name")
+  amount         Decimal            @db.Decimal(12, 2)
+  paymentMethod  PaymentMethod      @map("payment_method")
+  bankAccount    String             @map("bank_account")
+  paymentDetails String?            @map("payment_details")
+  status         DisbursementStatus @default(PENDING)
+  authorizedBy   String?            @map("authorized_by")
+  createdAt      DateTime           @default(now()) @map("created_at")
+  updatedAt      DateTime           @updatedAt @map("updated_at")
+  fundId         String             @map("fund_id")
 
-  fundId         String   @map("fund_id")
-  fund           Fund     @relation(fields: [fundId], references: [id], onDelete: Cascade)
+  // Hardened
+  fund Fund @relation(fields: [fundId], references: [id], onDelete: Restrict)
 
   @@map("disbursement_requests")
 }
 
-// ===================================================
-//      ADDED FOR USER STORY FS-005: REPAYMENT & WRITE-OFFS
-// ===================================================
-
 model LoanRepayment {
-  id                 String   @id @default(uuid())
-  loanReference      String   @map("loan_reference")
-  memberId           String   @map("member_id")
-  memberName         String   @map("member_name")
-  amount             Float    // Total amount paid
-  principalAmount    Float    @map("principal_amount")
-  serviceFeeAmount   Float    @map("service_fee_amount")
-  overpaymentAmount  Float    @default(0.0) @map("overpayment_amount")
-  paymentMethod      String   @map("payment_method")
-  referenceNumber    String?  @map("reference_number")
-  status             String   @default("PROCESSED") // PROCESSED, OVERPAYMENT_PENDING, OVERPAYMENT_CREDITED, OVERPAYMENT_REFUNDED
-  treasurerDecision  String   @default("NONE") // NONE, ADVANCE_CREDIT, REFUND
-  processedAt        DateTime @default(now()) @map("processed_at")
-  createdAt          DateTime @default(now()) @map("created_at")
-  updatedAt          DateTime @updatedAt @map("updated_at")
+  id                String            @id @default(uuid())
+  loanReference     String            @map("loan_reference")
+  memberId          String            @map("member_id")
+  memberName        String            @map("member_name")
+  amount            Decimal           @db.Decimal(12, 2)
+  principalAmount   Decimal           @map("principal_amount") @db.Decimal(12, 2)
+  serviceFeeAmount  Decimal           @map("service_fee_amount") @db.Decimal(12, 2)
+  overpaymentAmount Decimal           @default(0.00) @map("overpayment_amount") @db.Decimal(12, 2)
+  paymentMethod     PaymentMethod     @map("payment_method")
+  referenceNumber   String?           @map("reference_number")
+  status            RepaymentStatus   @default(PROCESSED)
+  treasurerDecision TreasurerDecision @default(NONE)
+  processedAt       DateTime          @default(now()) @map("processed_at")
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime          @updatedAt @map("updated_at")
 
   @@map("loan_repayments")
 }
 
 model LoanWriteOff {
-  id             String    @id @default(uuid())
-  loanReference  String    @unique @map("loan_reference")
-  memberId       String    @map("member_id")
-  memberName     String    @map("member_name")
-  amount         Float
-  reason         String
-  status         String    @default("PENDING") // PENDING, APPROVED, REJECTED
-  requestedBy    String    @map("requested_by")
-  authorizedBy   String?   @map("authorized_by")
-  createdAt      DateTime  @default(now()) @map("created_at")
-  updatedAt      DateTime  @updatedAt @map("updated_at")
+  id            String         @id @default(uuid())
+  loanReference String         @unique @map("loan_reference")
+  memberId      String         @map("member_id")
+  memberName    String         @map("member_name")
+  amount        Decimal        @db.Decimal(12, 2)
+  reason        String
+  status        WriteOffStatus @default(PENDING)
+  requestedBy   String         @map("requested_by")
+  authorizedBy  String?        @map("authorized_by")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
 
   @@map("loan_write_offs")
 }
 
-// ===================================================
-//      ADDED FOR USER STORY FS-003: DUES COLLECTION
-// ===================================================
-
 model DuesRecord {
-  id               String   @id @default(uuid())
-  transactionId    String   @unique @map("transaction_id")
-  memberId         String   @map("member_id")
-  name             String
-  month            String
-  amountPaid       Float    @map("amount_paid")
-  method           String
-  referenceNumber  String?  @map("reference_number")
-  fundToCredit     String   @map("fund_to_credit")
-  status           String   @default("Pending") // Pending, Confirmed
-  createdAt        DateTime @default(now()) @map("created_at")
-  updatedAt        DateTime @updatedAt @map("updated_at")
+  id              String        @id @default(uuid())
+  transactionId   String        @unique @map("transaction_id")
+  memberId        String        @map("member_id")
+  name            String
+  month           String
+  amountPaid      Decimal       @map("amount_paid") @db.Decimal(12, 2)
+  method          PaymentMethod
+  referenceNumber String?       @map("reference_number")
+  fundToCredit    String        @map("fund_to_credit")
+  status          DuesStatus    @default(PENDING)
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
 
   @@map("dues_records")
 }
 
-// ===================================================
-//      ADDED FOR BACKEND TASK: CHART OF ACCOUNTS
-// ===================================================
-
 model ChartOfAccount {
-  id        String   @id @default(uuid())
-  code      String   @unique
+  id        String        @id @default(uuid())
+  code      String        @unique
   name      String
-  type      String   // Asset, Liability, Equity, Income, Expense
-  fund      String   // e.g., "General Fund", "Loans"
-  status    String   @default("Active") // Active, Inactive
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  type      AccountType
+  fund      String
+  status    AccountStatus @default(Active)
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+
+  // Strict relations to dependent modules
+  vouchers         ExpenseVoucher[]
+  budgetCategories BudgetCategory[]
 
   @@map("chart_of_accounts")
 }
 
-// ===================================================
-//      ADDED FOR USER STORY FS-006: EXPENSE VOUCHERS
-// ===================================================
-
 model ExpenseVoucher {
-  id            String    @id @default(uuid())
-  voucherNumber String    @unique @map("voucher_number") // e.g., "EV-2026-001"
+  id            String        @id @default(uuid())
+  voucherNumber String        @unique @map("voucher_number")
   date          DateTime
   payee         String
   purpose       String
-  amount        Float
-  accountCode   String    @map("account_code")          // FK ref to ChartOfAccount.code
-  approvedBy    String?   @map("approved_by")           // Name/role of approver
-  status        String    @default("PENDING")           // PENDING, APPROVED, REJECTED, POSTED
-  receiptUrl    String?   @map("receipt_url")           // Path to uploaded receipt file
-  postedAt      DateTime? @map("posted_at")             // Set when status → POSTED
+  amount        Decimal       @db.Decimal(12, 2)
+  accountCode   String        @map("account_code")
+  approvedBy    String?       @map("approved_by")
+  status        VoucherStatus @default(PENDING)
+  receiptUrl    String?       @map("receipt_url")
+  postedAt      DateTime?     @map("posted_at")
   notes         String?
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
 
-  // Relation: a posted voucher may have a linked petty cash disbursement
+  // Strict Referential Integrity against Chart of Accounts
+  account ChartOfAccount @relation(fields: [accountCode], references: [code], onDelete: Restrict)
+
   pettyCashTransactions PettyCashTransaction[]
 
   @@map("expense_vouchers")
 }
 
+// Append-only ledger
 model PettyCashTransaction {
-  id               String    @id @default(uuid())
-  type             String    // REPLENISHMENT, DISBURSEMENT, OPENING_BALANCE
-  amount           Float
-  description      String
-  runningBalance   Float     @map("running_balance")   // Balance after this transaction
-  referenceVoucherId String? @map("reference_voucher_id") // Optional FK to ExpenseVoucher
-  transactedAt     DateTime  @default(now()) @map("transacted_at")
-  createdAt        DateTime  @default(now()) @map("created_at")
+  id                 String        @id @default(uuid())
+  type               PettyCashType
+  amount             Decimal       @db.Decimal(12, 2)
+  description        String
+  runningBalance     Decimal       @map("running_balance") @db.Decimal(12, 2)
+  referenceVoucherId String?       @map("reference_voucher_id")
+  transactedAt       DateTime      @default(now()) @map("transacted_at")
+  createdAt          DateTime      @default(now()) @map("created_at")
 
-  voucher ExpenseVoucher? @relation(fields: [referenceVoucherId], references: [id])
+  // Restrict cascading
+  voucher ExpenseVoucher? @relation(fields: [referenceVoucherId], references: [id], onDelete: Restrict)
 
   @@map("petty_cash_transactions")
 }
 
 model BudgetCategory {
   id             String   @id @default(uuid())
-  accountCode    String   @unique @map("account_code") // Corresponds to ChartOfAccount.code
-  accountName    String   @map("account_name")         // Denormalized for display
-  approvedAmount Float    @map("approved_amount")      // The annual/period budget ceiling
-  fiscalYear     Int      @map("fiscal_year")          // e.g., 2026
+  accountCode    String   @unique @map("account_code")
+  accountName    String   @map("account_name")
+  approvedAmount Decimal  @map("approved_amount") @db.Decimal(12, 2)
+  fiscalYear     Int      @map("fiscal_year")
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
 
+  // Enforced relationship to COA
+  account ChartOfAccount @relation(fields: [accountCode], references: [code], onDelete: Restrict)
+
   @@map("budget_categories")
 }
-

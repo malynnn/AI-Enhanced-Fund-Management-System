@@ -24,18 +24,7 @@ export class DisbursementsController {
     return this.disbursementsService.confirmDisbursement(id, authorizedBy);
   }
 
-  @Public()
-  @Post('webhook')
-  async simulateWebhook(@Body() data: any) {
-    this.logger.log(`Received HTTP webhook simulation for loan ${data?.loanReference}`);
-    try {
-      await this.disbursementsService.processLoanApproved(data);
-      return { status: 'success', message: 'Webhook processed successfully' };
-    } catch (err) {
-      this.logger.error(`Webhook error: ${err.message}`);
-      throw new BadRequestException(err.message);
-    }
-  }
+
 
   // ─── RabbitMQ Consumer ───────────────────────────────────────────────────
 

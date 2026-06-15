@@ -1,5 +1,5 @@
 import { Module, NestModule, MiddlewareConsumer, Logger } from '@nestjs/common';
-import { createProxyMiddleware } from 'http-proxy-middleware';
+import { createProxyMiddleware, fixRequestBody } from 'http-proxy-middleware';
 
 @Module({})
 export class AppModule implements NestModule {
@@ -24,6 +24,7 @@ export class AppModule implements NestModule {
           target: ledgerSvcUrl,
           changeOrigin: true,
           pathRewrite: { '^/': '/accounts/' },
+          on: { proxyReq: fixRequestBody },
         }),
       )
       .forRoutes('/api/finance/accounts', '/api/finance/accounts/*path');
@@ -35,9 +36,22 @@ export class AppModule implements NestModule {
           target: ledgerSvcUrl,
           changeOrigin: true,
           pathRewrite: { '^/': '/funds/' },
+          on: { proxyReq: fixRequestBody },
         }),
       )
       .forRoutes('/api/finance/funds', '/api/finance/funds/*path');
+
+    // ledger-accounts-svc (Dashboard)
+    consumer
+      .apply(
+        createProxyMiddleware({
+          target: ledgerSvcUrl,
+          changeOrigin: true,
+          pathRewrite: { '^/': '/dashboard' },
+          on: { proxyReq: fixRequestBody },
+        }),
+      )
+      .forRoutes('/api/finance/dashboard');
 
     // dues-collection-svc
     consumer
@@ -46,6 +60,7 @@ export class AppModule implements NestModule {
           target: duesSvcUrl,
           changeOrigin: true,
           pathRewrite: { '^/': '/dues/' },
+          on: { proxyReq: fixRequestBody },
         }),
       )
       .forRoutes('/api/finance/dues', '/api/finance/dues/*path');
@@ -57,6 +72,7 @@ export class AppModule implements NestModule {
           target: disbursementSvcUrl,
           changeOrigin: true,
           pathRewrite: { '^/': '/disbursements/' },
+          on: { proxyReq: fixRequestBody },
         }),
       )
       .forRoutes('/api/finance/disbursements', '/api/finance/disbursements/*path');
@@ -68,6 +84,7 @@ export class AppModule implements NestModule {
           target: disbursementSvcUrl,
           changeOrigin: true,
           pathRewrite: { '^/': '/loans/' },
+          on: { proxyReq: fixRequestBody },
         }),
       )
       .forRoutes('/api/finance/loans', '/api/finance/loans/*path');
@@ -79,6 +96,7 @@ export class AppModule implements NestModule {
           target: disbursementSvcUrl,
           changeOrigin: true,
           pathRewrite: { '^/': '/repayments/' },
+          on: { proxyReq: fixRequestBody },
         }),
       )
       .forRoutes('/api/finance/repayments', '/api/finance/repayments/*path');
@@ -90,6 +108,7 @@ export class AppModule implements NestModule {
           target: expenseSvcUrl,
           changeOrigin: true,
           pathRewrite: { '^/': '/vouchers/' },
+          on: { proxyReq: fixRequestBody },
         }),
       )
       .forRoutes('/api/finance/expense-vouchers', '/api/finance/expense-vouchers/*path');
@@ -101,6 +120,7 @@ export class AppModule implements NestModule {
           target: expenseSvcUrl,
           changeOrigin: true,
           pathRewrite: { '^/': '/budget-categories/' },
+          on: { proxyReq: fixRequestBody },
         }),
       )
       .forRoutes('/api/finance/budget-categories', '/api/finance/budget-categories/*path');
@@ -112,6 +132,7 @@ export class AppModule implements NestModule {
           target: expenseSvcUrl,
           changeOrigin: true,
           pathRewrite: { '^/': '/petty-cash/' },
+          on: { proxyReq: fixRequestBody },
         }),
       )
       .forRoutes('/api/finance/petty-cash', '/api/finance/petty-cash/*path');

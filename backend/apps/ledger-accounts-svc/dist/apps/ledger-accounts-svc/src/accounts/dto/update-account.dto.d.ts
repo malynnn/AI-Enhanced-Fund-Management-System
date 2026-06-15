@@ -1,6 +1,7 @@
+import { AccountType, AccountStatus } from '@prisma/client';
 export declare class UpdateAccountDto {
     name?: string;
-    type?: string;
+    type?: AccountType;
     fund?: string;
-    status?: string;
+    status?: AccountStatus;
 }

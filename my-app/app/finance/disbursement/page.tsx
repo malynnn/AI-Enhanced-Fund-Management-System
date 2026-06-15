@@ -42,17 +42,7 @@ export default function DisbursementPage() {
   const [rejectReason, setRejectReason] = useState('');
   const [isRejecting, setIsRejecting] = useState(false);
 
-  // --- Webhook Simulator Form State ---
-  const [simLoanRef, setSimLoanRef] = useState('LN-2026-004');
-  const [simMemberId, setSimMemberId] = useState('MEM-9981');
-  const [simMemberName, setSimMemberName] = useState('Aza Wanimari');
-  const [simAmount, setSimAmount] = useState('35000.00');
-  const [simPayMethod, setSimPayMethod] = useState('BANK_TRANSFER');
-  const [simBankAccount, setSimBankAccount] = useState('BDO-5521098231');
-  const [simDetails, setSimDetails] = useState('Approved Provident Loan Release');
-  const [simSuccessMsg, setSimSuccessMsg] = useState('');
-  const [simErrMsg, setSimErrMsg] = useState('');
-  const [isSendingSim, setIsSendingSim] = useState(false);
+
 
   // Fetch Disbursements Queue from real database
   const fetchDisbursements = async () => {
@@ -286,42 +276,7 @@ export default function DisbursementPage() {
     }
   };
 
-  // --- WEBHOOK SIMULATOR ---
-  const handleSendWebhook = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSendingSim(true);
-    setSimSuccessMsg(''); setSimErrMsg('');
 
-    try {
-      const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3000';
-      const res = await fetch(`${gatewayUrl}/api/finance/disbursements/webhook`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          loanReference: simLoanRef,
-          memberId: simMemberId,
-          memberName: simMemberName,
-          amount: parseFloat(simAmount),
-          paymentMethod: simPayMethod,
-          bankAccount: simBankAccount,
-          paymentDetails: simDetails
-        })
-      });
-
-      const data = await res.json();
-      if (res.ok) {
-        setSimSuccessMsg('Webhook sent! Fund auto-debited and request queued.');
-        await fetchDisbursements();
-        setSimLoanRef(`LN-2026-${Math.floor(100 + Math.random() * 900)}`);
-      } else {
-        setSimErrMsg(data.error || 'Failed to send webhook');
-      }
-    } catch (err: any) {
-      setSimErrMsg(err.message || 'Network error simulating webhook');
-    } finally {
-      setIsSendingSim(false);
-    }
-  };
 
   // --- ANALYTICS ---
   const pendingCount = disbursements.filter(d => d.status === 'PENDING').length;
@@ -542,65 +497,7 @@ export default function DisbursementPage() {
             </div>
           </div>
 
-          {/* Webhook Simulator */}
-          <div className="bg-white rounded-2xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 animate-slide-in-right" style={{ animationDelay: '0.1s' }}>
-            <div className="mb-6 border-b border-gray-100 pb-4">
-              <h2 className="text-xs font-black text-gray-400 uppercase tracking-[0.15em] mb-2 flex items-center gap-2">
-                <span className="text-blue-500">{`>_`}</span> Webhook Simulator
-              </h2>
-              <p className="text-gray-500 text-xs leading-relaxed font-medium">Use this panel to simulate receiving an approved loan webhook from the external Loan system.</p>
-            </div>
 
-            {simSuccessMsg && (
-              <div className="mb-5 bg-emerald-50 border border-emerald-200 text-emerald-700 p-4 rounded-xl text-xs font-bold flex gap-3 shadow-[inset_0_0_0_1.5px_rgba(5,150,105,0.3)]">
-                <CheckCircle size={18} className="shrink-0 mt-0.5 text-emerald-500" />
-                <p>{simSuccessMsg}</p>
-              </div>
-            )}
-            {simErrMsg && (
-              <div className="mb-5 bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-xs font-bold flex gap-3 shadow-[inset_0_0_0_1.5px_rgba(220,38,38,0.3)]">
-                <AlertTriangle size={18} className="shrink-0 mt-0.5 text-red-500" />
-                <p>{simErrMsg}</p>
-              </div>
-            )}
-
-            <form onSubmit={handleSendWebhook} className="space-y-4">
-              <div>
-                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Loan Reference</label>
-                <input type="text" required value={simLoanRef} onChange={(e) => setSimLoanRef(e.target.value)} className="w-full rounded-xl px-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] focus:border-[#04152d] outline-none font-mono font-bold text-[#04152d]" />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Member ID</label>
-                  <input type="text" required value={simMemberId} onChange={(e) => setSimMemberId(e.target.value)} className="w-full rounded-xl px-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] focus:border-[#04152d] outline-none font-mono font-bold text-[#04152d]" />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-black text-[#04152d] uppercase tracking-[0.12em] mb-1.5">Amount (₱)</label>
-                  <input type="number" required value={simAmount} onChange={(e) => setSimAmount(e.target.value)} className="w-full rounded-xl px-4 py-3 text-sm bg-white border-[1.5px] border-[#dde3ee] focus:border-[#04152d] outline-none font-black text-[#04152d]" />
-                </div>
-              </div>
-              <div>
-                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Payee (Member Name)</label>
-                <input type="text" required value={simMemberName} onChange={(e) => setSimMemberName(e.target.value)} className="w-full rounded-xl px-4 py-3 text-sm bg-white border-[1.5px] border-[#dde3ee] focus:border-[#04152d] outline-none font-bold text-[#04152d]" />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Method</label>
-                  <select value={simPayMethod} onChange={(e) => setSimPayMethod(e.target.value)} className="w-full rounded-xl px-4 py-3 text-sm bg-white border-[1.5px] border-[#dde3ee] focus:border-[#04152d] outline-none font-bold text-[#04152d] appearance-none cursor-pointer">
-                    <option value="BANK_TRANSFER">Bank Transfer</option>
-                    <option value="CHECK">Check</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Bank Account</label>
-                  <input type="text" required value={simBankAccount} onChange={(e) => setSimBankAccount(e.target.value)} className="w-full rounded-xl px-4 py-3 text-sm bg-white border-[1.5px] border-[#dde3ee] focus:border-[#04152d] outline-none font-mono font-bold text-[#04152d]" />
-                </div>
-              </div>
-              <button type="submit" disabled={isSendingSim} className="w-full inline-flex items-center justify-center gap-2 bg-[#facc15] text-[#04152d] font-black py-3 px-6 rounded-xl text-sm shadow-[0_6px_0_rgba(110,76,0,0.45),0_4px_18px_rgba(250,204,21,0.4)] hover:-translate-y-[1px] active:translate-y-[4px] active:shadow-[0_2px_0_rgba(110,76,0,0.45),0_2px_8px_rgba(250,204,21,0.25)] transition-all mt-6 disabled:opacity-40 disabled:cursor-not-allowed">
-                {isSendingSim ? 'Firing Webhook...' : <><Send size={16} /> Send Mock Webhook</>}
-              </button>
-            </form>
-          </div>
         </div>
 
       </main>

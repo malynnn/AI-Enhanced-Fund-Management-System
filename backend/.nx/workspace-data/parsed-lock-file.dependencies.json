@@ -1,5 +1,25 @@
 [
   {
+    "source": "npm:amqp-connection-manager@4.1.15",
+    "target": "npm:amqplib@0.10.9",
+    "type": "static"
+  },
+  {
+    "source": "npm:amqp-connection-manager@4.1.15",
+    "target": "npm:promise-breaker",
+    "type": "static"
+  },
+  {
+    "source": "npm:amqplib@0.10.9",
+    "target": "npm:buffer-more-ints",
+    "type": "static"
+  },
+  {
+    "source": "npm:amqplib@0.10.9",
+    "target": "npm:url-parse",
+    "type": "static"
+  },
+  {
     "source": "npm:@nestjs/common@10.4.22",
     "target": "npm:reflect-metadata",
     "type": "static"
@@ -2875,6 +2895,11 @@
     "type": "static"
   },
   {
+    "source": "npm:@types/multer",
+    "target": "npm:@types/express",
+    "type": "static"
+  },
+  {
     "source": "npm:@types/node",
     "target": "npm:undici-types",
     "type": "static"
@@ -4942,6 +4967,31 @@
   {
     "source": "npm:http-errors",
     "target": "npm:toidentifier",
+    "type": "static"
+  },
+  {
+    "source": "npm:http-proxy-middleware",
+    "target": "npm:debug",
+    "type": "static"
+  },
+  {
+    "source": "npm:http-proxy-middleware",
+    "target": "npm:httpxy",
+    "type": "static"
+  },
+  {
+    "source": "npm:http-proxy-middleware",
+    "target": "npm:is-glob",
+    "type": "static"
+  },
+  {
+    "source": "npm:http-proxy-middleware",
+    "target": "npm:is-plain-obj",
+    "type": "static"
+  },
+  {
+    "source": "npm:http-proxy-middleware",
+    "target": "npm:micromatch",
     "type": "static"
   },
   {
@@ -8447,6 +8497,16 @@
   {
     "source": "npm:uri-js",
     "target": "npm:punycode",
+    "type": "static"
+  },
+  {
+    "source": "npm:url-parse",
+    "target": "npm:querystringify",
+    "type": "static"
+  },
+  {
+    "source": "npm:url-parse",
+    "target": "npm:requires-port",
     "type": "static"
   },
   {
