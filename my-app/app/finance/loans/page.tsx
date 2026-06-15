@@ -91,13 +91,34 @@ export default function LoansDashboard() {
       const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
       const [fundsRes, repaymentsRes, writeOffsRes] = await Promise.all([
         fetch(`${gatewayUrl}/api/finance/funds`),
-        fetch(`${gatewayUrl}/api/webhooks/repayments`),
-        fetch(`${gatewayUrl}/api/finance/loans/write-off`)
+        fetch(`${gatewayUrl}/api/finance/repayments`),
+        fetch(`${gatewayUrl}/api/finance/loans/write-offs`)
       ]);
 
-      if (fundsRes.ok) setFunds(await fundsRes.json());
-      if (repaymentsRes.ok) setRepayments(await repaymentsRes.json());
-      if (writeOffsRes.ok) setWriteOffs(await writeOffsRes.json());
+      if (fundsRes.ok) {
+        const fundsData = await fundsRes.json();
+        setFunds(fundsData.map((f: any) => ({
+          ...f,
+          currentBalance: Number(f.currentBalance)
+        })));
+      }
+      if (repaymentsRes.ok) {
+        const repaymentsData = await repaymentsRes.json();
+        setRepayments(repaymentsData.map((r: any) => ({
+          ...r,
+          amount: Number(r.amount),
+          principalAmount: Number(r.principalAmount),
+          serviceFeeAmount: Number(r.serviceFeeAmount),
+          overpaymentAmount: Number(r.overpaymentAmount)
+        })));
+      }
+      if (writeOffsRes.ok) {
+        const writeOffsData = await writeOffsRes.json();
+        setWriteOffs(writeOffsData.map((w: any) => ({
+          ...w,
+          amount: Number(w.amount)
+        })));
+      }
     } catch (error) {
       console.error('Error loading dashboard data:', error);
       showNotification('error', 'Failed to synchronize loan records with the database.');
@@ -158,7 +179,7 @@ export default function LoansDashboard() {
     try {
       if (modal.actionType === 'overpayment') {
         const { repaymentId, decision } = modal.payload;
-        const res = await fetch(`${gatewayUrl}/api/finance/loans/overpayment`, {
+        const res = await fetch(`${gatewayUrl}/api/finance/loans/overpayments`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ repaymentId, decision, authorizedBy: 'Treasurer Romalyn' })
@@ -173,7 +194,7 @@ export default function LoansDashboard() {
       } 
       
       else if (modal.actionType === 'requestWriteOff') {
-        const res = await fetch(`${gatewayUrl}/api/finance/loans/write-off`, {
+        const res = await fetch(`${gatewayUrl}/api/finance/loans/write-offs`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -197,7 +218,7 @@ export default function LoansDashboard() {
 
       else if (modal.actionType === 'processWriteOff') {
         const { id, status } = modal.payload;
-        const res = await fetch(`${gatewayUrl}/api/finance/loans/write-off`, {
+        const res = await fetch(`${gatewayUrl}/api/finance/loans/write-offs`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ id, status, authorizedBy: 'Treasurer Workflow' })

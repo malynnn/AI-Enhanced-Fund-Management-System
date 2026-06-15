@@ -1,0 +1,57 @@
+
+> dues-collection-svc@0.0.1 build
+> nest build
+
+[96msrc/dues/dues.service.ts[0m:[93m45[0m:[93m9[0m - [91merror[0m[90m TS2322: [0mType 'string' is not assignable to type 'PaymentMethod'.
+
+[7m45[0m         method: data.paymentMethod || 'PAYROLL',
+[7m  [0m [91m        ~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m17607[0m:[93m5[0m
+    [7m17607[0m     method: $Enums.PaymentMethod
+    [7m     [0m [96m    ~~~~~~[0m
+    The expected type comes from property 'method' which is declared here on type '(Without<DuesRecordCreateInput, DuesRecordUncheckedCreateInput> & DuesRecordUncheckedCreateInput) | (Without<...> & DuesRecordCreateInput)'
+[96msrc/dues/dues.service.ts[0m:[93m48[0m:[93m9[0m - [91merror[0m[90m TS2820: [0mType '"Pending"' is not assignable to type 'DuesStatus'. Did you mean '"PENDING"'?
+
+[7m48[0m         status: 'Pending',
+[7m  [0m [91m        ~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m17610[0m:[93m5[0m
+    [7m17610[0m     status?: $Enums.DuesStatus
+    [7m     [0m [96m    ~~~~~~[0m
+    The expected type comes from property 'status' which is declared here on type '(Without<DuesRecordCreateInput, DuesRecordUncheckedCreateInput> & DuesRecordUncheckedCreateInput) | (Without<...> & DuesRecordCreateInput)'
+[96msrc/dues/dues.service.ts[0m:[93m58[0m:[93m7[0m - [91merror[0m[90m TS2322: [0mType '{ status: string; } | { status?: undefined; }' is not assignable to type 'DuesRecordWhereInput'.
+  Type '{ status: string; }' is not assignable to type 'DuesRecordWhereInput'.
+    Types of property 'status' are incompatible.
+      Type 'string' is not assignable to type 'DuesStatus | EnumDuesStatusFilter<"DuesRecord">'.
+
+[7m58[0m       where: whereClause,
+[7m  [0m [91m      ~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m11067[0m:[93m5[0m
+    [7m11067[0m     where?: DuesRecordWhereInput
+    [7m     [0m [96m    ~~~~~[0m
+    The expected type comes from property 'where' which is declared here on type '{ select?: DuesRecordSelect<DefaultArgs>; where?: DuesRecordWhereInput; orderBy?: DuesRecordOrderByWithRelationInput | DuesRecordOrderByWithRelationInput[]; cursor?: DuesRecordWhereUniqueInput; take?: number; skip?: number; distinct?: DuesRecordScalarFieldEnum | DuesRecordScalarFieldEnum[]; }'
+[96msrc/dues/dues.service.ts[0m:[93m70[0m:[93m9[0m - [91merror[0m[90m TS2367: [0mThis comparison appears to be unintentional because the types 'DuesStatus' and '"Confirmed"' have no overlap.
+
+[7m70[0m     if (record.status === 'Confirmed') {
+[7m  [0m [91m        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/dues/dues.service.ts[0m:[93m76[0m:[93m15[0m - [91merror[0m[90m TS2820: [0mType '"Confirmed"' is not assignable to type 'DuesStatus | EnumDuesStatusFieldUpdateOperationsInput'. Did you mean '"CONFIRMED"'?
+
+[7m76[0m       data: { status: 'Confirmed' },
+[7m  [0m [91m              ~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m17640[0m:[93m5[0m
+    [7m17640[0m     status?: EnumDuesStatusFieldUpdateOperationsInput | $Enums.DuesStatus
+    [7m     [0m [96m    ~~~~~~[0m
+    The expected type comes from property 'status' which is declared here on type '(Without<DuesRecordUpdateInput, DuesRecordUncheckedUpdateInput> & DuesRecordUncheckedUpdateInput) | (Without<...> & DuesRecordUpdateInput)'
+
+Found 5 error(s).
+
+npm error Lifecycle script `build` failed with error:
+npm error code 1
+npm error path C:\Users\Angel Aubrey\Documents\stone-cap\Finance-System_Capstone-1\backend\apps\dues-collection-svc
+npm error workspace dues-collection-svc@0.0.1
+npm error location C:\Users\Angel Aubrey\Documents\stone-cap\Finance-System_Capstone-1\backend\apps\dues-collection-svc
+npm error command failed
+npm error command C:\windows\system32\cmd.exe /d /s /c nest build

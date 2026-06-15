@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { PettyCashService } from './petty-cash.service';
-import { Public } from '@bdoea-fs/auth';
+import { Public, Roles } from '@bdoea-fs/auth';
 
 @Controller('petty-cash')
 export class PettyCashController {
@@ -19,7 +19,7 @@ export class PettyCashController {
   }
 
   @Post()
-  @Roles('Treasurer')
+  @Public()
   create(
     @Body()
     data: {

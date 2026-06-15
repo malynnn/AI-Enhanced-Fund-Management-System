@@ -28,7 +28,10 @@ export class VouchersService {
   }
 
   async findAll(status?: string) {
-    const where = status ? { status } : {};
+    const { VoucherStatus } = require('@prisma/client');
+    const where = status && Object.values(VoucherStatus).includes(status)
+      ? { status: status as any }
+      : {};
     return this.prisma.expenseVoucher.findMany({
       where,
       orderBy: { createdAt: 'desc' },
@@ -66,7 +69,7 @@ export class VouchersService {
       data: {
         ...data,
         date: new Date(data.date),
-        status: 'PENDING',
+        status: ((data as any).status || 'PENDING') as any,
       },
     });
 
@@ -171,8 +174,14 @@ export class VouchersService {
     }
 
     // Budget Ceiling Check
+    const fiscalYear = new Date(voucher.date).getFullYear();
     const budgetCategory = await this.prisma.budgetCategory.findUnique({
-      where: { accountCode: voucher.accountCode },
+      where: {
+        accountCode_fiscalYear: {
+          accountCode: voucher.accountCode,
+          fiscalYear,
+        },
+      },
     });
 
     let budgetWarning = false;
@@ -187,15 +196,15 @@ export class VouchersService {
           status: 'POSTED',
         },
       });
-      const currentSpent = result._sum.amount || 0;
-      const projectedTotal = currentSpent + voucher.amount;
+      const currentSpent = Number(result._sum.amount ?? 0);
+      const projectedTotal = currentSpent + Number(voucher.amount);
 
-      if (projectedTotal > budgetCategory.approvedAmount) {
+      if (projectedTotal > Number(budgetCategory.approvedAmount)) {
         budgetWarning = true;
         budgetWarningMessage = `Warning: Posting this voucher exceeds the budget ceiling for ${voucher.accountCode}`;
       }
       
-      utilization = projectedTotal / budgetCategory.approvedAmount;
+      utilization = projectedTotal / Number(budgetCategory.approvedAmount);
     }
 
     // Process Transaction
@@ -223,8 +232,8 @@ export class VouchersService {
       await tx.fundTransaction.create({
         data: {
           fundId: gf.id,
-          amount: -voucher.amount,
-          type: 'EXPENSE_VOUCHER',
+          amount: voucher.amount,
+          type: 'WITHDRAWAL',
           description: `Disbursement for ${voucher.purpose}`,
           referenceId: voucher.id,
         },
@@ -250,8 +259,8 @@ export class VouchersService {
           } = {
             accountCode: voucher.accountCode,
             accountName: budgetCategory.accountName,
-            approvedAmount: budgetCategory.approvedAmount,
-            totalSpent: (budgetCategory.approvedAmount * utilization),
+            approvedAmount: Number(budgetCategory.approvedAmount),
+            totalSpent: Number(budgetCategory.approvedAmount) * utilization,
             utilizationPercent,
             triggeredAt: new Date().toISOString(),
             voucherId: voucher.id,

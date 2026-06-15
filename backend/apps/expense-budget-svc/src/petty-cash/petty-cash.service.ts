@@ -20,7 +20,7 @@ export class PettyCashService {
       orderBy: { transactedAt: 'desc' },
       select: { runningBalance: true },
     });
-    return last?.runningBalance ?? 0;
+    return last ? Number(last.runningBalance) : 0;
   }
 
   private async getSummary() {
@@ -34,8 +34,8 @@ export class PettyCashService {
         where: { type: 'DISBURSEMENT' },
       }),
     ]);
-    const totalReplenishments = replenishments._sum.amount || 0;
-    const totalDisbursements = disbursements._sum.amount || 0;
+    const totalReplenishments = Number(replenishments._sum.amount ?? 0);
+    const totalDisbursements = Number(disbursements._sum.amount ?? 0);
     const currentBalance = totalReplenishments - totalDisbursements;
     return { currentBalance, totalReplenishments, totalDisbursements };
   }
@@ -123,9 +123,10 @@ export class PettyCashService {
         ? currentBalance + data.amount
         : currentBalance - data.amount;
 
+    const { PettyCashType } = require('@prisma/client');
     const tx = await this.prisma.pettyCashTransaction.create({
       data: {
-        type: data.type,
+        type: data.type as typeof PettyCashType[keyof typeof PettyCashType],
         amount: data.amount,
         description: data.description,
         runningBalance,

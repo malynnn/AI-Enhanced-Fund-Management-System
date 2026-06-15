@@ -2,6 +2,7 @@ import { Injectable, Logger, Inject } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { RepaymentPostedEvent } from '@backend/events';
 import { ClientProxy } from '@nestjs/microservices';
+import { PaymentMethod } from '@prisma/client';
 
 const LOAN_FUND_CODE = 'LOAN_BDOEA';
 const LOAN_FUND_FALLBACK = 'LN';
@@ -183,7 +184,7 @@ export class RepaymentsService {
         data: {
           fundId: loanFund.id,
           amount: creditToPrincipal,
-          type: 'LOAN_REPAYMENT',
+          type: 'DEPOSIT',
           description: `Principal repayment from ${memberName} (ref: ${loanReference})`,
           referenceId: loanReference,
         },
@@ -195,7 +196,7 @@ export class RepaymentsService {
           data: {
             fundId: generalFund.id,
             amount: serviceFee,
-            type: 'SERVICE_FEE',
+            type: 'CORRECTING_ENTRY',
             description: `Service fee from ${memberName} (ref: ${loanReference})`,
             referenceId: loanReference,
           },
@@ -212,7 +213,7 @@ export class RepaymentsService {
           principalAmount: creditToPrincipal,
           serviceFeeAmount: serviceFee,
           overpaymentAmount,
-          paymentMethod,
+          paymentMethod: paymentMethod as PaymentMethod,
           referenceNumber: referenceNumber || null,
           status,
         },

@@ -17,4 +17,8 @@ export declare class FundsService {
         currentBalance: any;
         history: any;
     }>;
+    transferFunds(sourceId: string, destId: string, amount: number, notes: string): Promise<{
+        success: boolean;
+        message: string;
+    }>;
 }

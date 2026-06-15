@@ -1,6 +1,6 @@
 import { Controller, Get, Put, Body, Logger } from '@nestjs/common';
 import { RepaymentsService } from './repayments.service';
-import { Public } from '@bdoea-fs/auth';
+import { Public, Roles } from '@bdoea-fs/auth';
 
 @Controller('loans/overpayments')
 export class OverpaymentsController {

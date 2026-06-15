@@ -48,7 +48,7 @@ export default function DisbursementPage() {
   const fetchDisbursements = async () => {
     try {
       setIsLoading(true);
-      const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3000';
+      const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
       const res = await fetch(`${gatewayUrl}/api/finance/disbursements`);
       if (res.ok) {
         const data = await res.json();
@@ -212,7 +212,7 @@ export default function DisbursementPage() {
     setActionModal(prev => ({ ...prev, status: 'loading' }));
     
     try {
-      const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3000';
+      const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
       const res = await fetch(`${gatewayUrl}/api/finance/disbursements/${selectedForAction.id}/confirm`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -249,28 +249,36 @@ export default function DisbursementPage() {
     
     setIsRejecting(true);
     try {
-      // Safely attempt the backend call if your backend supports /reject. 
-      // If not, this acts as a safe fallback that updates the UI immediately.
-      const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3000';
-      await fetch(`${gatewayUrl}/api/finance/disbursements/${selectedForAction.id}/reject`, {
+      const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
+      const res = await fetch(`${gatewayUrl}/api/finance/disbursements/${selectedForAction.id}/reject`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ reason: rejectReason, authorizedBy: 'Treasurer Romalyn Amante' })
-      }).catch(() => console.warn("Backend /reject endpoint may not exist yet. Proceeding with UI update."));
+      });
       
-      // Update UI state to reflect rejection immediately
-      setDisbursements(prev => prev.map(d => d.id === selectedForAction.id ? { ...d, status: 'REJECTED', rejectedReason: rejectReason } : d));
-      
+      if (res.ok) {
+        await fetchDisbursements();
+        setIsRejectModalOpen(false);
+        setActionModal({
+          isOpen: true,
+          title: 'Disbursement Rejected',
+          message: '',
+          status: 'success',
+          resultMsg: `The disbursement request for ${selectedForAction.memberName} has been rejected.`
+        });
+      } else {
+        throw new Error("Backend failed to reject the disbursement request.");
+      }
+    } catch (err: any) {
+      console.error('Error rejecting disbursement:', err);
       setIsRejectModalOpen(false);
       setActionModal({
         isOpen: true,
-        title: 'Disbursement Rejected',
+        title: 'Rejection Failed',
         message: '',
-        status: 'success',
-        resultMsg: `The disbursement request for ${selectedForAction.memberName} has been rejected.`
+        status: 'error',
+        resultMsg: err.message || 'An error occurred while rejecting the disbursement request.'
       });
-    } catch (err) {
-      console.error('Error rejecting disbursement:', err);
     } finally {
       setIsRejecting(false);
     }

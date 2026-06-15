@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma.service';
 import { DuesPayrollConfirmedEvent } from '@backend/events';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
+import { DuesStatus, PaymentMethod } from '@prisma/client';
 
 @Injectable()
 export class DuesService {
@@ -42,10 +43,10 @@ export class DuesService {
         name: data.fullName || 'Unknown',
         month: data.monthCovered || 'Unknown',
         amountPaid: Number(data.amount),
-        method: data.paymentMethod || 'PAYROLL',
+        method: (data.paymentMethod || 'SALARY_DEDUCTION') as PaymentMethod,
         referenceNumber: data.referenceNumber,
         fundToCredit: fund.code,
-        status: 'Pending',
+        status: 'PENDING',
       },
     });
     
@@ -53,7 +54,7 @@ export class DuesService {
   }
 
   async findAll(status?: string) {
-    const whereClause = status ? { status } : {};
+    const whereClause = status ? { status: status as DuesStatus } : {};
     return this.prisma.duesRecord.findMany({
       where: whereClause,
       orderBy: { createdAt: 'desc' },
@@ -67,13 +68,13 @@ export class DuesService {
       throw new NotFoundException(`Dues record ${id} not found`);
     }
 
-    if (record.status === 'Confirmed') {
+    if (record.status === 'CONFIRMED') {
       throw new ConflictException('Dues record is already Confirmed');
     }
 
     const updated = await this.prisma.duesRecord.update({
       where: { id },
-      data: { status: 'Confirmed' },
+      data: { status: 'CONFIRMED' },
     });
 
     // Publish event to ledger-accounts-svc

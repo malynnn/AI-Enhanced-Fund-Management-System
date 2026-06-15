@@ -1,9 +1,65 @@
 {
   "run": {
-    "command": "nx run-many --target=serve --all",
-    "startTime": "2026-06-15T04:36:42.520Z",
-    "endTime": "2026-06-15T04:36:42.542Z",
+    "command": "nx run-many --target=build --all",
+    "startTime": "2026-06-15T16:59:44.654Z",
+    "endTime": "2026-06-15T17:00:15.216Z",
     "inner": false
   },
-  "tasks": []
+  "tasks": [
+    {
+      "taskId": "dues-collection-svc:build",
+      "target": "build",
+      "projectName": "dues-collection-svc",
+      "hash": "3793217312425885278",
+      "startTime": "2026-06-15T16:59:44.700Z",
+      "endTime": "2026-06-15T17:00:00.516Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    },
+    {
+      "taskId": "disbursement-svc:build",
+      "target": "build",
+      "projectName": "disbursement-svc",
+      "hash": "6435904315188419977",
+      "startTime": "2026-06-15T16:59:44.700Z",
+      "endTime": "2026-06-15T17:00:02.333Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    },
+    {
+      "taskId": "expense-budget-svc:build",
+      "target": "build",
+      "projectName": "expense-budget-svc",
+      "hash": "13516820376653303415",
+      "startTime": "2026-06-15T16:59:44.700Z",
+      "endTime": "2026-06-15T17:00:03.008Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    },
+    {
+      "taskId": "fs-gateway:build",
+      "target": "build",
+      "projectName": "fs-gateway",
+      "hash": "13988069496375848624",
+      "startTime": "2026-06-15T17:00:02.355Z",
+      "endTime": "2026-06-15T17:00:14.274Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    },
+    {
+      "taskId": "ledger-accounts-svc:build",
+      "target": "build",
+      "projectName": "ledger-accounts-svc",
+      "hash": "5665845463607875757",
+      "startTime": "2026-06-15T17:00:00.588Z",
+      "endTime": "2026-06-15T17:00:15.200Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    }
+  ]
 }

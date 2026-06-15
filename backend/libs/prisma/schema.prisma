@@ -308,7 +308,7 @@ model PettyCashTransaction {
 
 model BudgetCategory {
   id             String   @id @default(uuid())
-  accountCode    String   @unique @map("account_code")
+  accountCode    String   @map("account_code")
   accountName    String   @map("account_name")
   approvedAmount Decimal  @map("approved_amount") @db.Decimal(12, 2)
   fiscalYear     Int      @map("fiscal_year")
@@ -318,5 +318,6 @@ model BudgetCategory {
   // Enforced relationship to COA
   account ChartOfAccount @relation(fields: [accountCode], references: [code], onDelete: Restrict)
 
+  @@unique([accountCode, fiscalYear])
   @@map("budget_categories")
 }

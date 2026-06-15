@@ -23,6 +23,9 @@ let FundsController = class FundsController {
     findAll() {
         return this.fundsService.findAll();
     }
+    transferFunds(sourceId, destId, amount, notes) {
+        return this.fundsService.transferFunds(sourceId, destId, amount, notes);
+    }
     findOne(id) {
         return this.fundsService.findById(id);
     }
@@ -35,6 +38,17 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], FundsController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Post)('transfer'),
+    (0, auth_1.Public)(),
+    __param(0, (0, common_1.Body)('sourceId')),
+    __param(1, (0, common_1.Body)('destId')),
+    __param(2, (0, common_1.Body)('amount')),
+    __param(3, (0, common_1.Body)('notes')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, Number, String]),
+    __metadata("design:returntype", void 0)
+], FundsController.prototype, "transferFunds", null);
 __decorate([
     (0, common_1.Get)(':id'),
     (0, auth_1.Public)(),

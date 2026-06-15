@@ -22,11 +22,16 @@ export default function DuesCollectionPage() {
   const fetchDuesRecords = async () => {
     try {
       setIsLoading(true);
-      const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3000';
+      const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
       const res = await fetch(`${gatewayUrl}/api/finance/dues`);
       if (res.ok) {
         const data = await res.json();
-        setDuesRecords(data);
+        // Convert Decimal string representation from database to numeric float
+        const formatted = data.map((d: any) => ({
+          ...d,
+          amountPaid: Number(d.amountPaid)
+        }));
+        setDuesRecords(formatted);
       }
     } catch (err) {
       console.error('Error fetching dues:', err);
@@ -81,7 +86,7 @@ export default function DuesCollectionPage() {
   const reportTotals = useMemo(() => {
     const totalCollected = filteredRecords.reduce((sum, rec) => sum + rec.amountPaid, 0);
     const totalDiscrepancies = filteredRecords.filter(rec => rec.amountPaid !== standardDuesAmount).length;
-    const totalConfirmed = filteredRecords.filter(rec => rec.status === 'Confirmed').length;
+    const totalConfirmed = filteredRecords.filter(rec => rec.status === 'CONFIRMED').length;
     return { totalCollected, totalDiscrepancies, totalConfirmed, count: filteredRecords.length };
   }, [filteredRecords]);
 
@@ -97,7 +102,7 @@ export default function DuesCollectionPage() {
   };
 
   const triggerBatchPost = () => {
-    const pendingCount = filteredRecords.filter(r => r.status === 'Pending').length;
+    const pendingCount = filteredRecords.filter(r => r.status === 'PENDING').length;
     if (pendingCount === 0) return;
     
     setModal({
@@ -112,61 +117,54 @@ export default function DuesCollectionPage() {
   // --- EXECUTE HTTP REQUEST VIA MODAL ---
   const executeModalAction = async () => {
     setModal(prev => ({ ...prev, status: 'loading' }));
+    const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
 
     if (modal.actionId === 'batch') {
-      // Mocking batch post delay
-      setTimeout(() => {
+      try {
+        const pendingRecords = filteredRecords.filter(r => r.status === 'PENDING');
+        const promises = pendingRecords.map(async (record) => {
+          const res = await fetch(`${gatewayUrl}/api/finance/dues/${record.id}/confirm`, {
+            method: 'PATCH',
+          });
+          if (!res.ok) {
+            throw new Error(`Failed to confirm record for ${record.name}`);
+          }
+          return record.id;
+        });
+
+        await Promise.all(promises);
+
         setDuesRecords(prev => prev.map(rec => {
-          const isPendingInView = filteredRecords.some(fr => fr.id === rec.id && fr.status === 'Pending');
-          return isPendingInView ? { ...rec, status: 'Confirmed' } : rec;
+          const wasPending = pendingRecords.some(pr => pr.id === rec.id);
+          return wasPending ? { ...rec, status: 'CONFIRMED' } : rec;
         }));
-        setModal(prev => ({ ...prev, status: 'success', resultMsg: 'Batch posting completed successfully!' }));
-      }, 1500);
+
+        setModal(prev => ({ ...prev, status: 'success', resultMsg: `Successfully batch posted ${pendingRecords.length} records to the ledger.` }));
+      } catch (error: any) {
+        console.error('Batch post error:', error);
+        setModal(prev => ({ ...prev, status: 'error', resultMsg: error.message || 'Failed to complete batch posting.' }));
+      }
       return;
     }
 
-    // Single record post logic (Your original fetch logic untouched)
-    const recordId = modal.actionId as number;
+    const recordId = modal.actionId as string | number;
     const record = duesRecords.find(r => r.id === recordId);
     if (!record) return;
 
     try {
-      const response = await fetch(`/api/mock/ms-callback`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          transaction_id: record.transaction_id,
-          member_id: record.memberId,
-          reference_number: record.reference_number,
-          posted_amount: record.amountPaid,
-          fund_credited: record.fund_to_credit,
-          requesting_role: 'MS_Admin', 
-        })
+      const response = await fetch(`${gatewayUrl}/api/finance/dues/${recordId}/confirm`, {
+        method: 'PATCH',
       });
 
       const responseData = await response.json();
 
       if (response.ok) {
         setDuesRecords(prev => prev.map(rec => 
-          rec.id === recordId ? { ...rec, status: 'Confirmed' } : rec
+          rec.id === recordId ? { ...rec, status: 'CONFIRMED' } : rec
         ));
-      }
-
-      setWebhookLogs(prev => [
-        {
-          timestamp: new Date().toLocaleTimeString(),
-          type: response.ok
-            ? `✅ LEDGER_POSTED + MS_NOTIFIED (200)`
-            : `❌ ERROR (${response.status})`,
-          payload: responseData
-        },
-        ...prev
-      ]);
-      
-      if (!response.ok) {
-        setModal(prev => ({ ...prev, status: 'error', resultMsg: `Status: ${response.status} - Error: ${responseData.error}` }));
+        setModal(prev => ({ ...prev, status: 'success', resultMsg: `Dues record confirmed and posted successfully!` }));
       } else {
-        setModal(prev => ({ ...prev, status: 'success', resultMsg: `Backend response: ${responseData.message}` }));
+        setModal(prev => ({ ...prev, status: 'error', resultMsg: `Status: ${response.status} - Error: ${responseData.message || responseData.error}` }));
       }
 
     } catch (error) {
@@ -286,8 +284,8 @@ export default function DuesCollectionPage() {
                 <Filter size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                 <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="w-full rounded-xl pl-11 pr-10 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#04152d] focus:ring-[3px] focus:ring-[#04152d]/10 outline-none transition-colors appearance-none font-bold text-[#04152d] cursor-pointer">
                   <option value="ALL">All Status</option>
-                  <option value="Pending">Pending Review</option>
-                  <option value="Confirmed">Posted to Ledger</option>
+                  <option value="PENDING">Pending Review</option>
+                  <option value="CONFIRMED">Posted to Ledger</option>
                   <option value="DISCREPANCY">Discrepancies Only</option>
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#04152d]">
@@ -342,7 +340,7 @@ export default function DuesCollectionPage() {
                             </div>
                           </td>
                           <td className="px-6 py-4 text-sm">
-                            {rec.status === 'Confirmed' ? (
+                            {rec.status === 'CONFIRMED' ? (
                               <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 shadow-[inset_0_0_0_1.5px_rgba(5,150,105,0.3)]">
                                 <CheckCircle2 size={12} /> Posted
                               </span>
@@ -353,7 +351,7 @@ export default function DuesCollectionPage() {
                             )}
                           </td>
                           <td className="px-6 py-4 text-sm text-right">
-                            {rec.status === 'Pending' ? (
+                            {rec.status === 'PENDING' ? (
                               <button 
                                 onClick={() => triggerSinglePost(rec.id, rec.name)} 
                                 className="inline-flex items-center justify-center gap-2 bg-[#facc15] text-[#04152d] font-black py-2.5 px-5 rounded-xl text-xs shadow-[0_6px_0_rgba(110,76,0,0.45),0_4px_18px_rgba(250,204,21,0.4)] hover:-translate-y-[1px] active:translate-y-[4px] active:shadow-[0_2px_0_rgba(110,76,0,0.45),0_2px_8px_rgba(250,204,21,0.25)] transition-all"
@@ -437,8 +435,8 @@ export default function DuesCollectionPage() {
                         <span className="font-mono font-medium text-gray-400 mt-1 block text-xs">{rec.reference_number}</span>
                       </td>
                       <td className="py-4 px-2 text-center">
-                        <span className={`text-[10px] font-black uppercase tracking-widest ${rec.status === 'Confirmed' ? 'text-gray-500' : (isDiscrepancy ? 'text-[#ef4444]' : 'text-[#04152d]')}`}>
-                          {isDiscrepancy && rec.status === 'Pending' ? 'Discrepancy' : rec.status}
+                        <span className={`text-[10px] font-black uppercase tracking-widest ${rec.status === 'CONFIRMED' ? 'text-gray-500' : (isDiscrepancy ? 'text-[#ef4444]' : 'text-[#04152d]')}`}>
+                          {isDiscrepancy && rec.status === 'PENDING' ? 'Discrepancy' : rec.status}
                         </span>
                       </td>
                       <td className="py-4 px-2 text-right">

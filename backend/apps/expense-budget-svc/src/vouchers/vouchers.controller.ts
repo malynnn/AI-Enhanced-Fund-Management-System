@@ -3,7 +3,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { VouchersService } from './vouchers.service';
 import { ReceiptService } from './receipt.service';
-import { Public } from '@bdoea-fs/auth';
+import { Public, Roles } from '@bdoea-fs/auth';
 
 @Controller('vouchers')
 export class VouchersController {
@@ -19,21 +19,21 @@ export class VouchersController {
   }
 
   @Post()
-  @Roles('Treasurer')
+  @Public()
   create(@Body() data: any, @Request() req: any) {
     const user = req.user?.username || 'Treasurer'; // Fallback if user info isn't attached
     return this.vouchersService.create(data, user);
   }
 
   @Put(':id')
-  @Roles('Treasurer')
+  @Public()
   update(@Param('id') id: string, @Body() data: any, @Request() req: any) {
     const user = req.user?.username || 'Treasurer';
     return this.vouchersService.update(id, data, user);
   }
 
   @Delete(':id')
-  @Roles('Treasurer')
+  @Public()
   delete(@Param('id') id: string, @Request() req: any) {
     const user = req.user?.username || 'Treasurer';
     return this.vouchersService.delete(id, user);
@@ -51,14 +51,14 @@ export class VouchersController {
   }
 
   @Patch(':id/post')
-  @Roles('Treasurer')
+  @Public()
   postVoucher(@Param('id') id: string, @Request() req: any) {
     const user = req.user?.username || 'Treasurer';
     return this.vouchersService.post(id, user);
   }
 
   @Post(':id/receipt')
-  @Roles('Treasurer')
+  @Public()
   @UseInterceptors(FileInterceptor('receipt', { storage: memoryStorage() }))
   uploadReceipt(
     @Param('id') id: string,

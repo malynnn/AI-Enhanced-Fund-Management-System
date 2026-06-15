@@ -19,15 +19,20 @@ export class BudgetService {
       where: {
         accountCode: category.accountCode,
         status: 'POSTED',
+        date: {
+          gte: new Date(`${category.fiscalYear}-01-01T00:00:00.000Z`),
+          lte: new Date(`${category.fiscalYear}-12-31T23:59:59.999Z`),
+        },
       },
     });
-    const totalSpent = result._sum.amount || 0;
-    const remainingBudget = category.approvedAmount - totalSpent;
+    const totalSpent = Number(result._sum.amount ?? 0);
+    const approvedAmount = Number(category.approvedAmount);
+    const remainingBudget = approvedAmount - totalSpent;
     const utilizationPercent =
-      category.approvedAmount > 0
-        ? parseFloat(((totalSpent / category.approvedAmount) * 100).toFixed(2))
+      approvedAmount > 0
+        ? parseFloat(((totalSpent / approvedAmount) * 100).toFixed(2))
         : 0;
-    const isExceeded = totalSpent > category.approvedAmount;
+    const isExceeded = totalSpent > approvedAmount;
 
     return {
       ...category,
@@ -67,7 +72,12 @@ export class BudgetService {
 
     // Check uniqueness (409 if already exists)
     const existing = await this.prisma.budgetCategory.findUnique({
-      where: { accountCode: data.accountCode },
+      where: {
+        accountCode_fiscalYear: {
+          accountCode: data.accountCode,
+          fiscalYear: data.fiscalYear,
+        },
+      },
     });
     if (existing) {
       throw new ConflictException(`Budget category for account code ${data.accountCode} already exists`);

@@ -1,0 +1,41 @@
+
+> disbursement-svc@0.0.1 build
+> nest build
+
+[96msrc/disbursements/disbursements.service.ts[0m:[93m113[0m:[93m11[0m - [91merror[0m[90m TS2322: [0mType 'string' is not assignable to type 'PaymentMethod'.
+
+[7m113[0m           paymentMethod,
+[7m   [0m [91m          ~~~~~~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m17272[0m:[93m5[0m
+    [7m17272[0m     paymentMethod: $Enums.PaymentMethod
+    [7m     [0m [96m    ~~~~~~~~~~~~~[0m
+    The expected type comes from property 'paymentMethod' which is declared here on type '(Without<DisbursementRequestCreateInput, DisbursementRequestUncheckedCreateInput> & DisbursementRequestUncheckedCreateInput) | (Without<...> & DisbursementRequestCreateInput)'
+[96msrc/repayments/repayments.service.ts[0m:[93m215[0m:[93m11[0m - [91merror[0m[90m TS2322: [0mType 'string' is not assignable to type 'PaymentMethod'.
+
+[7m215[0m           paymentMethod,
+[7m   [0m [91m          ~~~~~~~~~~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m17388[0m:[93m5[0m
+    [7m17388[0m     paymentMethod: $Enums.PaymentMethod
+    [7m     [0m [96m    ~~~~~~~~~~~~~[0m
+    The expected type comes from property 'paymentMethod' which is declared here on type '(Without<LoanRepaymentCreateInput, LoanRepaymentUncheckedCreateInput> & LoanRepaymentUncheckedCreateInput) | (Without<...> & LoanRepaymentCreateInput)'
+[96msrc/write-offs/write-offs.service.ts[0m:[93m99[0m:[93m13[0m - [91merror[0m[90m TS2322: [0mType '"LOAN_WRITE_OFF"' is not assignable to type 'FundTxType'.
+
+[7m99[0m             type: 'LOAN_WRITE_OFF',
+[7m  [0m [91m            ~~~~[0m
+
+  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m17195[0m:[93m5[0m
+    [7m17195[0m     type: $Enums.FundTxType
+    [7m     [0m [96m    ~~~~[0m
+    The expected type comes from property 'type' which is declared here on type '(Without<FundTransactionCreateInput, FundTransactionUncheckedCreateInput> & FundTransactionUncheckedCreateInput) | (Without<...> & FundTransactionCreateInput)'
+
+Found 3 error(s).
+
+npm error Lifecycle script `build` failed with error:
+npm error code 1
+npm error path C:\Users\Angel Aubrey\Documents\stone-cap\Finance-System_Capstone-1\backend\apps\disbursement-svc
+npm error workspace disbursement-svc@0.0.1
+npm error location C:\Users\Angel Aubrey\Documents\stone-cap\Finance-System_Capstone-1\backend\apps\disbursement-svc
+npm error command failed
+npm error command C:\windows\system32\cmd.exe /d /s /c nest build

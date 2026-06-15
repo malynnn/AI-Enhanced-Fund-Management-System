@@ -9,6 +9,10 @@ export declare class FundsController {
         currentBalance: any;
         history: any;
     }[]>;
+    transferFunds(sourceId: string, destId: string, amount: number, notes: string): Promise<{
+        success: boolean;
+        message: string;
+    }>;
     findOne(id: string): Promise<{
         id: any;
         name: any;

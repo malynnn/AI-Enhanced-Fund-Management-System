@@ -128,6 +128,7 @@ function HeaderContent({ unreadCount = 0 }: Props) {
               className="relative flex items-center justify-center w-9 h-9 rounded-xl text-gray-400 hover:text-[#04152d] hover:bg-gray-100 transition-colors"
               title="Notifications"
               aria-label="Toggle notifications"
+              suppressHydrationWarning
             >
               <Bell size={19} />
               {unreadCount > 0 && (
@@ -142,6 +143,7 @@ function HeaderContent({ unreadCount = 0 }: Props) {
             href="/profile"
             className="flex items-center justify-center w-9 h-9 rounded-xl text-gray-400 hover:text-[#04152d] hover:bg-gray-100 transition-colors"
             title="Settings"
+            suppressHydrationWarning
           >
             <Settings size={19} />
           </Link>

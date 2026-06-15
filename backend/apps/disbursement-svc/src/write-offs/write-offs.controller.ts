@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Body, Param, Logger } from '@nestjs/common';
 import { WriteOffsService } from './write-offs.service';
-import { Public } from '@bdoea-fs/auth';
+import { Public, Roles } from '@bdoea-fs/auth';
 
 @Controller('loans/write-offs')
 export class WriteOffsController {

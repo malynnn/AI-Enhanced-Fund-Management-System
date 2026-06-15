@@ -1,0 +1,103 @@
+import { PrismaService } from '../prisma.service';
+import { ClientProxy } from '@nestjs/microservices';
+export declare class VouchersService {
+    private readonly prisma;
+    private readonly auditClient;
+    private readonly budgetClient;
+    private readonly logger;
+    constructor(prisma: PrismaService, auditClient: ClientProxy, budgetClient: ClientProxy);
+    private emitAudit;
+    findAll(status?: string): Promise<{
+        status: import(".prisma/client").$Enums.VoucherStatus;
+        id: string;
+        voucherNumber: string;
+        date: Date;
+        payee: string;
+        purpose: string;
+        amount: import("@prisma/client/runtime/library").Decimal;
+        accountCode: string;
+        approvedBy: string | null;
+        receiptUrl: string | null;
+        postedAt: Date | null;
+        notes: string | null;
+        createdAt: Date;
+        updatedAt: Date;
+    }[]>;
+    create(data: {
+        voucherNumber: string;
+        date: string | Date;
+        payee: string;
+        purpose: string;
+        amount: number;
+        accountCode: string;
+        notes?: string;
+    }, user: string): Promise<{
+        status: import(".prisma/client").$Enums.VoucherStatus;
+        id: string;
+        voucherNumber: string;
+        date: Date;
+        payee: string;
+        purpose: string;
+        amount: import("@prisma/client/runtime/library").Decimal;
+        accountCode: string;
+        approvedBy: string | null;
+        receiptUrl: string | null;
+        postedAt: Date | null;
+        notes: string | null;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
+    update(id: string, data: any, user: string): Promise<{
+        status: import(".prisma/client").$Enums.VoucherStatus;
+        id: string;
+        voucherNumber: string;
+        date: Date;
+        payee: string;
+        purpose: string;
+        amount: import("@prisma/client/runtime/library").Decimal;
+        accountCode: string;
+        approvedBy: string | null;
+        receiptUrl: string | null;
+        postedAt: Date | null;
+        notes: string | null;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
+    delete(id: string, user: string): Promise<{
+        success: boolean;
+    }>;
+    approveOrReject(id: string, decision: 'APPROVED' | 'REJECTED', authorizedBy: string): Promise<{
+        status: import(".prisma/client").$Enums.VoucherStatus;
+        id: string;
+        voucherNumber: string;
+        date: Date;
+        payee: string;
+        purpose: string;
+        amount: import("@prisma/client/runtime/library").Decimal;
+        accountCode: string;
+        approvedBy: string | null;
+        receiptUrl: string | null;
+        postedAt: Date | null;
+        notes: string | null;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
+    post(id: string, user: string): Promise<{
+        budgetWarning: boolean;
+        budgetWarningMessage: string;
+        status: import(".prisma/client").$Enums.VoucherStatus;
+        id: string;
+        voucherNumber: string;
+        date: Date;
+        payee: string;
+        purpose: string;
+        amount: import("@prisma/client/runtime/library").Decimal;
+        accountCode: string;
+        approvedBy: string | null;
+        receiptUrl: string | null;
+        postedAt: Date | null;
+        notes: string | null;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
+}

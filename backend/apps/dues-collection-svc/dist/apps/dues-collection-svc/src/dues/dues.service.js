@@ -1,0 +1,101 @@
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var DuesService_1;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.DuesService = void 0;
+const common_1 = require("@nestjs/common");
+const prisma_service_1 = require("../prisma.service");
+const microservices_1 = require("@nestjs/microservices");
+let DuesService = DuesService_1 = class DuesService {
+    constructor(prisma, ledgerClient) {
+        this.prisma = prisma;
+        this.ledgerClient = ledgerClient;
+        this.logger = new common_1.Logger(DuesService_1.name);
+    }
+    async processDuesEvent(data) {
+        if (!data.transactionId || !data.memberId || !data.amount || !data.fundCredited) {
+            throw new Error('Missing required fields: transactionId, memberId, amount, or fundCredited');
+        }
+        const existing = await this.prisma.duesRecord.findUnique({
+            where: { transactionId: data.transactionId },
+        });
+        if (existing) {
+            this.logger.log(`Duplicate transactionId ${data.transactionId} ignored.`);
+            return;
+        }
+        const fund = await this.prisma.fund.findUnique({
+            where: { code: data.fundCredited },
+        });
+        if (!fund) {
+            throw new Error(`Fund with code ${data.fundCredited} does not exist`);
+        }
+        await this.prisma.duesRecord.create({
+            data: {
+                transactionId: data.transactionId,
+                memberId: data.memberId,
+                name: data.fullName || 'Unknown',
+                month: data.monthCovered || 'Unknown',
+                amountPaid: Number(data.amount),
+                method: (data.paymentMethod || 'SALARY_DEDUCTION'),
+                referenceNumber: data.referenceNumber,
+                fundToCredit: fund.code,
+                status: 'PENDING',
+            },
+        });
+        this.logger.log(`Successfully saved DuesRecord for transaction ${data.transactionId}`);
+    }
+    async findAll(status) {
+        const whereClause = status ? { status: status } : {};
+        return this.prisma.duesRecord.findMany({
+            where: whereClause,
+            orderBy: { createdAt: 'desc' },
+        });
+    }
+    async confirmDues(id) {
+        const record = await this.prisma.duesRecord.findUnique({ where: { id } });
+        if (!record) {
+            throw new common_1.NotFoundException(`Dues record ${id} not found`);
+        }
+        if (record.status === 'CONFIRMED') {
+            throw new common_1.ConflictException('Dues record is already Confirmed');
+        }
+        const updated = await this.prisma.duesRecord.update({
+            where: { id },
+            data: { status: 'CONFIRMED' },
+        });
+        try {
+            this.ledgerClient.emit('fund.dues.posted', {
+                duesRecordId: updated.id,
+                transactionId: updated.transactionId,
+                amount: updated.amountPaid,
+                fundCode: updated.fundToCredit,
+                memberId: updated.memberId,
+                memberName: updated.name,
+            });
+            this.logger.log(`Emitted fund.dues.posted for record ${id}`);
+        }
+        catch (error) {
+            this.logger.error(`Failed to emit fund.dues.posted event for ${id}: ${error.message}`);
+        }
+        return updated;
+    }
+};
+exports.DuesService = DuesService;
+exports.DuesService = DuesService = DuesService_1 = __decorate([
+    (0, common_1.Injectable)(),
+    __param(1, (0, common_1.Inject)('LEDGER_CLIENT')),
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        microservices_1.ClientProxy])
+], DuesService);
+//# sourceMappingURL=dues.service.js.map

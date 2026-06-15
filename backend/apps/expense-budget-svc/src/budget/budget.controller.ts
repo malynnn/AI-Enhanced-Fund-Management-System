@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
 import { BudgetService } from './budget.service';
-import { Public } from '@bdoea-fs/auth';
+import { Public, Roles } from '@bdoea-fs/auth';
 
 @Controller('budget-categories')
 export class BudgetController {
@@ -19,13 +19,13 @@ export class BudgetController {
   }
 
   @Post()
-  @Roles('Treasurer')
+  @Public()
   create(@Body() data: { accountCode: string; accountName: string; approvedAmount: number; fiscalYear: number }) {
     return this.budgetService.create(data);
   }
 
   @Put(':id')
-  @Roles('Treasurer')
+  @Public()
   update(
     @Param('id') id: string,
     @Body() data: Partial<{ accountName: string; approvedAmount: number; fiscalYear: number }>,
@@ -34,7 +34,7 @@ export class BudgetController {
   }
 
   @Delete(':id')
-  @Roles('Treasurer')
+  @Public()
   delete(@Param('id') id: string) {
     return this.budgetService.delete(id);
   }

@@ -4,24 +4,28 @@
 import { useState, useEffect } from 'react';
 import { X, Upload, CheckCircle2, Calculator, AlertTriangle, Receipt } from 'lucide-react';
 
-interface Category {
+interface BudgetCategory {
   id: string;
-  code: string;
-  name: string;
-  budget: number;
-  spent: number;
+  accountCode: string;
+  accountName: string;
+  approvedAmount: number;
+  fiscalYear: number;
+  totalSpent: number;
+  remainingBudget: number;
+  utilizationPercent: number;
+  isExceeded: boolean;
 }
 
 interface ExpenseVoucherModalProps {
   isOpen: boolean;
   onClose: () => void;
-  budgetCategories: Category[];
+  budgetCategories: BudgetCategory[];
   onSubmit: (expenseData: {
     voucherNo: string;
     payee: string;
     purpose: string;
     amount: number;
-    categoryId: string;
+    accountCode: string;
   }) => void;
 }
 
@@ -30,7 +34,7 @@ export default function ExpenseVoucherModal({ isOpen, onClose, budgetCategories,
   const [payee, setPayee] = useState('');
   const [purpose, setPurpose] = useState('');
   const [amount, setAmount] = useState<number | ''>('');
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedCategoryId, setSelectedCategoryId] = useState('');
   const [fileName, setFileName] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -40,7 +44,7 @@ export default function ExpenseVoucherModal({ isOpen, onClose, budgetCategories,
       setPayee('');
       setPurpose('');
       setAmount('');
-      setSelectedCategory('');
+      setSelectedCategoryId('');
       setFileName(null);
       setIsSubmitting(false);
     }
@@ -48,9 +52,11 @@ export default function ExpenseVoucherModal({ isOpen, onClose, budgetCategories,
 
   if (!isOpen) return null;
 
-  const activeCategory = budgetCategories.find(c => c.id === selectedCategory);
-  const projectedSpent = activeCategory ? activeCategory.spent + (Number(amount) || 0) : 0;
-  const utilizationPercent = activeCategory ? (projectedSpent / activeCategory.budget) * 100 : 0;
+  const activeCategory = budgetCategories.find(c => c.id === selectedCategoryId);
+  const projectedSpent = activeCategory ? activeCategory.totalSpent + (Number(amount) || 0) : 0;
+  const utilizationPercent = activeCategory && activeCategory.approvedAmount > 0
+    ? (projectedSpent / activeCategory.approvedAmount) * 100
+    : 0;
   const isApproachingBudget = utilizationPercent >= 80 && utilizationPercent <= 100;
   const isExceedingBudget = utilizationPercent > 100;
 
@@ -62,26 +68,23 @@ export default function ExpenseVoucherModal({ isOpen, onClose, budgetCategories,
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!amount || !selectedCategory || isExceedingBudget) return;
-    
+    if (!amount || !selectedCategoryId || isExceedingBudget || !activeCategory) return;
+
     setIsSubmitting(true);
-    // Simulate network delay
-    setTimeout(() => {
-      onSubmit({
-        voucherNo,
-        payee,
-        purpose,
-        amount: Number(amount),
-        categoryId: selectedCategory
-      });
-      setIsSubmitting(false);
-    }, 800);
+    onSubmit({
+      voucherNo,
+      payee,
+      purpose,
+      amount: Number(amount),
+      accountCode: activeCategory.accountCode,
+    });
+    // Note: the parent is async; it will close the modal when done
   };
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#04152d]/60 backdrop-blur-sm animate-fade-in p-4">
       <div className="bg-white w-full max-w-2xl rounded-2xl shadow-[0_20px_60px_-12px_rgba(0,0,0,0.3),0_4px_16px_rgba(0,0,0,0.12)] border border-white/80 overflow-hidden animate-pop flex flex-col max-h-[90vh]">
-        
+
         <div className="flex items-center justify-between p-5 border-b border-gray-100 bg-gray-50/80 shrink-0">
           <h3 className="font-black text-lg text-[#04152d] flex items-center gap-2">
             <Receipt size={20} className="text-blue-500" /> Expense Voucher Form
@@ -118,11 +121,11 @@ export default function ExpenseVoucherModal({ isOpen, onClose, budgetCategories,
                 </div>
               </div>
               <div>
-                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Account Code</label>
-                <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} required className="w-full rounded-xl px-4 py-3 text-sm bg-white border-[1.5px] border-[#dde3ee] focus:border-[#04152d] focus:ring-[3px] focus:ring-[#04152d]/10 outline-none transition-colors font-bold text-[#04152d] cursor-pointer appearance-none">
+                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Account / Budget Category</label>
+                <select value={selectedCategoryId} onChange={(e) => setSelectedCategoryId(e.target.value)} required className="w-full rounded-xl px-4 py-3 text-sm bg-white border-[1.5px] border-[#dde3ee] focus:border-[#04152d] focus:ring-[3px] focus:ring-[#04152d]/10 outline-none transition-colors font-bold text-[#04152d] cursor-pointer appearance-none">
                   <option value="" disabled>Select Category...</option>
                   {budgetCategories.map(cat => (
-                    <option key={cat.id} value={cat.id}>{cat.code} - {cat.name}</option>
+                    <option key={cat.id} value={cat.id}>{cat.accountCode} - {cat.accountName}</option>
                   ))}
                 </select>
               </div>
@@ -138,7 +141,10 @@ export default function ExpenseVoucherModal({ isOpen, onClose, budgetCategories,
                   <div className="w-full bg-white/60 rounded-full h-1.5 mb-2 overflow-hidden shadow-inner">
                     <div className={`h-1.5 rounded-full ${isExceedingBudget ? 'bg-red-500' : isApproachingBudget ? 'bg-amber-500' : 'bg-emerald-500'}`} style={{ width: `${Math.min(utilizationPercent, 100)}%` }}></div>
                   </div>
-                  <p className="text-xs font-bold opacity-80">Projected: ₱{projectedSpent.toLocaleString()} / ₱{activeCategory.budget.toLocaleString()}</p>
+                  <p className="text-xs font-bold opacity-80">
+                    Projected: ₱{projectedSpent.toLocaleString()} / ₱{activeCategory.approvedAmount.toLocaleString()}
+                    <span className="ml-3 text-[10px] text-gray-500">(₱{activeCategory.remainingBudget.toLocaleString()} remaining)</span>
+                  </p>
                   {isExceedingBudget && <p className="text-[10px] uppercase font-black mt-3 flex items-center gap-1.5 text-red-700 bg-red-100/80 w-fit px-2.5 py-1 rounded-md"><AlertTriangle size={12} /> Budget Exceeded</p>}
                 </div>
               </div>
@@ -159,7 +165,7 @@ export default function ExpenseVoucherModal({ isOpen, onClose, budgetCategories,
 
         <div className="p-5 border-t border-gray-100 bg-gray-50/50 flex justify-end gap-3 shrink-0">
           <button onClick={onClose} disabled={isSubmitting} className="inline-flex items-center justify-center gap-2 text-gray-600 hover:text-gray-900 hover:bg-gray-200/80 font-bold py-2.5 px-5 rounded-xl text-sm transition-all duration-150 disabled:opacity-50">Cancel</button>
-          <button type="submit" form="expense-form" disabled={isSubmitting || isExceedingBudget} className="inline-flex items-center justify-center gap-2 bg-[#04152d] text-white font-bold py-2.5 px-6 rounded-xl text-sm shadow-[0_6px_0_rgba(2,6,15,0.55),0_4px_18px_rgba(4,21,45,0.35)] hover:-translate-y-[1px] active:translate-y-[4px] active:shadow-[0_2px_0_rgba(2,6,15,0.55),0_2px_8px_rgba(4,21,45,0.25)] transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+          <button type="submit" form="expense-form" disabled={isSubmitting || isExceedingBudget || !selectedCategoryId} className="inline-flex items-center justify-center gap-2 bg-[#04152d] text-white font-bold py-2.5 px-6 rounded-xl text-sm shadow-[0_6px_0_rgba(2,6,15,0.55),0_4px_18px_rgba(4,21,45,0.35)] hover:-translate-y-[1px] active:translate-y-[4px] active:shadow-[0_2px_0_rgba(2,6,15,0.55),0_2px_8px_rgba(4,21,45,0.25)] transition-all disabled:opacity-50 disabled:cursor-not-allowed">
             {isSubmitting ? 'Posting...' : <><CheckCircle2 size={16} /> Post Voucher</>}
           </button>
         </div>

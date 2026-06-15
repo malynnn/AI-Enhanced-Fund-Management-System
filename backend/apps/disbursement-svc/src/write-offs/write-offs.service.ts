@@ -96,7 +96,7 @@ export class WriteOffsService {
           data: {
             fundId: loanFund.id,
             amount: -writeOff.amount,
-            type: 'LOAN_WRITE_OFF',
+            type: 'WITHDRAWAL',
             description: `Loan write-off for ${writeOff.memberName} (ref: ${writeOff.loanReference}) - ${writeOff.reason}`,
             referenceId: writeOff.loanReference,
           },

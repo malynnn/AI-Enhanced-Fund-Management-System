@@ -24,6 +24,16 @@ export class DisbursementsController {
     return this.disbursementsService.confirmDisbursement(id, authorizedBy);
   }
 
+  @Post(':id/reject')
+  @Public()
+  reject(
+    @Param('id') id: string,
+    @Body('reason') reason: string,
+    @Body('authorizedBy') authorizedBy: string,
+  ) {
+    return this.disbursementsService.rejectDisbursement(id, reason, authorizedBy);
+  }
+
 
 
   // ─── RabbitMQ Consumer ───────────────────────────────────────────────────

@@ -3,26 +3,54 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useState, useMemo, Suspense } from 'react';
+import { useState, useMemo, useEffect, Suspense } from 'react';
 import { Target, AlertTriangle, ArrowUpRight, TrendingDown, Settings2, CalendarDays } from 'lucide-react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { PieChart, Pie, Tooltip } from 'recharts';
 import Header from '@/components/Header';
 import ActionModal from '@/components/ActionModal';
 import BudgetEditModal from '@/components/BudgetEditModal';
 
-// --- MOCK DATABASE ---
-const initialCategories = [
-  { id: 'CAT-001', name: 'Office Supplies & IT', budget: 150000, actual: 135000 }, 
-  { id: 'CAT-002', name: 'Travel & Transportation', budget: 80000, actual: 85000 }, 
-  { id: 'CAT-003', name: 'Union Assembly & Events', budget: 350000, actual: 120000 }, 
-  { id: 'CAT-004', name: 'Legal & Professional Fees', budget: 120000, actual: 40000 }, 
-  { id: 'CAT-005', name: 'Miscellaneous Expenses', budget: 50000, actual: 42500 }, 
-];
-
 function BudgetMonitoringContent() {
-  const [categories, setCategories] = useState(initialCategories);
+  const [dbCategories, setDbCategories] = useState<any[]>([]);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  
+  const [isLoading, setIsLoading] = useState(true);
+
+  // --- LIVE BACKEND FETCH ---
+  const fetchRealBudgetData = async () => {
+    try {
+      setIsLoading(true);
+      const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
+      const res = await fetch(`${gatewayUrl}/api/finance/budget-categories`);
+      if (res.ok) {
+        const data = await res.json();
+        setDbCategories(data);
+      } else {
+        console.error("Failed to fetch budget categories from backend.");
+      }
+    } catch (err) {
+      console.error("Network error fetching budget data:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRealBudgetData();
+  }, []);
+
+  // Filter by selected year and map to standard UI shape
+  const categories = useMemo(() => {
+    return dbCategories
+      .filter((c: any) => c.fiscalYear === selectedYear)
+      .map((c: any) => ({
+        id: c.id,
+        name: c.accountName || c.name,
+        budget: Number(c.approvedAmount),
+        actual: Number(c.totalSpent ?? 0),
+        fiscalYear: c.fiscalYear
+      }));
+  }, [dbCategories, selectedYear]);
+
   // Modals
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [actionModal, setActionModal] = useState<{
@@ -54,7 +82,7 @@ function BudgetMonitoringContent() {
   const hasAlerts = exceededCats.length > 0 || warningCats.length > 0;
 
   // --- HANDLERS ---
-  const handleSaveBudget = (updates: { id: string; newBudget: number }[]) => {
+  const handleSaveBudget = async (updates: { id: string; newBudget: number }[]) => {
     setIsEditModalOpen(false);
     setActionModal({
       isOpen: true,
@@ -63,13 +91,22 @@ function BudgetMonitoringContent() {
       status: 'loading'
     });
 
-    // Simulate Backend Save
-    setTimeout(() => {
-      setCategories(prev => prev.map(cat => {
-        const update = updates.find(u => u.id === cat.id);
-        return update ? { ...cat, budget: update.newBudget } : cat;
-      }));
-      
+    try {
+      const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
+      const promises = updates.map(async (u) => {
+        const res = await fetch(`${gatewayUrl}/api/finance/budget-categories/${u.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ approvedAmount: u.newBudget })
+        });
+        if (!res.ok) {
+          throw new Error('Failed to update category allocation.');
+        }
+      });
+
+      await Promise.all(promises);
+      await fetchRealBudgetData();
+
       setActionModal({
         isOpen: true,
         title: 'Budget Revised',
@@ -77,7 +114,15 @@ function BudgetMonitoringContent() {
         status: 'success',
         resultMsg: `Successfully updated budget allocations for Fiscal Year ${selectedYear}. Audit logs have been updated.`
       });
-    }, 1000);
+    } catch (err: any) {
+      setActionModal({
+        isOpen: true,
+        title: 'Update Failed',
+        message: '',
+        status: 'error',
+        resultMsg: err.message || 'Failed to revise budget allocations.'
+      });
+    }
   };
 
   // --- COMPONENTS ---
@@ -86,13 +131,12 @@ function BudgetMonitoringContent() {
     const cappedActual = Math.min(actual, budget); 
     const remainder = Math.max(0, budget - actual);
     const data = [
-      { name: 'Utilized', value: actual, fill: color },
+      { name: 'Utilized', value: cappedActual, fill: color },
       { name: 'Remaining', value: remainder, fill: '#f1f5f9' }
     ];
     
     return (
       <div className="h-[80px] w-[160px] relative flex flex-col items-center">
-        {/* REMOVED ResponsiveContainer and explicitly set width/height */}
         <PieChart width={160} height={80}>
           <Pie data={data} cx="50%" cy="100%" startAngle={180} endAngle={0} innerRadius={50} outerRadius={70} dataKey="value" stroke="none" />
           <Tooltip formatter={(value: any) => `₱${Number(value).toLocaleString()}`} />
@@ -162,7 +206,7 @@ function BudgetMonitoringContent() {
         </div>
 
         {/* Dynamic Alert Banner */}
-        {hasAlerts && (
+        {hasAlerts && !isLoading && (
           <div className={`p-4 rounded-xl border flex items-start gap-4 shadow-sm animate-pop ${exceededCats.length > 0 ? 'bg-red-50 border-red-200' : 'bg-amber-50 border-amber-200'}`} style={{ animationDelay: '0.1s' }}>
             <AlertTriangle className={`shrink-0 mt-0.5 ${exceededCats.length > 0 ? 'text-red-500' : 'text-amber-500'}`} size={24} />
             <div>
@@ -182,32 +226,37 @@ function BudgetMonitoringContent() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-slide-up" style={{ animationDelay: '0.15s' }}>
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-center">
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total Fiscal Budget</p>
-            <p className="text-3xl font-black text-[#04152d]">₱{totalBudget.toLocaleString()}</p>
+            <p className="text-3xl font-black text-[#04152d]">₱{isLoading ? '...' : totalBudget.toLocaleString()}</p>
           </div>
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-center">
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Actual Spend YTD</p>
-            <p className="text-3xl font-black text-[#04152d]">₱{totalActual.toLocaleString()}</p>
+            <p className="text-3xl font-black text-[#04152d]">₱{isLoading ? '...' : totalActual.toLocaleString()}</p>
           </div>
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-center relative overflow-hidden">
             <Target size={100} className="absolute -right-4 -bottom-4 text-gray-50 opacity-50 pointer-events-none" />
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 relative z-10">Overall Utilization</p>
             <div className="flex items-end gap-3 relative z-10">
-              <p className="text-3xl font-black text-[#04152d]">{overallUtilization.toFixed(1)}%</p>
-              <span className={`text-xs font-bold mb-1.5 px-2 py-0.5 rounded-md ${overallUtilization > 90 ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}`}>
-                {totalBudget - totalActual >= 0 ? `₱${(totalBudget - totalActual).toLocaleString()} Left` : 'Deficit'}
-              </span>
+              <p className="text-3xl font-black text-[#04152d]">{isLoading ? '...' : `${overallUtilization.toFixed(1)}%`}</p>
+              {!isLoading && (
+                <span className={`text-xs font-bold mb-1.5 px-2 py-0.5 rounded-md ${overallUtilization > 90 ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}`}>
+                  {totalBudget - totalActual >= 0 ? `₱${(totalBudget - totalActual).toLocaleString()} Left` : 'Deficit'}
+                </span>
+              )}
             </div>
           </div>
         </div>
 
         {/* Top Utilization Gauges Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-          {enrichedCategories.map(cat => (
-            <div key={cat.id} className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-between">
-              <p className="text-xs font-bold text-[#04152d] text-center mb-4 truncate w-full" title={cat.name}>{cat.name}</p>
-              <GaugeChart actual={cat.actual} budget={cat.budget} color={cat.color} />
-            </div>
-          ))}
+          {categories.map((cat: any) => {
+            const enriched = enrichedCategories.find(ec => ec.id === cat.id);
+            return (
+              <div key={cat.id} className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-between">
+                <p className="text-xs font-bold text-[#04152d] text-center mb-4 truncate w-full" title={cat.name}>{cat.name}</p>
+                <GaugeChart actual={cat.actual} budget={cat.budget} color={enriched?.color || '#10b981'} />
+              </div>
+            );
+          })}
         </div>
 
         {/* Budget vs Actual Comparison Table */}
@@ -257,6 +306,13 @@ function BudgetMonitoringContent() {
                     </td>
                   </tr>
                 ))}
+                {categories.length === 0 && !isLoading && (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-16 text-center text-gray-400 font-medium">
+                      No budget allocations found for Fiscal Year {selectedYear}.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -273,4 +329,4 @@ export default function BudgetMonitoringPage() {
       <BudgetMonitoringContent />
     </Suspense>
   );
-}
+}

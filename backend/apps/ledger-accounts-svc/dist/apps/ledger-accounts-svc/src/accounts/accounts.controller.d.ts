@@ -33,6 +33,10 @@ export declare class AccountsController {
         status: import(".prisma/client").$Enums.AccountStatus;
         createdAt: Date;
         updatedAt: Date;
+    } | {
+        error: string;
+        message: any;
+        stack: any;
     }>;
     update(id: string, dto: UpdateAccountDto): Promise<{
         fund: string;
