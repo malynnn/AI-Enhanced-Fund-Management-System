@@ -35,7 +35,6 @@ const CHART_COLORS = ['#04152d', '#10b981', '#facc15', '#8b5cf6', '#ef4444'];
 function AdminChartOfAccountsContent() {
   const { data: session } = useSession();
   const role = (session?.user as any)?.role || 'Superadmin';
-  const accessToken = (session as any)?.accessToken;
 
   const [accounts, setAccounts] = useState<Account[]>(initialAccounts);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -162,13 +161,9 @@ function AdminChartOfAccountsContent() {
     
     if (actionType === 'toggle') {
       try {
-        const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
-        const res = await fetch(`${gatewayUrl}/api/finance/accounts/${id}`, {
-          method: 'PUT',
-          headers: { 
-            'Content-Type': 'application/json',
-            ...(accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {})
-          },
+        const res = await fetch(`/api/finance/accounts/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ status: currentStatus === 'Active' ? 'Inactive' : 'Active' })
         });
 
@@ -185,12 +180,8 @@ function AdminChartOfAccountsContent() {
     
     else if (actionType === 'delete') {
       try {
-        const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
-        const res = await fetch(`${gatewayUrl}/api/finance/accounts/${id}`, {
-          method: 'DELETE',
-          headers: {
-            ...(accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {})
-          }
+        const res = await fetch(`/api/finance/accounts/${id}`, {
+          method: 'DELETE'
         });
 
         if (res.ok) {
@@ -208,16 +199,12 @@ function AdminChartOfAccountsContent() {
   const handleSaveForm = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
-      const url = editingId ? `${gatewayUrl}/api/finance/accounts/${editingId}` : `${gatewayUrl}/api/finance/accounts`;
+      const url = editingId ? `/api/finance/accounts/${editingId}` : '/api/finance/accounts';
       const method = editingId ? 'PUT' : 'POST';
       
       const res = await fetch(url, {
         method,
-        headers: { 
-          'Content-Type': 'application/json',
-          ...(accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {})
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
       
@@ -487,9 +474,13 @@ function AdminChartOfAccountsContent() {
               <div>
                 <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Account Code</label>
                 <input 
-                  type="text" value={formData.code} onChange={e => setFormData({...formData, code: e.target.value})} 
+                  type="text" 
+                  placeholder="E.g., 1050"
+                  value={formData.code} 
+                  onChange={e => setFormData({...formData, code: e.target.value})} 
                   className="w-full rounded-xl px-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#04152d] focus:ring-[3px] focus:ring-[#04152d]/10 outline-none transition-colors font-mono font-bold text-[#04152d] disabled:bg-gray-100 disabled:text-gray-500" 
-                  required disabled={!!editingId} 
+                  required 
+                  disabled={!!editingId} 
                 />
                 {!editingId && <p className="text-[10px] text-gray-400 mt-1.5 ml-1">Account codes are permanent once established.</p>}
               </div>
@@ -497,7 +488,10 @@ function AdminChartOfAccountsContent() {
               <div>
                 <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Account Name</label>
                 <input 
-                  type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} 
+                  type="text" 
+                  placeholder="E.g., Petty Cash Fund"
+                  value={formData.name} 
+                  onChange={e => setFormData({...formData, name: e.target.value})} 
                   className="w-full rounded-xl px-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#04152d] focus:ring-[3px] focus:ring-[#04152d]/10 outline-none transition-colors font-bold text-[#04152d]" 
                   required 
                 />
