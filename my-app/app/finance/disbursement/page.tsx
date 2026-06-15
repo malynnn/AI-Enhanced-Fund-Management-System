@@ -1,12 +1,12 @@
-// app/finance/disbursement/page.tsx
 "use client";
 
 export const dynamic = 'force-dynamic';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { 
   CheckCircle, Eye, Printer, X, FileText, Clock, Check, Send, 
-  AlertTriangle, Download, Loader, Ban, ChevronLeft, ChevronRight 
+  AlertTriangle, Download, Loader, Ban, ChevronLeft, ChevronRight,
+  Search, Filter, CreditCard
 } from 'lucide-react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import Header from '@/components/Header';
@@ -46,9 +46,19 @@ export default function DisbursementPage() {
   const [rejectReason, setRejectReason] = useState('');
   const [isRejecting, setIsRejecting] = useState(false);
 
+  // --- Filters State ---
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('ALL');
+  const [filterMethod, setFilterMethod] = useState('ALL');
+
   // --- Pagination State ---
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+
+  // Reset to page 1 whenever filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterStatus, filterMethod]);
 
   // Fetch Disbursements Queue
   const fetchDisbursements = async () => {
@@ -71,9 +81,23 @@ export default function DisbursementPage() {
     fetchDisbursements();
   }, []);
 
+  // --- Filtering Logic ---
+  const filteredDisbursements = useMemo(() => {
+    return disbursements.filter(d => {
+      const matchesSearch = d.loanReference.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                            d.memberName.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus = filterStatus === 'ALL' ? true : d.status === filterStatus;
+      const matchesMethod = filterMethod === 'ALL' ? true : d.paymentMethod === filterMethod;
+      
+      return matchesSearch && matchesStatus && matchesMethod;
+    });
+  }, [disbursements, searchTerm, filterStatus, filterMethod]);
+
+  const uniqueMethods = Array.from(new Set(disbursements.map(d => d.paymentMethod)));
+
   // --- Pagination Logic ---
-  const totalPages = Math.max(1, Math.ceil(disbursements.length / itemsPerPage));
-  const paginatedDisbursements = disbursements.slice(
+  const totalPages = Math.max(1, Math.ceil(filteredDisbursements.length / itemsPerPage));
+  const paginatedDisbursements = filteredDisbursements.slice(
     (currentPage - 1) * itemsPerPage, 
     currentPage * itemsPerPage
   );
@@ -116,7 +140,6 @@ export default function DisbursementPage() {
       });
       const amount = selectedVoucher.amount.toLocaleString(undefined, { minimumFractionDigits: 2 });
       
-      // Clean the title from the name for the signature block
       const authorizedByRaw = selectedVoucher.authorizedBy || 'PENDING';
       const cleanAuthorizedBy = authorizedByRaw.replace(/Treasurer\s+/i, '');
       
@@ -347,6 +370,7 @@ export default function DisbursementPage() {
   return (
     <div className="flex flex-col min-h-screen relative">
       
+      {/* Hides the main dashboard during Print Preview */}
       <div className={selectedVoucher ? "print:hidden" : ""}>
         <ActionModal 
           isOpen={actionModal.isOpen}
@@ -359,6 +383,7 @@ export default function DisbursementPage() {
           confirmText="Authorize Disbursement"
         />
 
+        {/* REJECTION MODAL */}
         {isRejectModalOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#04152d]/60 backdrop-blur-sm animate-fade-in p-4">
             <div className="bg-white w-full max-w-md rounded-2xl shadow-[0_20px_60px_-12px_rgba(0,0,0,0.3),0_4px_16px_rgba(0,0,0,0.12)] border border-white/80 overflow-hidden animate-pop">
@@ -400,6 +425,7 @@ export default function DisbursementPage() {
         <main className="p-4 md:p-8 max-w-[1600px] w-full mx-auto space-y-6 flex-1 print:p-0 print:m-0 print:max-w-none">
           <div className="flex flex-col gap-6 mb-8 w-full">
               
+            {/* Top Analytics Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
               <div className="bg-white rounded-2xl p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 flex flex-col justify-center animate-slide-up" style={{ animationDelay: '0.05s' }}>
                 <div className="flex items-center gap-4">
@@ -447,10 +473,55 @@ export default function DisbursementPage() {
               </div>
             </div>
 
+            {/* Main Table */}
             <div className="bg-white rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 overflow-hidden flex flex-col min-h-[400px] w-full animate-slide-up" style={{ animationDelay: '0.2s' }}>
-              <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-                <h2 className="text-xl font-black text-[#04152d]">Treasurer Confirmation Queue</h2>
-                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600 shadow-[inset_0_0_0_1.5px_rgba(107,114,128,0.2)] font-mono">Real-Time Sync</span>
+              
+              {/* UPDATED: Title and Filter Bar Separated */}
+              <div className="p-6 border-b border-gray-100 flex flex-col gap-5 bg-white/50">
+                {/* Row 1: Title */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-xl font-black text-[#04152d]">Treasurer Confirmation Queue</h2>
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600 shadow-[inset_0_0_0_1.5px_rgba(107,114,128,0.2)] font-mono">{filteredDisbursements.length} Records</span>
+                  </div>
+                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-600 shadow-[inset_0_0_0_1px_rgba(59,130,246,0.2)] font-mono hidden sm:flex">Real-Time Sync</span>
+                </div>
+
+                {/* Row 2: Filters */}
+                <div className="flex flex-wrap gap-3 items-center">
+                  <div className="flex-1 min-w-[250px] relative">
+                    <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input 
+                      type="text" placeholder="Search Reference or Member Name..." 
+                      value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full rounded-xl pl-10 pr-4 py-2.5 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] focus:border-[#04152d] outline-none transition-colors font-bold text-[#04152d]"
+                    />
+                  </div>
+
+                  <div className="relative inline-block w-full sm:w-auto min-w-[180px]">
+                    <CreditCard size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                    <select value={filterMethod} onChange={(e) => setFilterMethod(e.target.value)} className="w-full rounded-xl pl-10 pr-8 py-2.5 text-sm bg-white border-[1.5px] border-[#dde3ee] focus:border-[#04152d] outline-none transition-colors appearance-none font-bold text-[#04152d] cursor-pointer">
+                      <option value="ALL">All Methods</option>
+                      {uniqueMethods.map(m => <option key={m} value={m}>{m}</option>)}
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#04152d]">
+                      <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+                    </div>
+                  </div>
+
+                  <div className="relative inline-block w-full sm:w-auto min-w-[180px]">
+                    <Filter size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                    <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="w-full rounded-xl pl-10 pr-8 py-2.5 text-sm bg-white border-[1.5px] border-[#dde3ee] focus:border-[#04152d] outline-none transition-colors appearance-none font-bold text-[#04152d] cursor-pointer">
+                      <option value="ALL">All Status</option>
+                      <option value="PENDING">Pending Review</option>
+                      <option value="COMPLETED">Completed</option>
+                      <option value="REJECTED">Rejected</option>
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#04152d]">
+                      <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+                    </div>
+                  </div>
+                </div>
               </div>
               
               <div className="overflow-x-auto w-full">
@@ -459,21 +530,21 @@ export default function DisbursementPage() {
                     <Loader size={32} className="animate-spin mb-4 text-[#04152d]" />
                     <p className="font-bold">Loading records...</p>
                   </div>
-                ) : disbursements.length === 0 ? (
+                ) : filteredDisbursements.length === 0 ? (
                   <div className="p-16 flex flex-col items-center justify-center text-gray-400">
                     <AlertTriangle className="mb-4 text-amber-400" size={48} />
-                    <p className="font-black text-[#04152d] text-lg">No requests found.</p>
+                    <p className="font-black text-[#04152d] text-lg">No requests found matching filters.</p>
                   </div>
                 ) : (
                   <table className="w-full text-left whitespace-nowrap min-w-[900px]">
                     <thead>
                       <tr>
-                        <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wide bg-[#f8faff]">Reference</th>
-                        <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wide bg-[#f8faff]">Payee (Member)</th>
-                        <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wide bg-[#f8faff] text-right">Amount</th>
-                        <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wide bg-[#f8faff]">Bank Details</th>
-                        <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wide bg-[#f8faff] text-center">Status</th>
-                        <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wide bg-[#f8faff] text-right pr-6">Actions</th>
+                        <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)]">Reference</th>
+                        <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)]">Payee (Member)</th>
+                        <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] text-right">Amount</th>
+                        <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)]">Bank Details</th>
+                        <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] text-center">Status</th>
+                        <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] text-right pr-6">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
@@ -595,6 +666,10 @@ export default function DisbursementPage() {
 
             <div ref={voucherRef} className="p-8 md:p-12 overflow-y-auto print:p-0 bg-white print:overflow-visible">
               
+              <div className="hidden print:flex w-full justify-end pb-8">
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">BDOEA Financial System</span>
+              </div>
+
               {selectedVoucher.status === 'REJECTED' && (
                 <div className="mb-8 bg-red-50 border border-red-200 rounded-xl p-5 flex items-start gap-4 shadow-[inset_0_0_0_1.5px_rgba(220,38,38,0.3)] print:hidden">
                   <Ban size={24} className="text-red-600 shrink-0" />
@@ -613,19 +688,19 @@ export default function DisbursementPage() {
                 </h2>
               </div>
 
-              <div className="grid grid-cols-2 gap-y-6 gap-x-12 mb-10 text-sm bg-[#f8faff] p-6 rounded-2xl border border-gray-100">
+              <div className="grid grid-cols-2 gap-y-6 gap-x-12 mb-10 text-sm bg-[#f8faff] p-6 rounded-2xl border border-gray-100 print:bg-white print:border-none print:p-0">
                 <div><p className="block text-xs font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Voucher Reference</p><p className="font-mono font-bold text-sm text-[#04152d]">{selectedVoucher.id}</p></div>
                 <div><p className="block text-xs font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Posting Date</p><p className="font-medium text-[#04152d]">{new Date(selectedVoucher.createdAt).toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p></div>
                 <div><p className="block text-xs font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Loan Reference Code</p><p className="font-mono font-medium text-[#04152d] text-base">{selectedVoucher.loanReference}</p></div>
-                <div><p className="block text-xs font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Disbursement Method</p><p className="font-medium text-blue-700 text-xs font-mono bg-blue-50 px-3 py-1.5 rounded-lg inline-block">{selectedVoucher.paymentMethod} &mdash; {selectedVoucher.bankAccount}</p></div>
+                <div><p className="block text-xs font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Disbursement Method</p><p className="font-medium text-blue-700 text-xs font-mono bg-blue-50 px-3 py-1.5 rounded-lg inline-block print:bg-transparent print:px-0 print:text-[#04152d] print:font-bold">{selectedVoucher.paymentMethod} &mdash; {selectedVoucher.bankAccount}</p></div>
                 <div className="col-span-2 pt-4 border-t border-gray-200"><p className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Payee (Member Name & ID)</p><p className="font-black text-2xl text-[#04152d]">{selectedVoucher.memberName} <span className="text-sm font-medium text-gray-400 font-mono ml-2">ID: {selectedVoucher.memberId}</span></p></div>
               </div>
 
               <table className="w-full mb-12 border-collapse text-sm">
                 <thead>
-                  <tr className="bg-[#04152d] text-white border-y-2 border-[#04152d]">
-                    <th className="py-3.5 px-5 text-left text-[10px] font-black uppercase tracking-widest rounded-tl-lg">Particulars / Narrative</th>
-                    <th className="py-3.5 px-5 text-right text-[10px] font-black uppercase tracking-widest rounded-tr-lg">Debit Amount (PHP)</th>
+                  <tr className="bg-[#04152d] text-white border-y-2 border-[#04152d] print:bg-white print:text-[#04152d]">
+                    <th className="py-3.5 px-5 text-left text-[10px] font-black uppercase tracking-widest rounded-tl-lg print:border-b-2 print:border-[#04152d]">Particulars / Narrative</th>
+                    <th className="py-3.5 px-5 text-right text-[10px] font-black uppercase tracking-widest rounded-tr-lg print:border-b-2 print:border-[#04152d]">Debit Amount (PHP)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -634,12 +709,11 @@ export default function DisbursementPage() {
                       Disbursement release for approved loan reference <span className="font-black text-[#04152d]">{selectedVoucher.loanReference}</span>. <br/>
                       <span className="text-xs text-gray-500 font-medium italic mt-2 block">Description: {selectedVoucher.paymentDetails || 'Approved disbursement'}</span>
                     </td>
-                    <td className="py-6 px-5 text-right font-black text-2xl text-emerald-700 align-top">₱{selectedVoucher.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                    <td className="py-6 px-5 text-right font-black text-2xl text-emerald-700 align-top print:text-[#04152d]">₱{selectedVoucher.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                   </tr>
                 </tbody>
               </table>
               
-              {/* UPDATED: React UI Signature Block */}
               <div className="grid grid-cols-3 gap-8 pt-12 print:pt-16">
                 <div className="flex flex-col items-center text-center">
                   <p className="block text-[11px] font-black text-[#04152d] uppercase tracking-[0.1em] mb-12">Prepared By</p>
