@@ -4,7 +4,10 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useRef } from 'react';
-import { CheckCircle, Eye, Printer, X, FileText, Clock, Check, Send, AlertTriangle, Download, Loader, Ban } from 'lucide-react';
+import { 
+  CheckCircle, Eye, Printer, X, FileText, Clock, Check, Send, 
+  AlertTriangle, Download, Loader, Ban, ChevronLeft, ChevronRight 
+} from 'lucide-react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import Header from '@/components/Header';
 import ActionModal from '@/components/ActionModal';
@@ -22,6 +25,7 @@ interface Disbursement {
   authorizedBy: string | null;
   createdAt: string;
   rejectedReason?: string;
+  reason?: string; 
 }
 
 export default function DisbursementPage() {
@@ -42,9 +46,11 @@ export default function DisbursementPage() {
   const [rejectReason, setRejectReason] = useState('');
   const [isRejecting, setIsRejecting] = useState(false);
 
+  // --- Pagination State ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
-
-  // Fetch Disbursements Queue from real database
+  // Fetch Disbursements Queue
   const fetchDisbursements = async () => {
     try {
       setIsLoading(true);
@@ -65,7 +71,14 @@ export default function DisbursementPage() {
     fetchDisbursements();
   }, []);
 
-  // --- DIRECT PDF DOWNLOAD (no print dialog) ---
+  // --- Pagination Logic ---
+  const totalPages = Math.max(1, Math.ceil(disbursements.length / itemsPerPage));
+  const paginatedDisbursements = disbursements.slice(
+    (currentPage - 1) * itemsPerPage, 
+    currentPage * itemsPerPage
+  );
+
+  // --- DIRECT PDF DOWNLOAD ---
   const downloadVoucherPDF = async () => {
     if (!selectedVoucher) return;
     setIsGeneratingPDF(true);
@@ -102,7 +115,10 @@ export default function DisbursementPage() {
         year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
       });
       const amount = selectedVoucher.amount.toLocaleString(undefined, { minimumFractionDigits: 2 });
-      const authorizedBy = selectedVoucher.authorizedBy || 'PENDING';
+      
+      // Clean the title from the name for the signature block
+      const authorizedByRaw = selectedVoucher.authorizedBy || 'PENDING';
+      const cleanAuthorizedBy = authorizedByRaw.replace(/Treasurer\s+/i, '');
       
       const voucherHTML = `
 <!DOCTYPE html>
@@ -128,9 +144,12 @@ export default function DisbursementPage() {
     thead th { background: #021124; padding: 12px 16px; text-align: left; font-size: 10px; font-weight: 800; text-transform: uppercase; color: #ffffff; }
     tbody td { padding: 18px 16px; border-bottom: 1px solid #cbd5e1; }
     .amount-cell { text-align: right; font-size: 22px; font-weight: 900; color: #15803d; }
-    .signatures { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 30px; margin-top: 15px; }
-    .sig-label { font-size: 9px; font-weight: 700; text-transform: uppercase; color: #64748b; margin-bottom: 50px; }
-    .sig-line { border-top: 1.5px solid #021124; padding-top: 8px; text-align: center; }
+    .signatures { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 30px; margin-top: 40px; }
+    .sig-block { text-align: center; }
+    .sig-label { font-size: 11px; font-weight: 800; text-transform: uppercase; color: #04152d; margin-bottom: 50px; letter-spacing: 1px; }
+    .sig-line { border-top: 1px solid #04152d; padding-top: 8px; width: 100%; }
+    .name { font-size: 11px; font-weight: 800; color: #04152d; text-transform: uppercase; letter-spacing: 0.5px; }
+    .title { font-size: 10px; font-weight: 700; color: #04152d; text-transform: uppercase; margin-top: 4px; }
   </style>
 </head>
 <body>
@@ -151,10 +170,29 @@ export default function DisbursementPage() {
         <tr><td>Disbursement release for loan ${selectedVoucher.loanReference}.</td><td class="amount-cell">₱${amount}</td></tr>
       </tbody>
     </table>
+    
     <div class="signatures">
-      <div><div class="sig-label">Prepared By</div><div class="sig-line">LAS System</div></div>
-      <div><div class="sig-label">Confirmed By</div><div class="sig-line">${authorizedBy}</div></div>
-      <div><div class="sig-label">Received By</div><div class="sig-line">${selectedVoucher.memberName}</div></div>
+      <div class="sig-block">
+        <div class="sig-label">Prepared By</div>
+        <div class="sig-line">
+          <div class="name">Loan App System</div>
+          <div class="title">LAS Authorized Personnel</div>
+        </div>
+      </div>
+      <div class="sig-block">
+        <div class="sig-label">Confirmed By</div>
+        <div class="sig-line">
+          <div class="name">${cleanAuthorizedBy}</div>
+          <div class="title">Treasurer</div>
+        </div>
+      </div>
+      <div class="sig-block">
+        <div class="sig-label">Received By Payee</div>
+        <div class="sig-line">
+          <div class="name">${selectedVoucher.memberName}</div>
+          <div class="title">Member</div>
+        </div>
+      </div>
     </div>
   </div>
 </body>
@@ -257,7 +295,20 @@ export default function DisbursementPage() {
       });
       
       if (res.ok) {
+        setDisbursements(prev => prev.map(d => 
+          d.id === selectedForAction.id 
+            ? { ...d, status: 'REJECTED', rejectedReason: rejectReason, authorizedBy: 'Treasurer Romalyn Amante' } 
+            : d
+        ));
+        
         await fetchDisbursements();
+        
+        setDisbursements(prev => prev.map(d => 
+          d.id === selectedForAction.id 
+            ? { ...d, status: 'REJECTED', rejectedReason: d.rejectedReason || d.reason || rejectReason, authorizedBy: d.authorizedBy || 'Treasurer Romalyn Amante' } 
+            : d
+        ));
+
         setIsRejectModalOpen(false);
         setActionModal({
           isOpen: true,
@@ -284,9 +335,6 @@ export default function DisbursementPage() {
     }
   };
 
-
-
-  // --- ANALYTICS ---
   const pendingCount = disbursements.filter(d => d.status === 'PENDING').length;
   const completedCount = disbursements.filter(d => d.status === 'COMPLETED').length;
   const rejectedCount = disbursements.filter(d => d.status === 'REJECTED').length;
@@ -299,63 +347,60 @@ export default function DisbursementPage() {
   return (
     <div className="flex flex-col min-h-screen relative">
       
-      <ActionModal 
-        isOpen={actionModal.isOpen}
-        title={actionModal.title}
-        message={actionModal.message}
-        status={actionModal.status}
-        resultMsg={actionModal.resultMsg}
-        onConfirm={actionModal.status === 'idle' ? handleAcceptConfirm : () => setActionModal({ ...actionModal, isOpen: false })}
-        onClose={() => setActionModal({ ...actionModal, isOpen: false })}
-        confirmText="Authorize Disbursement"
-      />
+      <div className={selectedVoucher ? "print:hidden" : ""}>
+        <ActionModal 
+          isOpen={actionModal.isOpen}
+          title={actionModal.title}
+          message={actionModal.message}
+          status={actionModal.status}
+          resultMsg={actionModal.resultMsg}
+          onConfirm={actionModal.status === 'idle' ? handleAcceptConfirm : () => setActionModal({ ...actionModal, isOpen: false })}
+          onClose={() => setActionModal({ ...actionModal, isOpen: false })}
+          confirmText="Authorize Disbursement"
+        />
 
-      {/* REJECTION MODAL */}
-      {isRejectModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#04152d]/60 backdrop-blur-sm animate-fade-in p-4">
-          <div className="bg-white w-full max-w-md rounded-2xl shadow-[0_20px_60px_-12px_rgba(0,0,0,0.3),0_4px_16px_rgba(0,0,0,0.12)] border border-white/80 overflow-hidden animate-pop">
-            <div className="flex items-center justify-between p-5 border-b border-gray-100 bg-gray-50/80">
-              <h3 className="font-black text-lg text-[#04152d] flex items-center gap-2">
-                <Ban size={20} className="text-red-500" /> Reject Disbursement
-              </h3>
-              <button 
-                onClick={() => setIsRejectModalOpen(false)} disabled={isRejecting}
-                className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors disabled:opacity-50"
-              >
-                <X size={20} />
-              </button>
-            </div>
-            <form onSubmit={handleRejectConfirm} className="p-6 space-y-4">
-              <p className="text-sm font-medium text-gray-600">
-                You are about to reject the disbursement for <span className="font-bold text-[#04152d]">{selectedForAction?.memberName}</span>. Please provide a reason for this rejection.
-              </p>
-              <div>
-                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Reason for Rejection</label>
-                <textarea 
-                  required value={rejectReason} onChange={e => setRejectReason(e.target.value)} rows={3} placeholder="E.g., Invalid bank details provided..."
-                  className="w-full rounded-xl px-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] focus:border-red-500 focus:ring-[3px] focus:ring-red-500/10 outline-none transition-colors font-medium text-[#04152d] resize-none"
-                />
-              </div>
-              <div className="pt-4 border-t border-gray-100 flex justify-end gap-3">
-                <button type="button" onClick={() => setIsRejectModalOpen(false)} disabled={isRejecting} className="inline-flex items-center justify-center gap-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 font-bold py-2.5 px-5 rounded-xl text-sm transition-all duration-150 disabled:opacity-50">Cancel</button>
-                <button type="submit" disabled={isRejecting || !rejectReason.trim()} className="inline-flex items-center justify-center gap-2 bg-red-500 text-white font-bold py-2.5 px-6 rounded-xl text-sm shadow-[0_6px_0_rgba(153,27,27,0.45),0_4px_18px_rgba(220,38,38,0.35)] hover:-translate-y-[1px] active:translate-y-[4px] active:shadow-[0_2px_0_rgba(153,27,27,0.45),0_2px_8px_rgba(220,38,38,0.25)] transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                  {isRejecting ? <><Loader size={16} className="animate-spin" /> Rejecting...</> : 'Confirm Rejection'}
+        {isRejectModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#04152d]/60 backdrop-blur-sm animate-fade-in p-4">
+            <div className="bg-white w-full max-w-md rounded-2xl shadow-[0_20px_60px_-12px_rgba(0,0,0,0.3),0_4px_16px_rgba(0,0,0,0.12)] border border-white/80 overflow-hidden animate-pop">
+              <div className="flex items-center justify-between p-5 border-b border-gray-100 bg-gray-50/80">
+                <h3 className="font-black text-lg text-[#04152d] flex items-center gap-2">
+                  <Ban size={20} className="text-red-500" /> Reject Disbursement
+                </h3>
+                <button 
+                  onClick={() => setIsRejectModalOpen(false)} disabled={isRejecting}
+                  className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors disabled:opacity-50"
+                >
+                  <X size={20} />
                 </button>
               </div>
-            </form>
+              <form onSubmit={handleRejectConfirm} className="p-6 space-y-4">
+                <p className="text-sm font-medium text-gray-600">
+                  You are about to reject the disbursement for <span className="font-bold text-[#04152d]">{selectedForAction?.memberName}</span>. Please provide a reason for this rejection.
+                </p>
+                <div>
+                  <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Reason for Rejection</label>
+                  <textarea 
+                    required value={rejectReason} onChange={e => setRejectReason(e.target.value)} rows={3} placeholder="E.g., Invalid bank details provided..."
+                    className="w-full rounded-xl px-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] focus:border-red-500 focus:ring-[3px] focus:ring-red-500/10 outline-none transition-colors font-medium text-[#04152d] resize-none"
+                  />
+                </div>
+                <div className="pt-4 border-t border-gray-100 flex justify-end gap-3">
+                  <button type="button" onClick={() => setIsRejectModalOpen(false)} disabled={isRejecting} className="inline-flex items-center justify-center gap-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 font-bold py-2.5 px-5 rounded-xl text-sm transition-all duration-150 disabled:opacity-50">Cancel</button>
+                  <button type="submit" disabled={isRejecting || !rejectReason.trim()} className="inline-flex items-center justify-center gap-2 bg-red-500 text-white font-bold py-2.5 px-6 rounded-xl text-sm shadow-[0_6px_0_rgba(153,27,27,0.45),0_4px_18px_rgba(220,38,38,0.35)] hover:-translate-y-[1px] active:translate-y-[4px] active:shadow-[0_2px_0_rgba(153,27,27,0.45),0_2px_8px_rgba(220,38,38,0.25)] transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                    {isRejecting ? <><Loader size={16} className="animate-spin" /> Rejecting...</> : 'Confirm Rejection'}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      <Header />
+        <Header />
 
-      <main className="p-4 md:p-8 max-w-[1600px] w-full mx-auto space-y-6 flex-1 print:p-0 print:m-0 print:max-w-none">
-        
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 items-start">
-          <div className="lg:col-span-2 space-y-6">
-            
-            {/* Top Analytics Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <main className="p-4 md:p-8 max-w-[1600px] w-full mx-auto space-y-6 flex-1 print:p-0 print:m-0 print:max-w-none">
+          <div className="flex flex-col gap-6 mb-8 w-full">
+              
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
               <div className="bg-white rounded-2xl p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 flex flex-col justify-center animate-slide-up" style={{ animationDelay: '0.05s' }}>
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600"><FileText size={24} /></div>
@@ -380,7 +425,7 @@ export default function DisbursementPage() {
                 {chartData.length > 0 ? (
                   <div className="w-full h-[80px] flex items-center justify-between">
                     <div className="h-[80px] w-[80px]">
-                      <ResponsiveContainer width="100%" height="100%">
+                      <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
                         <PieChart>
                           <Pie data={chartData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={25} outerRadius={38} paddingAngle={3} />
                           <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', fontSize: '12px', fontWeight: 'bold' }} itemStyle={{ color: '#04152d' }} />
@@ -402,8 +447,7 @@ export default function DisbursementPage() {
               </div>
             </div>
 
-            {/* Main Table */}
-            <div className="bg-white rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 overflow-hidden flex flex-col min-h-[400px] animate-slide-up" style={{ animationDelay: '0.2s' }}>
+            <div className="bg-white rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 overflow-hidden flex flex-col min-h-[400px] w-full animate-slide-up" style={{ animationDelay: '0.2s' }}>
               <div className="p-6 border-b border-gray-100 flex items-center justify-between">
                 <h2 className="text-xl font-black text-[#04152d]">Treasurer Confirmation Queue</h2>
                 <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600 shadow-[inset_0_0_0_1.5px_rgba(107,114,128,0.2)] font-mono">Real-Time Sync</span>
@@ -433,7 +477,7 @@ export default function DisbursementPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
-                      {disbursements.map((disb) => (
+                      {paginatedDisbursements.map((disb) => (
                         <tr key={disb.id} className="hover:bg-[#e8edf8]/60 transition-colors duration-100">
                           
                           <td className="px-6 py-5 text-sm text-gray-700">
@@ -502,18 +546,37 @@ export default function DisbursementPage() {
                   </table>
                 )}
               </div>
+
+              {totalPages > 1 && !isLoading && (
+                <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-gray-50/50 mt-auto">
+                  <button
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="inline-flex items-center justify-center gap-2 bg-white border border-gray-200 text-[#04152d] hover:bg-gray-50 hover:text-blue-600 font-bold py-2.5 px-4 rounded-xl text-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
+                  >
+                    <ChevronLeft size={16} /> Previous
+                  </button>
+                  <span className="text-[11px] font-black text-gray-500 uppercase tracking-widest">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <button
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="inline-flex items-center justify-center gap-2 bg-white border border-gray-200 text-[#04152d] hover:bg-gray-50 hover:text-blue-600 font-bold py-2.5 px-4 rounded-xl text-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
+                  >
+                    Next <ChevronRight size={16} />
+                  </button>
+                </div>
+              )}
             </div>
           </div>
-
-
-        </div>
-
-      </main>
+        </main>
+      </div>
 
       {/* --- MODAL / PRINTABLE VOUCHER VIEW --- */}
       {selectedVoucher && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#04152d]/60 backdrop-blur-sm print:bg-white print:static print:block print:inset-auto animate-fade-in p-4">
-          <div className="bg-white w-full max-w-3xl rounded-[24px] shadow-2xl flex flex-col max-h-[95vh] print:max-h-none print:shadow-none print:rounded-none print:mx-auto animate-pop overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#04152d]/60 backdrop-blur-sm print:bg-transparent print:static print:block print:inset-auto animate-fade-in p-4 print:p-0">
+          <div className="bg-white w-full max-w-3xl rounded-[24px] shadow-2xl flex flex-col max-h-[95vh] print:max-h-none print:shadow-none print:border-none print:rounded-none print:mx-auto animate-pop overflow-hidden print:overflow-visible">
             
             <div className="flex items-center justify-between p-5 border-b border-gray-100 print:hidden bg-gray-50/80">
               <h2 className="font-black text-xl text-[#04152d]">Disbursement Details</h2>
@@ -530,14 +593,14 @@ export default function DisbursementPage() {
               </div>
             </div>
 
-            <div ref={voucherRef} className="p-8 md:p-12 overflow-y-auto print:p-0 bg-white">
+            <div ref={voucherRef} className="p-8 md:p-12 overflow-y-auto print:p-0 bg-white print:overflow-visible">
               
               {selectedVoucher.status === 'REJECTED' && (
                 <div className="mb-8 bg-red-50 border border-red-200 rounded-xl p-5 flex items-start gap-4 shadow-[inset_0_0_0_1.5px_rgba(220,38,38,0.3)] print:hidden">
                   <Ban size={24} className="text-red-600 shrink-0" />
                   <div>
                     <p className="text-red-800 font-black text-base">Disbursement Request Rejected</p>
-                    <p className="text-red-700 text-sm mt-1.5 font-medium">Reason: {selectedVoucher.rejectedReason || 'No reason provided.'}</p>
+                    <p className="text-red-700 text-sm mt-1.5 font-medium">Reason: {selectedVoucher.rejectedReason || selectedVoucher.reason || 'No reason provided.'}</p>
                   </div>
                 </div>
               )}
@@ -576,23 +639,29 @@ export default function DisbursementPage() {
                 </tbody>
               </table>
               
-              <div className="grid grid-cols-3 gap-10 pt-8">
-                <div>
-                  <p className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.12em] mb-10">Prepared By</p>
-                  <div className="border-t-2 border-[#04152d] pt-2.5 text-center">
+              {/* UPDATED: React UI Signature Block */}
+              <div className="grid grid-cols-3 gap-8 pt-12 print:pt-16">
+                <div className="flex flex-col items-center text-center">
+                  <p className="block text-[11px] font-black text-[#04152d] uppercase tracking-[0.1em] mb-12">Prepared By</p>
+                  <div className="w-full border-t border-[#04152d] pt-3">
                     <p className="font-black text-xs text-[#04152d] uppercase tracking-wide">Loan App System</p>
+                    <p className="text-[10px] text-[#04152d] font-bold uppercase mt-1">LAS Authorized Personnel</p>
                   </div>
                 </div>
-                <div>
-                  <p className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.12em] mb-10">Confirmed By</p>
-                  <div className="border-t-2 border-[#04152d] pt-2.5 text-center">
-                    <p className={`font-black text-xs uppercase tracking-wide ${selectedVoucher.status === 'REJECTED' ? 'text-red-600' : 'text-blue-800'}`}>{selectedVoucher.authorizedBy || 'PENDING'}</p>
+                <div className="flex flex-col items-center text-center">
+                  <p className="block text-[11px] font-black text-[#04152d] uppercase tracking-[0.1em] mb-12">Confirmed By</p>
+                  <div className="w-full border-t border-[#04152d] pt-3">
+                    <p className="font-black text-xs text-[#04152d] uppercase tracking-wide">
+                      {selectedVoucher.authorizedBy ? selectedVoucher.authorizedBy.replace(/Treasurer\s+/i, '') : 'PENDING'}
+                    </p>
+                    <p className="text-[10px] text-[#04152d] font-bold uppercase mt-1">Treasurer</p>
                   </div>
                 </div>
-                <div>
-                  <p className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.12em] mb-10">Received By Payee</p>
-                  <div className="border-t-2 border-[#04152d] pt-2.5 text-center">
+                <div className="flex flex-col items-center text-center">
+                  <p className="block text-[11px] font-black text-[#04152d] uppercase tracking-[0.1em] mb-12">Received By Payee</p>
+                  <div className="w-full border-t border-[#04152d] pt-3">
                     <p className="font-black text-xs text-[#04152d] uppercase tracking-wide">{selectedVoucher.memberName}</p>
+                    <p className="text-[10px] text-[#04152d] font-bold uppercase mt-1">Member</p>
                   </div>
                 </div>
               </div>

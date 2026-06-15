@@ -5,7 +5,8 @@ export const dynamic = 'force-dynamic';
 import { useState, useEffect, useMemo } from 'react';
 import { 
   FileText, ShieldCheck, RefreshCw, Send, CheckCircle2, 
-  XCircle, AlertCircle, Landmark, Search, Activity, Terminal, CreditCard, Filter
+  XCircle, AlertCircle, Landmark, Search, Activity, Terminal, 
+  CreditCard, Filter, ChevronLeft, ChevronRight, X, Plus
 } from 'lucide-react';
 import Header from '@/components/Header';
 import ActionModal from '@/components/ActionModal';
@@ -46,6 +47,15 @@ interface WriteOff {
   createdAt: string;
 }
 
+const initialWriteOffForm = {
+  loanReference: '',
+  memberId: '',
+  memberName: '',
+  amount: '',
+  reason: '',
+  requestedBy: 'Treasurer Office'
+};
+
 export default function LoansDashboard() {
   // --- STATE ---
   const [funds, setFunds] = useState<Fund[]>([]);
@@ -54,13 +64,25 @@ export default function LoansDashboard() {
   
   const [activeTab, setActiveTab] = useState<'repayments' | 'writeoffs'>('repayments');
   
-  // Filters
+  // Repayments Filters & Pagination
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('ALL');
   const [filterMethod, setFilterMethod] = useState('ALL');
+  const [repaymentPage, setRepaymentPage] = useState(1);
+
+  // Write-Off Filters & Pagination
+  const [writeOffSearch, setWriteOffSearch] = useState('');
+  const [writeOffStatus, setWriteOffStatus] = useState('ALL');
+  const [writeOffPage, setWriteOffPage] = useState(1);
+
+  const itemsPerPage = 10;
 
   const [loading, setLoading] = useState(true);
   const [notification, setNotification] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+  // Reset pagination when filters change
+  useEffect(() => { setRepaymentPage(1); }, [searchTerm, filterStatus, filterMethod]);
+  useEffect(() => { setWriteOffPage(1); }, [writeOffSearch, writeOffStatus]);
 
   // --- MODAL STATE MANAGEMENT ---
   const [modal, setModal] = useState<{
@@ -73,16 +95,8 @@ export default function LoansDashboard() {
     resultMsg?: string;
   }>({ isOpen: false, title: '', message: '', actionType: null, status: 'idle' });
 
-
-
-  const [writeOffForm, setWriteOffForm] = useState({
-    loanReference: 'LN-2026-092',
-    memberId: 'M-105',
-    memberName: 'Romalyn Amante',
-    amount: '15000',
-    reason: 'Member has migrated overseas with no remaining collateral.',
-    requestedBy: 'Treasurer Office'
-  });
+  const [isWriteOffModalOpen, setIsWriteOffModalOpen] = useState(false);
+  const [writeOffForm, setWriteOffForm] = useState(initialWriteOffForm);
 
   // --- BACKEND API LOGIC ---
   const loadData = async () => {
@@ -136,21 +150,15 @@ export default function LoansDashboard() {
     setTimeout(() => setNotification(null), 5000);
   };
 
-
-
-  const triggerResolveOverpayment = (repaymentId: string, decision: 'ADVANCE_CREDIT' | 'REFUND') => {
-    setModal({
-      isOpen: true,
-      title: decision === 'ADVANCE_CREDIT' ? 'Confirm Advance Credit' : 'Confirm Cash Refund',
-      message: `Are you sure you want to process this overpayment as ${decision === 'ADVANCE_CREDIT' ? 'credit towards the principal balance' : 'a cash refund to the member'}?`,
-      actionType: 'overpayment',
-      payload: { repaymentId, decision },
-      status: 'idle'
-    });
+  // --- TRIGGER MODAL LOGIC ---
+  const handleCancelWriteOffForm = () => {
+    setIsWriteOffModalOpen(false);
+    setWriteOffForm(initialWriteOffForm); // Explicitly clears the form when cancelled
   };
 
   const triggerRequestWriteOff = (e: React.FormEvent) => {
     e.preventDefault();
+    setIsWriteOffModalOpen(false); // Hide the form modal first to prevent overlapping
     setModal({
       isOpen: true,
       title: 'Confirm Write-Off Request',
@@ -158,6 +166,14 @@ export default function LoansDashboard() {
       actionType: 'requestWriteOff',
       status: 'idle'
     });
+  };
+
+  const closeActionModal = () => {
+    // If the user aborts the confirmation modal, re-open the form with their typed data
+    if (modal.actionType === 'requestWriteOff' && modal.status !== 'success' && modal.status !== 'loading') {
+      setIsWriteOffModalOpen(true);
+    }
+    setModal(prev => ({ ...prev, isOpen: false }));
   };
 
   const triggerProcessWriteOff = (id: string, status: 'APPROVED' | 'REJECTED') => {
@@ -177,23 +193,7 @@ export default function LoansDashboard() {
     const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
     
     try {
-      if (modal.actionType === 'overpayment') {
-        const { repaymentId, decision } = modal.payload;
-        const res = await fetch(`${gatewayUrl}/api/finance/loans/overpayments`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ repaymentId, decision, authorizedBy: 'Treasurer Romalyn' })
-        });
-        const data = await res.json();
-        if (res.ok && data.success) {
-          await loadData();
-          setModal(prev => ({ ...prev, status: 'success', resultMsg: data.message }));
-        } else {
-          setModal(prev => ({ ...prev, status: 'error', resultMsg: data.error || 'Failed to process decision.' }));
-        }
-      } 
-      
-      else if (modal.actionType === 'requestWriteOff') {
+      if (modal.actionType === 'requestWriteOff') {
         const res = await fetch(`${gatewayUrl}/api/finance/loans/write-offs`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -208,7 +208,7 @@ export default function LoansDashboard() {
         });
         const data = await res.json();
         if (res.ok) {
-          setWriteOffForm(prev => ({ ...prev, loanReference: 'LN-2026-0' + Math.floor(100 + Math.random() * 900), amount: '' }));
+          setWriteOffForm(initialWriteOffForm); // Clear form on success
           await loadData();
           setModal(prev => ({ ...prev, status: 'success', resultMsg: 'Write-off request successfully submitted.' }));
         } else {
@@ -238,20 +238,35 @@ export default function LoansDashboard() {
     }
   };
 
-  // --- DATA FILTERING & AGGREGATION ---
+  // --- REPAYMENTS FILTERING & PAGINATION ---
   const filteredRepayments = useMemo(() => {
     return repayments.filter(r => {
       const matchesSearch = r.loanReference.toLowerCase().includes(searchTerm.toLowerCase()) || 
                             r.memberName.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesStatus = filterStatus === 'ALL' ? true : r.status === filterStatus;
       const matchesMethod = filterMethod === 'ALL' ? true : r.paymentMethod === filterMethod;
-      
       return matchesSearch && matchesStatus && matchesMethod;
     });
   }, [repayments, searchTerm, filterStatus, filterMethod]);
 
+  const totalRepaymentPages = Math.max(1, Math.ceil(filteredRepayments.length / itemsPerPage));
+  const paginatedRepayments = filteredRepayments.slice((repaymentPage - 1) * itemsPerPage, repaymentPage * itemsPerPage);
   const uniqueMethods = Array.from(new Set(repayments.map(r => r.paymentMethod)));
 
+  // --- WRITE-OFFS FILTERING & PAGINATION ---
+  const filteredWriteOffs = useMemo(() => {
+    return writeOffs.filter(w => {
+      const matchesSearch = w.loanReference.toLowerCase().includes(writeOffSearch.toLowerCase()) || 
+                            w.memberName.toLowerCase().includes(writeOffSearch.toLowerCase());
+      const matchesStatus = writeOffStatus === 'ALL' ? true : w.status === writeOffStatus;
+      return matchesSearch && matchesStatus;
+    });
+  }, [writeOffs, writeOffSearch, writeOffStatus]);
+
+  const totalWriteOffPages = Math.max(1, Math.ceil(filteredWriteOffs.length / itemsPerPage));
+  const paginatedWriteOffs = filteredWriteOffs.slice((writeOffPage - 1) * itemsPerPage, writeOffPage * itemsPerPage);
+
+  // --- METRICS ---
   const bdoeaFund = funds.find(f => f.code === 'LOAN_BDOEA' || f.code === 'LN');
   const loanBalance = bdoeaFund ? bdoeaFund.currentBalance : 0.0;
   const totalRepaymentsValue = repayments.reduce((acc, curr) => acc + curr.amount, 0);
@@ -261,7 +276,7 @@ export default function LoansDashboard() {
   return (
     <div className="flex flex-col min-h-screen bg-transparent print:bg-white relative">
       
-      {/* Toast Notification (Used for generic Syncs) */}
+      {/* Toast Notification */}
       {notification && (
         <div className={`fixed bottom-6 right-6 z-[100] flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl transition-all animate-slide-up ${
           notification.type === 'success' ? 'bg-emerald-50 border border-emerald-200 text-emerald-900' : 'bg-red-50 border border-red-200 text-red-900'
@@ -279,9 +294,95 @@ export default function LoansDashboard() {
         status={modal.status}
         resultMsg={modal.resultMsg}
         onConfirm={executeModalAction}
-        onClose={() => setModal({ ...modal, isOpen: false })}
+        onClose={closeActionModal}
         confirmText="Confirm Action"
       />
+
+      {/* Write-Off Request Form Modal */}
+      {isWriteOffModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#04152d]/60 backdrop-blur-sm animate-fade-in p-4">
+          <div className="bg-white w-full max-w-lg rounded-2xl shadow-[0_20px_60px_-12px_rgba(0,0,0,0.3),0_4px_16px_rgba(0,0,0,0.12)] border border-white/80 overflow-hidden animate-pop">
+            <div className="flex items-center justify-between p-5 border-b border-gray-100 bg-gray-50/80">
+              <h3 className="font-black text-lg text-[#04152d] flex items-center gap-2">
+                <ShieldCheck size={20} className="text-red-500" /> Request Loan Write-Off
+              </h3>
+              <button 
+                onClick={handleCancelWriteOffForm}
+                className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <form onSubmit={triggerRequestWriteOff} className="p-6 flex flex-col gap-4 text-sm">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Member ID</label>
+                  <input 
+                    type="text" 
+                    placeholder="E.g., M-105" 
+                    value={writeOffForm.memberId} 
+                    onChange={(e) => setWriteOffForm({...writeOffForm, memberId: e.target.value})} 
+                    className="w-full rounded-xl px-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#04152d] focus:ring-[3px] focus:ring-[#04152d]/10 outline-none transition-colors font-mono font-bold text-[#04152d]" 
+                    required 
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Loan Ref ID</label>
+                  <input 
+                    type="text" 
+                    placeholder="E.g., LN-2026-092" 
+                    value={writeOffForm.loanReference} 
+                    onChange={(e) => setWriteOffForm({...writeOffForm, loanReference: e.target.value})} 
+                    className="w-full rounded-xl px-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#04152d] focus:ring-[3px] focus:ring-[#04152d]/10 outline-none transition-colors font-mono font-bold text-[#04152d]" 
+                    required 
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Member Name</label>
+                <input 
+                  type="text" 
+                  placeholder="E.g., Juan Dela Cruz" 
+                  value={writeOffForm.memberName} 
+                  onChange={(e) => setWriteOffForm({...writeOffForm, memberName: e.target.value})} 
+                  className="w-full rounded-xl px-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#04152d] focus:ring-[3px] focus:ring-[#04152d]/10 outline-none transition-colors font-bold text-[#04152d]" 
+                  required 
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Write-Off Amount (₱)</label>
+                <input 
+                  type="number" 
+                  placeholder="E.g., 15000" 
+                  value={writeOffForm.amount} 
+                  onChange={(e) => setWriteOffForm({...writeOffForm, amount: e.target.value})} 
+                  className="w-full rounded-xl px-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-red-500 focus:ring-[3px] focus:ring-red-500/10 outline-none transition-colors font-mono font-black text-red-600 text-lg" 
+                  required 
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Justification Reason</label>
+                <textarea 
+                  placeholder="E.g., Member has migrated overseas with no remaining collateral..." 
+                  value={writeOffForm.reason} 
+                  onChange={(e) => setWriteOffForm({...writeOffForm, reason: e.target.value})} 
+                  rows={3} 
+                  className="w-full rounded-xl px-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#04152d] focus:ring-[3px] focus:ring-[#04152d]/10 outline-none transition-colors resize-none font-medium text-[#04152d]" 
+                  required 
+                />
+              </div>
+              
+              <div className="pt-4 border-t border-gray-100 flex justify-end gap-3">
+                <button type="button" onClick={handleCancelWriteOffForm} className="inline-flex items-center justify-center gap-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 font-bold py-2.5 px-5 rounded-xl text-sm transition-all duration-150">Cancel</button>
+                <button type="submit" className="inline-flex items-center justify-center gap-2 bg-[#04152d] text-white font-bold py-2.5 px-6 rounded-xl text-sm shadow-[0_6px_0_rgba(2,6,15,0.55),0_4px_18px_rgba(4,21,45,0.35)] hover:-translate-y-[1px] active:translate-y-[4px] active:shadow-[0_2px_0_rgba(2,6,15,0.55),0_2px_8px_rgba(4,21,45,0.25)] transition-all">
+                  File Request
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <Header />
 
@@ -324,92 +425,54 @@ export default function LoansDashboard() {
           </div>
         </div>
 
-        {/* KPI Cards */}
+        {/* FIXED KPI Cards: Added min-w-0 to prevent flex blowout on resize */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 flex flex-col justify-center animate-slide-up" style={{ animationDelay: '0.05s' }}>
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
-                <Landmark size={24} />
-              </div>
-              <div>
-                <p className="block text-xs font-black text-gray-500 uppercase tracking-[0.12em] mb-0.5">Active Loan Capital</p>
-                <p className="text-3xl font-black text-[#04152d]">₱{loanBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
-              </div>
+          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 flex items-center gap-4 animate-slide-up" style={{ animationDelay: '0.05s' }}>
+            <div className="w-12 h-12 rounded-full bg-blue-50 flex-shrink-0 flex items-center justify-center text-blue-600">
+              <Landmark size={24} />
+            </div>
+            <div className="min-w-0">
+              <p className="block text-xs font-black text-gray-500 uppercase tracking-[0.12em] mb-0.5">Active Loan Capital</p>
+              <p className="text-2xl md:text-3xl font-black text-[#04152d] truncate">₱{loanBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 flex flex-col justify-center animate-slide-up" style={{ animationDelay: '0.1s' }}>
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600">
-                <Activity size={24} />
-              </div>
-              <div>
-                <p className="block text-xs font-black text-gray-500 uppercase tracking-[0.12em] mb-0.5">Total Repayments</p>
-                <p className="text-3xl font-black text-[#04152d]">₱{totalRepaymentsValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
-              </div>
+          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 flex items-center gap-4 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+            <div className="w-12 h-12 rounded-full bg-emerald-50 flex-shrink-0 flex items-center justify-center text-emerald-600">
+              <Activity size={24} />
+            </div>
+            <div className="min-w-0">
+              <p className="block text-xs font-black text-gray-500 uppercase tracking-[0.12em] mb-0.5">Total Repayments</p>
+              <p className="text-2xl md:text-3xl font-black text-[#04152d] truncate">₱{totalRepaymentsValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
             </div>
           </div>
 
-          <div className={`rounded-2xl p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] flex flex-col justify-center animate-slide-up ${
-            (pendingWriteOffs.length + pendingOverpayments.length) > 0 ? 'bg-red-50 border border-red-200' : 'bg-white border border-white/80'
+          <div className={`rounded-2xl p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] flex items-center gap-4 animate-slide-up ${
+            (pendingWriteOffs.length) > 0 ? 'bg-red-50 border border-red-200' : 'bg-white border border-white/80'
           }`} style={{ animationDelay: '0.15s' }}>
-            <div className="flex items-center gap-4">
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                 (pendingWriteOffs.length + pendingOverpayments.length) > 0 ? 'bg-red-100 text-red-600' : 'bg-gray-50 text-gray-500'
-              }`}>
-                <AlertCircle size={24} />
-              </div>
-              <div>
-                <p className={`block text-xs font-black uppercase tracking-[0.12em] mb-0.5 ${
-                  (pendingWriteOffs.length + pendingOverpayments.length) > 0 ? 'text-red-700' : 'text-gray-500'
-                }`}>Pending Approvals</p>
-                <p className={`text-3xl font-black ${
-                  (pendingWriteOffs.length + pendingOverpayments.length) > 0 ? 'text-red-700' : 'text-[#04152d]'
-                }`}>{(pendingWriteOffs.length + pendingOverpayments.length)} Items</p>
-              </div>
+            <div className={`w-12 h-12 rounded-full flex-shrink-0 flex items-center justify-center ${
+                (pendingWriteOffs.length) > 0 ? 'bg-red-100 text-red-600' : 'bg-gray-50 text-gray-500'
+            }`}>
+              <AlertCircle size={24} />
+            </div>
+            <div className="min-w-0">
+              <p className={`block text-xs font-black uppercase tracking-[0.12em] mb-0.5 ${
+                (pendingWriteOffs.length) > 0 ? 'text-red-700' : 'text-gray-500'
+              }`}>Pending Approvals</p>
+              <p className={`text-2xl md:text-3xl font-black truncate ${
+                (pendingWriteOffs.length) > 0 ? 'text-red-700' : 'text-[#04152d]'
+              }`}>{(pendingWriteOffs.length)} Items</p>
             </div>
           </div>
         </div>
 
-        {/* Clean Overpayments Alert Banner */}
-        {pendingOverpayments.length > 0 && (
-          <div className="bg-orange-50 border border-orange-200 rounded-2xl p-6 shadow-[inset_0_0_0_1.5px_rgba(217,119,6,0.2)] animate-pop">
-            <div className="flex items-center gap-3 mb-5">
-              <AlertCircle size={22} className="text-orange-600" />
-              <h4 className="font-black text-orange-900 text-lg">Overpayments Action Required</h4>
-            </div>
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-              {pendingOverpayments.map(rep => (
-                <div key={rep.id} className="bg-white border border-orange-200 rounded-xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
-                  <div>
-                    <span className="text-[10px] bg-gray-100 border border-gray-200 px-2.5 py-1 rounded font-black text-gray-600 mr-3 uppercase tracking-widest">{rep.loanReference}</span>
-                    <span className="font-black text-[#04152d] text-base">{rep.memberName}</span>
-                    <div className="text-[11px] font-bold text-gray-500 uppercase tracking-widest mt-2">
-                      Excess Balance: <span className="text-orange-600 font-black text-sm ml-1">₱{rep.overpaymentAmount.toLocaleString()}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <button onClick={() => triggerResolveOverpayment(rep.id, 'ADVANCE_CREDIT')} className="inline-flex items-center justify-center gap-2 bg-[#04152d] text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow-[0_4px_0_rgba(2,6,15,0.55),0_4px_12px_rgba(4,21,45,0.35)] hover:-translate-y-[1px] active:translate-y-[2px] active:shadow-[0_2px_0_rgba(2,6,15,0.55),0_2px_8px_rgba(4,21,45,0.25)] transition-all">
-                      Apply Credit
-                    </button>
-                    <button onClick={() => triggerResolveOverpayment(rep.id, 'REFUND')} className="inline-flex items-center justify-center gap-2 border-2 border-gray-300 text-gray-600 hover:border-[#04152d] hover:text-[#04152d] font-bold py-2.5 px-4 rounded-xl text-xs transition-all duration-150">
-                      Refund
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Content Area */}
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col w-full">
           
           {/* TAB 1: REPAYMENT LEDGER */}
           {activeTab === 'repayments' && (
             <div className="w-full flex flex-col gap-6 animate-fade-in">
               
-              {/* Added Filter Bar for Repayments */}
               <div className="bg-white rounded-2xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 flex flex-wrap gap-4 items-center">
                 <div className="flex-1 min-w-[250px] relative">
                   <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -436,7 +499,6 @@ export default function LoansDashboard() {
                   <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="w-full rounded-xl pl-11 pr-10 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#04152d] focus:ring-[3px] focus:ring-[#04152d]/10 outline-none transition-colors appearance-none font-bold text-[#04152d] cursor-pointer">
                     <option value="ALL">All Status</option>
                     <option value="PROCESSED">Processed</option>
-                    <option value="OVERPAYMENT_PENDING">Overpayment Pending</option>
                   </select>
                   <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#04152d]">
                     <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
@@ -445,8 +507,8 @@ export default function LoansDashboard() {
               </div>
 
               {/* Table Card */}
-              <div className="w-full bg-white rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 overflow-hidden flex flex-col">
-                <div className="overflow-x-auto w-full max-h-[500px] overflow-y-auto">
+              <div className="w-full bg-white rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 overflow-hidden flex flex-col min-h-[500px]">
+                <div className="overflow-x-auto w-full">
                   <table className="w-full text-left whitespace-nowrap min-w-[900px]">
                     <thead className="sticky top-0 z-10">
                       <tr>
@@ -459,7 +521,8 @@ export default function LoansDashboard() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
-                      {filteredRepayments.length > 0 ? filteredRepayments.map((rep) => (
+                      {/* Using paginated array */}
+                      {paginatedRepayments.length > 0 ? paginatedRepayments.map((rep) => (
                         <tr key={rep.id} className="hover:bg-[#e8edf8]/60 transition-colors duration-100">
                           <td className="px-6 py-5 text-sm text-gray-500 font-medium">
                             {new Date(rep.processedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
@@ -491,49 +554,78 @@ export default function LoansDashboard() {
                     </tbody>
                   </table>
                 </div>
+
+                {/* Repayments Pagination Footer */}
+                {totalRepaymentPages > 1 && !loading && (
+                  <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-gray-50/50 mt-auto">
+                    <button
+                      onClick={() => setRepaymentPage(p => Math.max(1, p - 1))}
+                      disabled={repaymentPage === 1}
+                      className="inline-flex items-center justify-center gap-2 bg-white border border-gray-200 text-[#04152d] hover:bg-gray-50 hover:text-blue-600 font-bold py-2.5 px-4 rounded-xl text-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
+                    >
+                      <ChevronLeft size={16} /> Previous
+                    </button>
+                    <span className="text-[11px] font-black text-gray-500 uppercase tracking-widest">
+                      Page {repaymentPage} of {totalRepaymentPages}
+                    </span>
+                    <button
+                      onClick={() => setRepaymentPage(p => Math.min(totalRepaymentPages, p + 1))}
+                      disabled={repaymentPage === totalRepaymentPages}
+                      className="inline-flex items-center justify-center gap-2 bg-white border border-gray-200 text-[#04152d] hover:bg-gray-50 hover:text-blue-600 font-bold py-2.5 px-4 rounded-xl text-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
+                    >
+                      Next <ChevronRight size={16} />
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           )}
 
           {/* TAB 2: WRITE-OFF WORKFLOWS */}
           {activeTab === 'writeoffs' && (
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 animate-fade-in">
-              <div className="xl:col-span-1 bg-white rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 p-8 self-start">
-                <h3 className="text-lg font-black text-[#04152d] mb-6 flex items-center gap-2 border-b border-gray-100 pb-4">
-                  <ShieldCheck size={20} className="text-red-500" /> Request Loan Write-Off
-                </h3>
-                <form onSubmit={triggerRequestWriteOff} className="flex flex-col gap-4 text-sm">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Member ID</label>
-                      <input type="text" value={writeOffForm.memberId} onChange={(e) => setWriteOffForm({...writeOffForm, memberId: e.target.value})} className="w-full rounded-xl px-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#04152d] focus:ring-[3px] focus:ring-[#04152d]/10 outline-none transition-colors font-mono font-bold text-[#04152d]" required />
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Loan Ref ID</label>
-                      <input type="text" value={writeOffForm.loanReference} onChange={(e) => setWriteOffForm({...writeOffForm, loanReference: e.target.value})} className="w-full rounded-xl px-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#04152d] focus:ring-[3px] focus:ring-[#04152d]/10 outline-none transition-colors font-mono font-bold text-[#04152d]" required />
-                    </div>
+            <div className="w-full flex flex-col gap-6 animate-fade-in">
+              
+              {/* Write-Offs Filter Bar */}
+              <div className="bg-white rounded-2xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 flex flex-wrap gap-4 items-center">
+                <div className="flex-1 min-w-[250px] relative">
+                  <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input 
+                    type="text" placeholder="Search by Loan Ref or Member..." 
+                    value={writeOffSearch} onChange={(e) => setWriteOffSearch(e.target.value)}
+                    className="w-full rounded-xl pl-11 pr-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#04152d] focus:ring-[3px] focus:ring-[#04152d]/10 outline-none transition-colors font-bold text-[#04152d]"
+                  />
+                </div>
+
+                <div className="relative inline-block w-full sm:w-auto min-w-[200px]">
+                  <Filter size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                  <select value={writeOffStatus} onChange={(e) => setWriteOffStatus(e.target.value)} className="w-full rounded-xl pl-11 pr-10 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#04152d] focus:ring-[3px] focus:ring-[#04152d]/10 outline-none transition-colors appearance-none font-bold text-[#04152d] cursor-pointer">
+                    <option value="ALL">All Status</option>
+                    <option value="PENDING">Pending Review</option>
+                    <option value="APPROVED">Approved</option>
+                    <option value="REJECTED">Rejected</option>
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#04152d]">
+                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
                   </div>
-                  <div>
-                    <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Member Name</label>
-                    <input type="text" value={writeOffForm.memberName} onChange={(e) => setWriteOffForm({...writeOffForm, memberName: e.target.value})} className="w-full rounded-xl px-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#04152d] focus:ring-[3px] focus:ring-[#04152d]/10 outline-none transition-colors font-bold text-[#04152d]" required />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Write-Off Amount (₱)</label>
-                    <input type="number" value={writeOffForm.amount} onChange={(e) => setWriteOffForm({...writeOffForm, amount: e.target.value})} className="w-full rounded-xl px-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-red-500 focus:ring-[3px] focus:ring-red-500/10 outline-none transition-colors font-mono font-black text-red-600 text-lg" required />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.12em] mb-1.5">Justification Reason</label>
-                    <textarea value={writeOffForm.reason} onChange={(e) => setWriteOffForm({...writeOffForm, reason: e.target.value})} rows={3} className="w-full rounded-xl px-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_2px_rgba(0,0,0,0.02)] focus:border-[#04152d] focus:ring-[3px] focus:ring-[#04152d]/10 outline-none transition-colors resize-none font-medium text-[#04152d]" required />
-                  </div>
-                  <button type="submit" className="w-full inline-flex items-center justify-center gap-2 bg-[#04152d] text-white font-bold py-3.5 px-6 rounded-xl text-sm shadow-[0_6px_0_rgba(2,6,15,0.55),0_4px_18px_rgba(4,21,45,0.35)] hover:-translate-y-[1px] active:translate-y-[4px] active:shadow-[0_2px_0_rgba(2,6,15,0.55),0_2px_8px_rgba(4,21,45,0.25)] transition-all mt-4">
-                    File Request
-                  </button>
-                </form>
+                </div>
+
+                {/* Open Modal Button */}
+                <button 
+                  onClick={() => setIsWriteOffModalOpen(true)}
+                  className="inline-flex items-center justify-center gap-2 bg-[#04152d] text-white font-bold py-3 px-5 rounded-xl text-sm shadow-[0_6px_0_rgba(2,6,15,0.55),0_4px_18px_rgba(4,21,45,0.35)] hover:-translate-y-[1px] active:translate-y-[4px] active:shadow-[0_2px_0_rgba(2,6,15,0.55),0_2px_8px_rgba(4,21,45,0.25)] transition-all ml-auto"
+                >
+                  <Plus size={16} /> Request Write-Off
+                </button>
               </div>
 
-              <div className="xl:col-span-2 bg-white rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 overflow-hidden flex flex-col">
+              <div className="w-full bg-white rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 overflow-hidden flex flex-col min-h-[500px]">
+                <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+                  <h2 className="text-xl font-black text-[#04152d]">Write-Off Logs</h2>
+                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600 shadow-[inset_0_0_0_1.5px_rgba(107,114,128,0.2)] font-mono">{filteredWriteOffs.length} Records</span>
+                </div>
+                
                 <div className="overflow-x-auto flex-grow">
-                  <table className="w-full text-left text-sm border-collapse">
+                  <table className="w-full text-left text-sm border-collapse min-w-[900px]">
                     <thead className="bg-[#f8faff] border-b border-gray-100 text-gray-500 font-black uppercase text-xs tracking-wide">
                       <tr>
                         <th className="px-6 py-5 shadow-[0_1px_0_rgba(229,231,235,1)]">Loan Ref</th>
@@ -545,7 +637,7 @@ export default function LoansDashboard() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
-                      {writeOffs.length > 0 ? writeOffs.map((wo) => (
+                      {paginatedWriteOffs.length > 0 ? paginatedWriteOffs.map((wo) => (
                         <tr key={wo.id} className="hover:bg-[#e8edf8]/60 transition-colors duration-100">
                           <td className="px-6 py-5 font-bold text-red-600 font-mono text-xs">{wo.loanReference}</td>
                           <td className="px-6 py-5 font-bold text-[#04152d]">{wo.memberName}</td>
@@ -557,7 +649,7 @@ export default function LoansDashboard() {
                               wo.status === 'APPROVED' ? 'bg-emerald-100 text-emerald-700 shadow-[inset_0_0_0_1.5px_rgba(5,150,105,0.3)]' : 'bg-red-100 text-red-700 shadow-[inset_0_0_0_1.5px_rgba(220,38,38,0.3)]'
                             }`}>{wo.status}</span>
                           </td>
-                          <td className="px-6 py-5 text-right">
+                          <td className="px-6 py-5 text-right pr-6">
                             {wo.status === 'PENDING' ? (
                               <div className="flex justify-end gap-2">
                                 <button onClick={() => triggerProcessWriteOff(wo.id, 'APPROVED')} className="inline-flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-3 rounded-lg text-xs shadow-[0_3px_0_rgba(5,70,40,0.45),0_2px_8px_rgba(16,185,129,0.3)] active:translate-y-[2px] active:shadow-[0_1px_0_rgba(5,70,40,0.45),0_1px_4px_rgba(16,185,129,0.2)] transition-all">Approve</button>
@@ -570,14 +662,35 @@ export default function LoansDashboard() {
                     </tbody>
                   </table>
                 </div>
+
+                {/* Write-Offs Pagination Footer */}
+                {totalWriteOffPages > 1 && !loading && (
+                  <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-gray-50/50 mt-auto">
+                    <button
+                      onClick={() => setWriteOffPage(p => Math.max(1, p - 1))}
+                      disabled={writeOffPage === 1}
+                      className="inline-flex items-center justify-center gap-2 bg-white border border-gray-200 text-[#04152d] hover:bg-gray-50 hover:text-blue-600 font-bold py-2.5 px-4 rounded-xl text-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
+                    >
+                      <ChevronLeft size={16} /> Previous
+                    </button>
+                    <span className="text-[11px] font-black text-gray-500 uppercase tracking-widest">
+                      Page {writeOffPage} of {totalWriteOffPages}
+                    </span>
+                    <button
+                      onClick={() => setWriteOffPage(p => Math.min(totalWriteOffPages, p + 1))}
+                      disabled={writeOffPage === totalWriteOffPages}
+                      className="inline-flex items-center justify-center gap-2 bg-white border border-gray-200 text-[#04152d] hover:bg-gray-50 hover:text-blue-600 font-bold py-2.5 px-4 rounded-xl text-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
+                    >
+                      Next <ChevronRight size={16} />
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           )}
-
-
 
         </div>
       </main>
     </div>
   );
-} 
+}

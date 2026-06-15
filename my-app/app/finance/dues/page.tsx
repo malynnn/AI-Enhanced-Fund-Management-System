@@ -1,16 +1,14 @@
 "use client";
 
-// --- REPLACE YOUR CURRENT IMPORTS WITH THIS EXACT BLOCK ---
 import { useState, useEffect, useMemo } from 'react';
 import { 
   Search, AlertTriangle, CheckCircle2, Send, Filter, UploadCloud, 
-  Terminal, RefreshCw, Calendar, CreditCard, FileText, BarChart3, Printer 
+  Terminal, RefreshCw, Calendar, CreditCard, FileText, BarChart3, Printer,
+  ChevronLeft, ChevronRight 
 } from 'lucide-react';
 import Header from '@/components/Header'; 
 import ActionModal from '@/components/ActionModal';
-// -----------------------------------------------------------
 
-// ... rest of your code remains exactly the same
 // --- INITIAL DATA (UNTOUCHED) ---
 const standardDuesAmount = 500.00;
 
@@ -19,6 +17,7 @@ export default function DuesCollectionPage() {
   const [duesRecords, setDuesRecords] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // --- BACKEND LOGIC (UNTOUCHED) ---
   const fetchDuesRecords = async () => {
     try {
       setIsLoading(true);
@@ -26,7 +25,6 @@ export default function DuesCollectionPage() {
       const res = await fetch(`${gatewayUrl}/api/finance/dues`);
       if (res.ok) {
         const data = await res.json();
-        // Convert Decimal string representation from database to numeric float
         const formatted = data.map((d: any) => ({
           ...d,
           amountPaid: Number(d.amountPaid)
@@ -52,7 +50,7 @@ export default function DuesCollectionPage() {
   const [filterMonth, setFilterMonth] = useState('ALL');
   const [filterMethod, setFilterMethod] = useState('ALL');
 
-  // --- NEW: MODAL STATE MANAGEMENT ---
+  // --- MODAL STATE MANAGEMENT ---
   const [modal, setModal] = useState<{
     isOpen: boolean;
     title: string;
@@ -62,7 +60,14 @@ export default function DuesCollectionPage() {
     resultMsg?: string;
   }>({ isOpen: false, title: '', message: '', status: 'idle' });
 
+  // --- PAGINATION STATE ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
+  // Reset to page 1 whenever filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterStatus, filterMonth, filterMethod]);
 
   // --- FILTERING LOGIC ---
   const filteredRecords = useMemo(() => {
@@ -78,6 +83,13 @@ export default function DuesCollectionPage() {
       return matchesSearch && matchesStatus && matchesMonth && matchesMethod;
     });
   }, [duesRecords, searchTerm, filterStatus, filterMonth, filterMethod]);
+
+  // --- PAGINATION LOGIC ---
+  const totalPages = Math.max(1, Math.ceil(filteredRecords.length / itemsPerPage));
+  const paginatedRecords = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredRecords.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredRecords, currentPage]);
 
   const uniqueMonths = Array.from(new Set(duesRecords.map(r => r.month)));
   const uniqueMethods = Array.from(new Set(duesRecords.map(r => r.method)));
@@ -173,12 +185,31 @@ export default function DuesCollectionPage() {
     }
   };
 
-
-
-
   return (
-    <div className="flex flex-col min-h-screen bg-transparent print:bg-white relative">
+    <div className="flex flex-col min-h-screen bg-transparent print:bg-white relative print:block print:min-h-0 print:h-auto print:w-full print:overflow-visible">
       
+      {/* Deep Print Override CSS */}
+      <style dangerouslySetInnerHTML={{__html: `
+        @media print {
+          html, body {
+            height: auto !important;
+            overflow: visible !important;
+            background-color: white !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          /* Removes Browser Default Headers/Footers */
+          @page {
+            size: portrait;
+            margin: 0 !important; 
+          }
+          /* Applies internal safe margin for the actual content */
+          body {
+            padding: 15mm !important;
+          }
+        }
+      `}} />
+
       {/* GLOBAL MODAL COMPONENT */}
       <ActionModal 
         isOpen={modal.isOpen}
@@ -193,8 +224,7 @@ export default function DuesCollectionPage() {
 
       <Header />
 
-
-      <main className="p-4 md:p-8 max-w-[1600px] w-full mx-auto space-y-8 flex-1 print:p-0 print:m-0 print:max-w-none">
+      <main className="p-4 md:p-8 max-w-[1600px] w-full mx-auto space-y-8 flex-1 print:p-0 print:m-0 print:max-w-full print:w-full print:block print:overflow-visible">
         
         {/* TOP TABS & ACTION BUTTONS */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6 flex-shrink-0 print:hidden mt-2">
@@ -226,7 +256,7 @@ export default function DuesCollectionPage() {
             {activeTab === 'ledger' && (
               <button 
                 onClick={triggerBatchPost}
-                disabled={filteredRecords.filter(r => r.status === 'Pending').length === 0}
+                disabled={filteredRecords.filter(r => r.status === 'PENDING').length === 0}
                 className="inline-flex items-center justify-center gap-2 bg-[#04152d] text-white font-bold py-2.5 px-5 rounded-xl text-sm shadow-[0_6px_0_rgba(2,6,15,0.55),0_4px_18px_rgba(4,21,45,0.35)] hover:-translate-y-[1px] active:translate-y-[4px] active:shadow-[0_2px_0_rgba(2,6,15,0.55),0_2px_8px_rgba(4,21,45,0.25)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <UploadCloud size={16} /> Batch Post to MS
@@ -246,7 +276,6 @@ export default function DuesCollectionPage() {
         {activeTab === 'ledger' && (
           <div className="flex flex-col gap-6 flex-1 print:hidden animate-fade-in">
             
-            {/* FILTER BAR - Full Width */}
             <div className="bg-white rounded-2xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 flex flex-wrap gap-4 items-center">
               
               <div className="flex-1 min-w-[250px] relative">
@@ -294,14 +323,13 @@ export default function DuesCollectionPage() {
               </div>
             </div>
 
-            {/* TOP COMPONENT: LEDGER TABLE - FULL WIDTH */}
             <div className="w-full bg-white rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 overflow-hidden flex flex-col">
-              <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+              <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-white/50">
                 <h2 className="text-xl font-black text-[#04152d]">Collection Ledger</h2>
-                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600 shadow-[inset_0_0_0_1.5px_rgba(107,114,128,0.2)]">{filteredRecords.length} Records</span>
+                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600 shadow-[inset_0_0_0_1.5px_rgba(107,114,128,0.2)]">{filteredRecords.length} Records Found</span>
               </div>
 
-              <div className="overflow-x-auto w-full max-h-[500px] overflow-y-auto">
+              <div className="overflow-x-auto w-full">
                 <table className="w-full text-left whitespace-nowrap min-w-[900px]">
                   <thead className="sticky top-0 z-10">
                     <tr>
@@ -310,11 +338,11 @@ export default function DuesCollectionPage() {
                       <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)]">Method & Ref</th>
                       <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] text-right">Amount Remitted</th>
                       <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)]">Status</th>
-                      <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] text-right">Ledger Action</th>
+                      <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] text-right pr-6">Ledger Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50">
-                    {filteredRecords.map((rec) => {
+                    {paginatedRecords.map((rec) => {
                       const isDiscrepancy = rec.amountPaid !== standardDuesAmount;
                       return (
                         <tr key={rec.id} className="hover:bg-[#e8edf8]/60 transition-colors duration-100">
@@ -350,7 +378,7 @@ export default function DuesCollectionPage() {
                               </span>
                             )}
                           </td>
-                          <td className="px-6 py-4 text-sm text-right">
+                          <td className="px-6 py-4 text-sm text-right pr-6">
                             {rec.status === 'PENDING' ? (
                               <button 
                                 onClick={() => triggerSinglePost(rec.id, rec.name)} 
@@ -359,7 +387,7 @@ export default function DuesCollectionPage() {
                                 <Send size={14} /> Post & Notify
                               </button>
                             ) : (
-                              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest pr-4">Ledger Updated</span>
+                              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest pr-2">Ledger Updated</span>
                             )}
                           </td>
                         </tr>
@@ -371,9 +399,29 @@ export default function DuesCollectionPage() {
                   </tbody>
                 </table>
               </div>
+
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-gray-50/50">
+                  <button
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="inline-flex items-center justify-center gap-2 bg-white border border-gray-200 text-[#04152d] hover:bg-gray-50 hover:text-blue-600 font-bold py-2.5 px-4 rounded-xl text-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
+                  >
+                    <ChevronLeft size={16} /> Previous
+                  </button>
+                  <span className="text-[11px] font-black text-gray-500 uppercase tracking-widest">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <button
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="inline-flex items-center justify-center gap-2 bg-white border border-gray-200 text-[#04152d] hover:bg-gray-50 hover:text-blue-600 font-bold py-2.5 px-4 rounded-xl text-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
+                  >
+                    Next <ChevronRight size={16} />
+                  </button>
+                </div>
+              )}
             </div>
-
-
 
           </div>
         )}
@@ -382,37 +430,42 @@ export default function DuesCollectionPage() {
         {/* TAB 2: SUMMARY REPORT VIEW                */}
         {/* ========================================= */}
         {activeTab === 'report' && (
-          <div className="bg-white p-10 rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 w-full max-w-5xl mx-auto print:border-none print:shadow-none print:p-0 animate-fade-in">
+          <div className="bg-white p-10 rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 w-full max-w-5xl mx-auto print:border-none print:shadow-none print:p-0 print:m-0 print:max-w-none print:w-full print:block print:overflow-visible animate-fade-in relative">
             
+            {/* EXPLICIT CUSTOM HEADER FOR PRINT ONLY */}
+            <div className="hidden print:flex w-full justify-end pb-6">
+              <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">BDOEA Financial System</span>
+            </div>
+
             {/* Report Header */}
-            <div className="text-center mb-10 border-b-2 border-[#04152d] pb-8 flex flex-col items-center">
-              <img src="/bdoea-logo-blue.png" alt="BDOEA Logo" className="h-16 object-contain mb-6" />
-              <h2 className="text-lg font-black bg-[#04152d] text-white inline-block px-10 py-3 rounded-full uppercase tracking-widest shadow-[0_4px_12px_rgba(4,21,45,0.2)] print:bg-white print:text-[#04152d] print:border-2 print:border-[#04152d] print:shadow-none">
+            <div className="text-center mb-10 border-b-2 border-[#04152d] pb-8 print:border-b print:pb-6 print:mb-6 print:block">
+              <img src="/bdoea-logo-blue.png" alt="BDOEA Logo" className="h-16 object-contain mb-6 mx-auto print:h-12 print:mb-4" />
+              <h2 className="text-lg font-black bg-[#04152d] text-white inline-block px-10 py-3 rounded-full uppercase tracking-widest shadow-[0_4px_12px_rgba(4,21,45,0.2)] print:bg-white print:text-[#04152d] print:border-2 print:border-[#04152d] print:shadow-none print:px-6 print:py-2 print:text-sm">
                 Monthly Dues Summary Report
               </h2>
-              <p className="mt-6 font-bold text-gray-500 uppercase tracking-widest text-xs">
-                Reporting Period: <span className="text-[#04152d] text-sm">{filterMonth === 'ALL' ? 'All Data Records' : filterMonth}</span>
+              <p className="mt-6 font-bold text-gray-500 uppercase tracking-widest text-xs print:mt-4 print:text-[10px]">
+                Reporting Period: <span className="text-[#04152d] text-sm print:text-xs">{filterMonth === 'ALL' ? 'All Data Records' : filterMonth}</span>
               </p>
             </div>
 
-            {/* Stat Cards */}
-            <div className="grid grid-cols-3 gap-6 mb-12">
-              <div className="border-t-4 border-[#04152d] bg-gray-50 p-6 rounded-2xl text-center">
-                <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Total Collections</p>
-                <p className="text-3xl font-black text-[#04152d] tracking-tight">₱{reportTotals.totalCollected.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+            {/* Redesigned BDOEA KPI Cards (Outlines) */}
+            <div className="grid grid-cols-3 gap-6 mb-12 print:gap-4 print:mb-8">
+              <div className="bg-white p-6 rounded-2xl shadow-md border-2 border-[#04152d] text-center print:bg-white print:border-2 print:border-[#04152d] print:p-4 print:shadow-none">
+                <p className="text-[10px] font-black text-[#04152d] uppercase tracking-widest mb-2 print:text-[8px]">Total Collections</p>
+                <p className="text-3xl font-black text-[#04152d] tracking-tight print:text-xl">₱{reportTotals.totalCollected.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
               </div>
-              <div className="border-t-4 border-[#04152d] bg-gray-50 p-6 rounded-2xl text-center">
-                <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Members Paid</p>
-                <p className="text-3xl font-black text-[#04152d] tracking-tight">{reportTotals.count}</p>
+              <div className="bg-white p-6 rounded-2xl shadow-md border-2 border-[#04152d] text-center print:bg-white print:border-2 print:border-[#04152d] print:p-4 print:shadow-none">
+                <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 print:text-[8px]">Members Paid</p>
+                <p className="text-3xl font-black text-[#04152d] tracking-tight print:text-xl">{reportTotals.count}</p>
               </div>
-              <div className={`border-t-4 p-6 rounded-2xl text-center ${reportTotals.totalDiscrepancies > 0 ? 'border-[#ef4444] bg-red-50' : 'border-[#10b981] bg-emerald-50'}`}>
-                <p className={`text-[10px] font-black uppercase tracking-widest mb-2 ${reportTotals.totalDiscrepancies > 0 ? 'text-red-700' : 'text-emerald-700'}`}>Total Discrepancies</p>
-                <p className={`text-3xl font-black tracking-tight ${reportTotals.totalDiscrepancies > 0 ? 'text-red-700' : 'text-emerald-700'}`}>{reportTotals.totalDiscrepancies}</p>
+              <div className={`p-6 rounded-2xl text-center shadow-md border-2 print:border-2 print:p-4 print:shadow-none ${reportTotals.totalDiscrepancies > 0 ? 'border-[#ef4444] bg-red-50 print:bg-red-50 print:border-[#ef4444]' : 'border-[#10b981] bg-emerald-50 print:bg-emerald-50 print:border-[#10b981]'}`}>
+                <p className={`text-[10px] font-black uppercase tracking-widest mb-2 print:text-[8px] ${reportTotals.totalDiscrepancies > 0 ? 'text-red-700' : 'text-emerald-700'}`}>Total Discrepancies</p>
+                <p className={`text-3xl font-black tracking-tight print:text-xl ${reportTotals.totalDiscrepancies > 0 ? 'text-red-700' : 'text-emerald-700'}`}>{reportTotals.totalDiscrepancies}</p>
               </div>
             </div>
 
             {/* Per-Member Breakdown Table */}
-            <table className="w-full text-left text-sm mb-16 border-collapse">
+            <table className="w-full text-left text-sm mb-16 border-collapse print:mb-8 print:text-xs">
               <thead>
                 <tr className="bg-white border-y-2 border-[#04152d]">
                   <th className="py-4 px-2 text-[10px] font-black text-[#04152d] uppercase tracking-widest">Member Name & ID</th>
@@ -427,20 +480,20 @@ export default function DuesCollectionPage() {
                   return (
                     <tr key={rec.id} className="border-b border-gray-100">
                       <td className="py-4 px-2">
-                        <span className="font-bold text-[#04152d] block text-sm">{rec.name}</span>
-                        <span className="text-xs font-mono text-gray-500 mt-1 block">{rec.memberId}</span>
+                        <span className="font-bold text-[#04152d] block text-sm print:text-xs">{rec.name}</span>
+                        <span className="text-xs font-mono text-gray-500 mt-1 block print:text-[10px]">{rec.memberId}</span>
                       </td>
-                      <td className="py-4 px-2 text-[#04152d] font-bold text-sm">
+                      <td className="py-4 px-2 text-[#04152d] font-bold text-sm print:text-xs">
                         {rec.method} <br/>
-                        <span className="font-mono font-medium text-gray-400 mt-1 block text-xs">{rec.reference_number}</span>
+                        <span className="font-mono font-medium text-gray-400 mt-1 block text-xs print:text-[10px]">{rec.reference_number}</span>
                       </td>
                       <td className="py-4 px-2 text-center">
-                        <span className={`text-[10px] font-black uppercase tracking-widest ${rec.status === 'CONFIRMED' ? 'text-gray-500' : (isDiscrepancy ? 'text-[#ef4444]' : 'text-[#04152d]')}`}>
+                        <span className={`text-[10px] font-black uppercase tracking-widest print:text-[8px] ${rec.status === 'CONFIRMED' ? 'text-gray-500' : (isDiscrepancy ? 'text-[#ef4444]' : 'text-[#04152d]')}`}>
                           {isDiscrepancy && rec.status === 'PENDING' ? 'Discrepancy' : rec.status}
                         </span>
                       </td>
                       <td className="py-4 px-2 text-right">
-                        <span className={`font-mono font-black text-lg ${isDiscrepancy ? 'text-[#ef4444]' : 'text-[#04152d]'}`}>
+                        <span className={`font-mono font-black text-lg print:text-sm ${isDiscrepancy ? 'text-[#ef4444]' : 'text-[#04152d]'}`}>
                           ₱{rec.amountPaid.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                         </span>
                       </td>
@@ -453,22 +506,21 @@ export default function DuesCollectionPage() {
               </tbody>
             </table>
 
-            {/* Signatures */}
-            <div className="grid grid-cols-2 gap-16 pt-8 max-w-3xl mx-auto print:mt-16">
-              <div>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-12">Prepared & Noted By:</p>
-                <div className="border-t-2 border-[#04152d] pt-3 text-center">
-                  <p className="font-black text-sm text-[#04152d] uppercase tracking-wider">Treasurer</p>
-                  <p className="text-xs text-gray-500 font-medium mt-1">BDOEA Finance</p>
+            {/* True Signature Block (Centered) */}
+            <div className="flex justify-center pt-8 print:pt-12 print:max-w-full print:w-full">
+              <div className="flex flex-col items-center text-center w-full max-w-[300px]">
+                <p className="text-[11px] font-black text-[#04152d] uppercase tracking-widest mb-12 print:text-[10px] print:mb-10">Prepared And Noted By</p>
+                <div className="w-full border-t-2 border-[#04152d] pt-3">
+                  <p className="font-black text-xs text-[#04152d] uppercase tracking-wide print:text-[11px]">(ROMALYN AMANTE)</p>
+                  <p className="text-[10px] text-[#04152d] font-bold uppercase mt-1 print:text-[9px]">Treasurer, BDOEA</p>
                 </div>
               </div>
-              <div>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-12">System Generated On:</p>
-                <div className="border-t-2 border-[#04152d] pt-3 text-center">
-                  <p className="font-black text-sm text-[#04152d] uppercase tracking-wider">{new Date().toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                  <p className="text-xs text-gray-500 font-medium mt-1">Finance & Dues Module</p>
-                </div>
-              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="mt-16 pt-6 border-t border-dashed border-gray-200 flex justify-between items-center text-[10px] text-gray-400 font-mono print:mt-16 print:pt-4 print:text-[8px]">
+              <span>BDOEA Financial System • Finance & Dues Module</span>
+              <span>Generated On: {new Date().toLocaleString('en-PH', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</span>
             </div>
 
           </div>

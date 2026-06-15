@@ -64,15 +64,10 @@ export default function Sidebar() {
         { label: 'Dues & Contributions', href: '/finance/dues', icon: WalletCards, roles: ['Superadmin', 'Officer/Admin', 'Treasurer', 'Auditor'] },
         { label: 'Disbursement', href: '/finance/disbursement', icon: Send, roles: ['Superadmin', 'Officer/Admin', 'Treasurer'] },
         { label: 'Loan Ledger', href: '/finance/loans', icon: CircleDollarSign, roles: ['Superadmin', 'Officer/Admin', 'Treasurer', 'Auditor'] },
-        { label: 'Fund Management', href: '/finance/funds', icon: Briefcase, roles: ['Superadmin', 'Officer/Admin', 'Treasurer', 'Auditor'] },
-        
-        // REMOVED 'Auditor' from Budget Monitoring
-        { label: 'Budget Monitoring', href: '/finance/budget', icon: Target, roles: ['Superadmin', 'Officer/Admin', 'Treasurer'] },
-        
-        { label: 'Chart of Accounts', href: '/finance/config/accounts', icon: ListTree, roles: ['Superadmin', 'Officer/Admin'] },
-        { label: 'Reports Center', href: '/finance/reports', icon: BarChart3, roles: ['Superadmin', 'Officer/Admin', 'Treasurer', 'Auditor'] },
-        { label: 'Audit Logs', href: '/finance/audit', icon: ClipboardList, roles: ['Superadmin'] },
         { label: 'Expenses & Petty Cash', href: '/finance/expenses', icon: Receipt, roles: ['Superadmin', 'Officer/Admin', 'Treasurer', 'Auditor'] },
+        { label: 'Fund Management', href: '/finance/funds', icon: Briefcase, roles: ['Superadmin', 'Officer/Admin', 'Treasurer', 'Auditor'] },
+        { label: 'Chart of Accounts', href: '/finance/config/accounts', icon: ListTree, roles: ['Superadmin', 'Officer/Admin'] },
+        { label: 'Audit Logs', href: '/finance/audit', icon: ClipboardList, roles: ['Superadmin'] },
       ]
     },
   ];
