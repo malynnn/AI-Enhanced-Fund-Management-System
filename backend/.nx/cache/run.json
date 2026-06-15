@@ -1,21 +1,9 @@
 {
   "run": {
-    "command": "nx build ledger-accounts-svc",
-    "startTime": "2026-06-14T21:35:17.802Z",
-    "endTime": "2026-06-14T21:35:26.158Z",
+    "command": "nx run-many --target=serve --all",
+    "startTime": "2026-06-15T04:36:42.520Z",
+    "endTime": "2026-06-15T04:36:42.542Z",
     "inner": false
   },
-  "tasks": [
-    {
-      "taskId": "ledger-accounts-svc:build",
-      "target": "build",
-      "projectName": "ledger-accounts-svc",
-      "hash": "6385088837741868648",
-      "startTime": "2026-06-14T21:35:17.827Z",
-      "endTime": "2026-06-14T21:35:26.135Z",
-      "params": "",
-      "cacheStatus": "cache-miss",
-      "status": 0
-    }
-  ]
+  "tasks": []
 }
