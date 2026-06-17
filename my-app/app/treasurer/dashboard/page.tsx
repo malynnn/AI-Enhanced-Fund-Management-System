@@ -3,7 +3,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useMemo, Suspense, useEffect } from 'react';
-import { Wallet, Clock, CheckCircle2, ShieldCheck, CreditCard, WalletCards, CircleDollarSign, ArrowRight, Activity, Loader2 } from 'lucide-react';
+import { Wallet, Clock, CheckCircle2, ShieldCheck, CreditCard, WalletCards, CircleDollarSign, Activity, Loader2 } from 'lucide-react';
 import { PieChart, Pie, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import Header from '@/components/Header';
 import ActionModal from '@/components/ActionModal';
@@ -15,11 +15,12 @@ function TreasurerDashboardContent() {
   const [ledger, setLedger] = useState<any[]>([]);
   const [pendingDisbursements, setPendingDisbursements] = useState<any[]>([]);
   const [selectedFund, setSelectedFund] = useState<any>(null);
+  
+  // Note: Internal variables kept as duesOverview to match backend JSON payload, but UI text is changed.
   const [duesOverview, setDuesOverview] = useState({ collectedThisMonth: 0, targetThisMonth: 0, collectionRate: 0, unpaidMembers: 0 });
   const [loansOverview, setLoansOverview] = useState({ activeLoans: 0, totalReceivables: 0, pendingApplications: 0 });
   const [isLoading, setIsLoading] = useState(true);
   
-  // --- MODAL STATE ---
   const [actionModal, setActionModal] = useState<{
     isOpen: boolean; title: string; message: string; status: 'idle' | 'loading' | 'success' | 'error'; resultMsg?: string; payload?: any;
   }>({ isOpen: false, title: '', message: '', status: 'idle' });
@@ -27,9 +28,19 @@ function TreasurerDashboardContent() {
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
+        setIsLoading(true);
         const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
         const res = await fetch(`${gatewayUrl}/api/finance/dashboard`);
-        const data = await res.json();
+        
+        // Defensive Parsing Fix to prevent crash on Proxy Error
+        const rawText = await res.text();
+        if (!res.ok) {
+          console.error("Backend Error:", rawText);
+          return; 
+        }
+
+        const data = JSON.parse(rawText);
+        
         setFunds(data.funds || []);
         setLedger(data.ledger || []);
         setPendingDisbursements(data.incomingWebhookQueue || []);
@@ -45,7 +56,6 @@ function TreasurerDashboardContent() {
     fetchDashboard();
   }, []);
 
-  // Prepare chart data with `fill` injected to fix Recharts warning
   const chartData = useMemo(() => {
     return funds.map((f, index) => ({
       ...f,
@@ -53,12 +63,11 @@ function TreasurerDashboardContent() {
     }));
   }, [funds]);
 
-  // --- MODAL HANDLERS ---
   const triggerDisbursementConfirm = (txn: any) => {
     setActionModal({
       isOpen: true,
       title: 'Authorize Disbursement',
-      message: `You are about to generate a Disbursement Voucher for ${txn.member_name} amounting to ₱${txn.amount.toLocaleString()}. This will deduct from the ${txn.fund_to_debit} fund. Proceed?`,
+      message: `You are about to generate a Disbursement Voucher for ${txn.member_name} amounting to ₱${txn.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}. This will deduct from the ${txn.fund_to_debit} fund. Proceed?`,
       status: 'idle',
       payload: txn
     });
@@ -78,7 +87,7 @@ function TreasurerDashboardContent() {
         fundId: txn.fund_id,
         date: txn.date,
         desc: `Disbursement: ${txn.member_name}`,
-        type: 'Debit',
+        type: 'CASH_OUT', // Explicitly using CASH_OUT instead of Debit
         amount: txn.amount,
         ref: `DV-${txn.disbursement_txn_id.split('-')[2]}` 
       }, ...prev]);
@@ -96,6 +105,7 @@ function TreasurerDashboardContent() {
   const activeTransactions = selectedFund ? ledger.filter(tx => tx.fundId === selectedFund.id) : [];
   const totalLiquidity = funds.reduce((acc, curr) => acc + curr.balance, 0);
 
+  // Fallback styling for dynamically generated funds
   const fundStyles: Record<string, string> = {
     'GF': 'bg-[#04152d] text-white', 
     'UF': 'bg-[#10b981] text-white', 
@@ -129,14 +139,13 @@ function TreasurerDashboardContent() {
           </div>
         ) : (
           <>
-            {/* STATIC TOP FUND CONTAINERS */}
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           {funds.map((fund) => (
-            <div key={fund.id} className={`relative isolate overflow-hidden rounded-[20px] p-5 shadow-sm ${fundStyles[fund.id]}`}>
+            <div key={fund.id} className={`relative isolate overflow-hidden rounded-[20px] p-5 shadow-sm ${fundStyles[fund.id] || 'bg-[#04152d] text-white'}`}>
               <div className="relative z-10">
-                <h3 className="text-[11px] font-bold uppercase tracking-widest opacity-90 mb-2 truncate">{fund.name}</h3>
-                <p className="text-2xl lg:text-[28px] font-black tracking-tight truncate">
-                  ₱{fund.balance.toLocaleString()}
+                <h3 className="text-[11px] font-bold uppercase tracking-widest opacity-90 mb-2 truncate text-left">{fund.name}</h3>
+                <p className="text-2xl lg:text-[28px] font-black tracking-tight truncate text-left">
+                  ₱{fund.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </p>
               </div>
               <Wallet className="absolute -bottom-4 -right-4 w-24 h-24 opacity-10 transform -rotate-12 z-0" />
@@ -148,24 +157,23 @@ function TreasurerDashboardContent() {
           
           <div className="xl:col-span-2 space-y-6">
             
-            {/* NEW: DUES & LOANS HIGH-LEVEL OVERVIEW */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               
-              {/* Dues Overview Card */}
               <div className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center gap-3">
                     <div className="bg-blue-50 p-2.5 rounded-xl text-blue-600">
                       <WalletCards size={24} strokeWidth={2.5} />
                     </div>
-                    <h2 className="text-lg font-black text-[#04152d]">Dues Collection</h2>
+                    {/* RENAMED: Dues Collection -> Collections */}
+                    <h2 className="text-lg font-black text-[#04152d] text-left">Collections</h2>
                   </div>
                 </div>
                 <div>
                   <div className="flex justify-between items-end mb-2">
                     <div>
-                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Collected this month</p>
-                      <p className="text-2xl font-black text-[#04152d]">₱{duesOverview.collectedThisMonth.toLocaleString()}</p>
+                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5 text-left">Collections this month</p>
+                      <p className="text-2xl font-black text-[#04152d] text-left">₱{duesOverview.collectedThisMonth.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
                     </div>
                     <p className="text-sm font-bold text-blue-600">{duesOverview.collectionRate}%</p>
                   </div>
@@ -173,27 +181,27 @@ function TreasurerDashboardContent() {
                     <div className="bg-blue-600 h-1.5 rounded-full" style={{ width: `${duesOverview.collectionRate}%` }}></div>
                   </div>
                   <div className="flex justify-between items-center text-xs font-medium text-gray-500">
-                    <span>Target: ₱{duesOverview.targetThisMonth.toLocaleString()}</span>
+                    <span>Target: ₱{duesOverview.targetThisMonth.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                     <span className="flex items-center gap-1 text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md"><Activity size={12}/> {duesOverview.unpaidMembers} Pending</span>
                   </div>
                 </div>
               </div>
 
-              {/* Loans Overview Card */}
               <div className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center gap-3">
                     <div className="bg-emerald-50 p-2.5 rounded-xl text-emerald-600">
                       <CircleDollarSign size={24} strokeWidth={2.5} />
                     </div>
-                    <h2 className="text-lg font-black text-[#04152d]">Loan Ledger</h2>
+                    {/* RENAMED: Loan Ledger -> Member Loan Ledgers */}
+                    <h2 className="text-lg font-black text-[#04152d] text-left">Member Loan Ledgers</h2>
                   </div>
                 </div>
                 <div>
                   <div className="flex justify-between items-end mb-2">
                     <div>
-                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Total Receivables</p>
-                      <p className="text-2xl font-black text-[#04152d]">₱{loansOverview.totalReceivables.toLocaleString()}</p>
+                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5 text-left">Total Receivables</p>
+                      <p className="text-2xl font-black text-[#04152d] text-left">₱{loansOverview.totalReceivables.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
                     </div>
                     <p className="text-sm font-bold text-emerald-600">{loansOverview.activeLoans} Active</p>
                   </div>
@@ -210,7 +218,6 @@ function TreasurerDashboardContent() {
 
             </div>
 
-            {/* PENDING LAS DISBURSEMENTS */}
             {pendingDisbursements.length > 0 && (
               <div className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100">
                 <div className="flex flex-wrap gap-4 items-center justify-between mb-6">
@@ -219,8 +226,9 @@ function TreasurerDashboardContent() {
                       <Clock size={24} strokeWidth={2.5} />
                     </div>
                     <div>
-                      <h2 className="text-xl font-black text-[#04152d]">Pending LAS Disbursements</h2>
-                      <p className="text-sm text-gray-500 font-medium">Webhook payloads requiring confirmation</p>
+                      {/* RENAMED: Pending LAS Disbursements -> Pending Disbursements */}
+                      <h2 className="text-xl font-black text-[#04152d] text-left">Pending Disbursements</h2>
+                      <p className="text-sm text-gray-500 font-medium text-left">Payloads requiring confirmation</p>
                     </div>
                   </div>
                   <div className="px-4 py-1.5 rounded-full border border-[#f59e0b] text-[#f59e0b] font-bold text-xs uppercase tracking-widest flex items-center gap-2">
@@ -234,21 +242,21 @@ function TreasurerDashboardContent() {
                       
                       <div className="flex flex-wrap gap-x-12 gap-y-4 flex-1">
                         <div className="flex flex-col max-w-[120px]">
-                          <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Member</span>
-                          <p className="text-sm font-black text-[#04152d] leading-snug">{txn.member_name.replace(', ', ',\n')}</p>
-                          <p className="text-[11px] font-bold text-[#3b82f6] mt-1">{txn.loan_ref}</p>
+                          <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 text-left">Member</span>
+                          <p className="text-sm font-black text-[#04152d] leading-snug text-left">{txn.member_name.replace(', ', ',\n')}</p>
+                          <p className="text-[11px] font-bold text-[#3b82f6] mt-1 text-left">{txn.loan_ref}</p>
                         </div>
                         <div className="flex flex-col">
-                          <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Amount</span>
-                          <p className="text-xl font-black text-[#ef4444] tracking-tighter">₱{txn.amount.toLocaleString()}</p>
+                          <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 text-left">Amount</span>
+                          <p className="text-xl font-black text-[#ef4444] tracking-tighter text-left">₱{txn.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
                         </div>
                         <div className="flex flex-col">
-                          <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Target Fund</span>
-                          <p className="text-sm font-black text-[#04152d]">{txn.fund_to_debit}</p>
+                          <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 text-left">Target Fund</span>
+                          <p className="text-sm font-black text-[#04152d] text-left">{txn.fund_to_debit}</p>
                         </div>
                         <div className="flex flex-col">
-                          <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Authorization</span>
-                          <p className="text-xs font-medium text-gray-500">{txn.authorised_by}</p>
+                          <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 text-left">Authorization</span>
+                          <p className="text-xs font-medium text-gray-500 text-left">{txn.authorised_by}</p>
                         </div>
                       </div>
 
@@ -266,7 +274,6 @@ function TreasurerDashboardContent() {
               </div>
             )}
 
-            {/* LEDGER TABLE WITH CUSTOM DROPDOWN */}
             <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 overflow-hidden flex flex-col min-h-[400px]">
               <div className="p-6 pb-4 border-b border-gray-50 flex flex-wrap gap-4 justify-between items-center bg-white">
                 <div>
@@ -289,12 +296,12 @@ function TreasurerDashboardContent() {
                       </div>
                     </div>
                   </div>
-                  <p className="text-sm text-gray-500 font-medium mt-3 ml-1">Monthly transaction history</p>
+                  <p className="text-sm text-gray-500 font-medium mt-3 ml-1 text-left">Monthly transaction history</p>
                 </div>
                 
                 <div className="flex items-center gap-4 text-xs font-bold text-gray-500">
-                  <span className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-[#10b981]"></div> Credit</span>
-                  <span className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-[#ef4444]"></div> Debit</span>
+                  <span className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-[#10b981]"></div> Collection (Cash In)</span>
+                  <span className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-[#ef4444]"></div> Disbursement (Cash Out)</span>
                 </div>
               </div>
               
@@ -302,32 +309,32 @@ function TreasurerDashboardContent() {
                 <table className="w-full text-left text-sm">
                   <thead>
                     <tr>
-                      <th className="py-3 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50">Date</th>
-                      <th className="py-3 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50">Transaction Detail</th>
-                      <th className="py-3 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50 text-right">Amount</th>
-                      <th className="py-3 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50 text-right">Reference</th>
+                      <th className="py-3 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50 text-left">Date</th>
+                      <th className="py-3 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50 text-left">Transaction Detail</th>
+                      <th className="py-3 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50 text-left">Amount</th>
+                      <th className="py-3 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50 text-left">Reference</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50">
                     {activeTransactions.length > 0 ? activeTransactions.map((tx) => (
                       <tr key={tx.id} className="hover:bg-gray-50/50 transition-colors">
-                        <td className="py-4 px-6 text-gray-500 font-medium text-sm whitespace-nowrap">{tx.date}</td>
-                        <td className="py-4 px-6 text-sm">
+                        <td className="py-4 px-6 text-gray-500 font-medium text-sm whitespace-nowrap text-left">{tx.date}</td>
+                        <td className="py-4 px-6 text-sm text-left">
                           <div className="flex items-center gap-3">
-                            <div className={`w-2 h-2 rounded-full flex-shrink-0 ${tx.type === 'Credit' ? 'bg-[#10b981]' : 'bg-[#ef4444]'}`}></div>
+                            <div className={`w-2 h-2 rounded-full flex-shrink-0 ${tx.type === 'CASH_IN' || tx.type === 'Credit' ? 'bg-[#10b981]' : 'bg-[#ef4444]'}`}></div>
                             <span className="font-medium text-[#04152d]">{tx.desc}</span>
                           </div>
                         </td>
-                        <td className="py-4 px-6 text-right font-semibold text-[#04152d] text-sm whitespace-nowrap">
-                          {tx.type === 'Debit' ? '- ' : ''}₱{tx.amount.toLocaleString()}
+                        <td className="py-4 px-6 font-semibold text-[#04152d] text-sm whitespace-nowrap text-left">
+                          {tx.type === 'CASH_OUT' || tx.type === 'Debit' ? '- ' : '+ '}₱{tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                         </td>
-                        <td className="py-4 px-6 text-right font-mono text-xs text-[#3b82f6] cursor-pointer hover:underline whitespace-nowrap">
+                        <td className="py-4 px-6 font-mono text-xs text-[#3b82f6] cursor-pointer hover:underline whitespace-nowrap text-left">
                           {tx.ref}
                         </td>
                       </tr>
                     )) : (
                       <tr>
-                        <td colSpan={4} className="py-16 text-center text-gray-400 font-medium text-sm">
+                        <td colSpan={4} className="py-16 text-center text-gray-400 font-medium text-sm text-left">
                           No transactions recorded for this fund.
                         </td>
                       </tr>
@@ -339,17 +346,16 @@ function TreasurerDashboardContent() {
 
           </div>
 
-          {/* RIGHT COLUMN: Summaries */}
           <div className="xl:col-span-1 space-y-6">
             
             <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 p-6">
               <div className="flex justify-between items-center mb-5 pb-4">
-                 <h2 className="text-xl font-black text-[#04152d]">Liquidity Summary</h2>
+                 <h2 className="text-xl font-black text-[#04152d] text-left">Liquidity Summary</h2>
               </div>
               
               <div className="mb-6">
-                <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total Active Balance</span>
-                <p className="text-4xl font-black text-[#04152d] tracking-tight">₱{totalLiquidity.toLocaleString()}</p>
+                <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 text-left">Total Active Balance</span>
+                <p className="text-4xl font-black text-[#04152d] tracking-tight text-left">₱{totalLiquidity.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
               </div>
 
               <div className="space-y-4 pt-4 border-t border-gray-50">
@@ -360,12 +366,12 @@ function TreasurerDashboardContent() {
                         <CreditCard size={14} className="text-white" />
                       </div>
                       <div>
-                        <div className="text-xs font-bold text-[#04152d]">{fund.name}</div>
-                        <div className="text-[10px] text-gray-500">Status: <span className="text-[#10b981] font-bold">Active</span></div>
+                        <div className="text-xs font-bold text-[#04152d] text-left">{fund.name}</div>
+                        <div className="text-[10px] text-gray-500 text-left">Status: <span className="text-[#10b981] font-bold">Active</span></div>
                       </div>
                     </div>
-                    <div className="text-sm font-semibold text-[#04152d]">
-                      ₱{fund.balance.toLocaleString()}
+                    <div className="text-sm font-semibold text-[#04152d] text-left">
+                      ₱{fund.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                     </div>
                   </div>
                 ))}
@@ -373,10 +379,9 @@ function TreasurerDashboardContent() {
             </div>
 
             <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 p-6">
-              <h2 className="text-xl font-black text-[#04152d] mb-2 pb-4 border-b border-gray-50">Fund Distribution</h2>
+              <h2 className="text-xl font-black text-[#04152d] mb-2 pb-4 border-b border-gray-50 text-left">Fund Distribution</h2>
               
               <div className="h-[300px] w-full mt-4">
-                {/* FIXED: Added minWidth={1} and minHeight={1} to prevent Recharts rendering crash */}
                 <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
                   <PieChart>
                     <Pie
@@ -390,7 +395,7 @@ function TreasurerDashboardContent() {
                       paddingAngle={3}
                     />
                     <Tooltip 
-                      formatter={(value: any) => `₱${Number(value).toLocaleString()}`}
+                      formatter={(value: any) => `₱${Number(value).toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
                       contentStyle={{ borderRadius: '12px', border: '1px solid #f3f4f6', boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}
                     />
                     <Legend 

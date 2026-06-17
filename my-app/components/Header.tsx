@@ -22,33 +22,22 @@ const ADMIN_TAB_TITLES: Record<string, string> = {
   users:                 'User Management',
 };
 
+// UPDATED: Mapping based on new role-based folder structure
 const PAGE_TITLES: Record<string, string> = {
-  '/dashboard':               'Dashboard',
-  '/admin/dashboard':         'Dashboard',
-  '/finance/dashboard':       'Fund Overview',
-  '/finance/dues':            'Dues Collection',
-  '/finance/disbursement':    'Disbursement Control Center',
-  '/finance/loans':           'Loan Ledger',
-  '/finance/funds':           'Fund Management',
-  '/finance/budget':          'Budget Monitoring',
-  '/finance/config/accounts': 'Chart of Accounts',
-  '/finance/reports':         'Reports Center',
-  '/finance/reconciliation':  'Bank Reconciliation',
-  '/finance/config':          'System Config',
-  '/finance/audit':           'Audit Logs',
-  '/finance/expenses':        'Expenses & Petty Cash',
+  '/member/dashboard':        'My Dashboard',
+  '/treasurer/dashboard':     'Dashboard',
+  '/treasurer/collections':   'Collections',
+  '/treasurer/disbursement':  'Disbursement',
+  '/treasurer/loans':         'Loan Ledger',
+  '/treasurer/funds':         'Funds',
+  '/auditor/dashboard':       'Audit Oversight',
   '/profile':                 'Settings',
-  '/member':                  'Member Profile',
-  '/beneficiaries':           'Beneficiaries',
-  '/benefits':                'Benefits',
   '/events':                  'Events',
-  '/loan-center':             'Loan Center',
   '/documents':               'Documents',
   '/election':                'Elections',
   '/grievance':               'Grievances',
 };
 
-// Inner component — uses useSearchParams, must be inside Suspense boundary
 function HeaderContent({ unreadCount = 0 }: Props) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -79,11 +68,9 @@ function HeaderContent({ unreadCount = 0 }: Props) {
   }, []);
 
   const userName = session?.user?.name || session?.user?.email?.split('@')[0] || 'Member';
-  const isMemberDashboard = pathname === '/';
-
-  let title = isMemberDashboard
-    ? `${greeting}, ${userName}`
-    : (PAGE_TITLES[pathname] ?? 'BDOEA');
+  
+  // Logic: Show Greeting for dashboards, otherwise show page title
+  let title = PAGE_TITLES[pathname] ?? 'BDOEA';
 
   if (pathname === '/admin') {
     const tab = searchParams.get('tab') ?? '';
@@ -108,7 +95,7 @@ function HeaderContent({ unreadCount = 0 }: Props) {
       className="sticky top-0 z-40 flex items-center justify-between pl-16 md:pl-6 pr-4 py-3 bg-white/85 backdrop-blur-md border-b border-gray-200 print:hidden"
       style={{ boxShadow: '0 1px 6px rgba(4,21,45,0.07)' }}
     >
-      <h1 className="text-base font-black text-[#04152d] tracking-tight select-none">
+      <h1 className="text-base font-black text-[#04152d] tracking-tight select-none text-left">
         {title}
       </h1>
 
@@ -153,7 +140,6 @@ function HeaderContent({ unreadCount = 0 }: Props) {
   );
 }
 
-// Exported Header: wraps HeaderContent in Suspense so useSearchParams is safe for SSR/prerender
 export default function Header(props: Props) {
   return (
     <Suspense fallback={

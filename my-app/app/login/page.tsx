@@ -35,16 +35,20 @@ function LoginForm() {
       setIsLoading(false);
     } else {
       const session = await getSession();
-      const userRole = (session?.user as any)?.role || "User";
+      // Default to "Member" if role is undefined
+      const userRole = (session?.user as any)?.role || "Member"; 
       
       setDetectedRole(userRole);
 
       setTimeout(() => {
-        // If they are a standard user, go to root dashboard. Otherwise, go to finance hub.
-        if (userRole === "User") {
-          router.push("/");
+        // EXACT ROLE-BASED ROUTING TO NEW FOLDERS
+        if (userRole === "Member" || userRole === "User") {
+          router.push("/member/dashboard");
+        } else if (userRole === "Auditor") {
+          router.push("/auditor/dashboard");
         } else {
-          router.push("/finance/dashboard");
+          // Admin, Treasurer, Officer go to the Treasurer workspace
+          router.push("/treasurer/dashboard");
         }
         router.refresh();
       }, 1500);
@@ -103,7 +107,7 @@ function LoginForm() {
                 onChange={(e) => setUsername(e.target.value)}
                 disabled={!!detectedRole}
                 className="w-full p-3 bg-white border border-gray-200 rounded text-sm focus:ring-2 focus:ring-[#021124] outline-none transition-all disabled:opacity-50"
-                placeholder="Example: member, admin, treasuerer, auditor, superadmin"
+                placeholder="Example: member, admin, treasurer, auditor, superadmin"
               />
             </div>
 
