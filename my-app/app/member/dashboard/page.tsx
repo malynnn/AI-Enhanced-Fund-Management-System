@@ -16,7 +16,7 @@ export default function MemberDashboard() {
 
   // Fallback for demonstration if session isn't fully wired yet
   const currentUser = session?.user?.name || "Ven"; 
-  const currentUserId = "BDOEA-001"; // Mock ID for lookup
+  const currentUserId = (session?.user as any)?.id || "BDOEA-001"; // Dynamically resolved from login session
 
   useEffect(() => {
     const loadPersonalData = async () => {

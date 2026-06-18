@@ -145,7 +145,7 @@ export default function DisbursementPage() {
       const postingDate = new Date(selectedVoucher.createdAt).toLocaleDateString('en-PH', {
         year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
       });
-      const amount = selectedVoucher.amount.toLocaleString(undefined, { minimumFractionDigits: 2 });
+      const amount = Number(selectedVoucher.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 });
       
       const authorizedByRaw = selectedVoucher.authorizedBy || 'PENDING';
       const cleanAuthorizedBy = authorizedByRaw.replace(/Treasurer\s+/i, '');
@@ -387,7 +387,7 @@ export default function DisbursementPage() {
               </div>
               <form onSubmit={handleAcceptConfirm} className="p-6 space-y-5">
                 <p className="text-sm font-medium text-gray-600 leading-relaxed text-left">
-                  You are authorizing a release of <span className="font-black text-[#04152d] text-base">₱{selectedForAction.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span> to <span className="font-bold text-[#04152d]">{selectedForAction.memberName}</span>. Please specify the category and fund source.
+                  You are authorizing a release of <span className="font-black text-[#04152d] text-base">₱{Number(selectedForAction.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span> to <span className="font-bold text-[#04152d]">{selectedForAction.memberName}</span>. Please specify the category and fund source.
                 </p>
                 
                 <div className="space-y-4 pt-2">
@@ -601,7 +601,7 @@ export default function DisbursementPage() {
                           </td>
                           
                           <td className="px-6 py-5 text-sm text-left font-black text-emerald-700 text-base">
-                            ₱{disb.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                            ₱{Number(disb.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                           </td>
                           
                           <td className="px-6 py-5 text-left text-sm">
@@ -714,7 +714,7 @@ export default function DisbursementPage() {
                       Disbursement release for reference: <span className="font-black text-[#04152d]">{selectedVoucher.loanReference}</span>. <br/>
                       <span className="text-xs text-gray-500 font-medium italic mt-2 block text-left">Method: {selectedVoucher.paymentMethod} ({selectedVoucher.bankAccount})</span>
                     </td>
-                    <td className="py-6 px-5 text-left font-black text-2xl text-emerald-700 align-top print:text-[#04152d]">₱{selectedVoucher.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                    <td className="py-6 px-5 text-left font-black text-2xl text-emerald-700 align-top print:text-[#04152d]">₱{Number(selectedVoucher.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                   </tr>
                 </tbody>
               </table>

@@ -16,6 +16,7 @@ export declare class DuesController {
         referenceNumber: string | null;
         fundToCredit: string;
         status: import(".prisma/client").$Enums.DuesStatus;
+        collectionType: import(".prisma/client").$Enums.CollectionType;
         createdAt: Date;
         updatedAt: Date;
     }[]>;
@@ -30,6 +31,22 @@ export declare class DuesController {
         referenceNumber: string | null;
         fundToCredit: string;
         status: import(".prisma/client").$Enums.DuesStatus;
+        collectionType: import(".prisma/client").$Enums.CollectionType;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
+    createCollection(payload: any): Promise<{
+        id: string;
+        transactionId: string;
+        memberId: string;
+        name: string;
+        month: string;
+        amountPaid: import("@prisma/client/runtime/library").Decimal;
+        method: import(".prisma/client").$Enums.PaymentMethod;
+        referenceNumber: string | null;
+        fundToCredit: string;
+        status: import(".prisma/client").$Enums.DuesStatus;
+        collectionType: import(".prisma/client").$Enums.CollectionType;
         createdAt: Date;
         updatedAt: Date;
     }>;

@@ -62,13 +62,6 @@ export class BudgetService {
     approvedAmount: number;
     fiscalYear: number;
   }) {
-    // Validate accountCode exists
-    const account = await this.prisma.chartOfAccount.findUnique({
-      where: { code: data.accountCode },
-    });
-    if (!account) {
-      throw new BadRequestException(`Account code ${data.accountCode} does not exist in ChartOfAccount`);
-    }
 
     // Check uniqueness (409 if already exists)
     const existing = await this.prisma.budgetCategory.findUnique({

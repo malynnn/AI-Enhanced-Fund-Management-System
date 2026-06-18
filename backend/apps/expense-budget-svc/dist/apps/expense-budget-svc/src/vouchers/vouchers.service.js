@@ -56,12 +56,6 @@ let VouchersService = VouchersService_1 = class VouchersService {
         if (!data.voucherNumber || !data.date || !data.payee || !data.purpose || !data.amount || !data.accountCode) {
             throw new common_1.BadRequestException('Missing required fields for voucher');
         }
-        const account = await this.prisma.chartOfAccount.findUnique({
-            where: { code: data.accountCode },
-        });
-        if (!account) {
-            throw new common_1.BadRequestException(`Account code ${data.accountCode} does not exist`);
-        }
         const existing = await this.prisma.expenseVoucher.findUnique({
             where: { voucherNumber: data.voucherNumber },
         });
@@ -86,14 +80,6 @@ let VouchersService = VouchersService_1 = class VouchersService {
         }
         if (voucher.status !== 'PENDING') {
             throw new common_1.ConflictException(`Only PENDING vouchers can be edited (current status: ${voucher.status})`);
-        }
-        if (data.accountCode && data.accountCode !== voucher.accountCode) {
-            const account = await this.prisma.chartOfAccount.findUnique({
-                where: { code: data.accountCode },
-            });
-            if (!account) {
-                throw new common_1.BadRequestException(`Account code ${data.accountCode} does not exist`);
-            }
         }
         if (data.voucherNumber && data.voucherNumber !== voucher.voucherNumber) {
             const existing = await this.prisma.expenseVoucher.findUnique({

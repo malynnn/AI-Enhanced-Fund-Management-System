@@ -51,12 +51,6 @@ export class VouchersService {
       throw new BadRequestException('Missing required fields for voucher');
     }
 
-    const account = await this.prisma.chartOfAccount.findUnique({
-      where: { code: data.accountCode },
-    });
-    if (!account) {
-      throw new BadRequestException(`Account code ${data.accountCode} does not exist`);
-    }
 
     const existing = await this.prisma.expenseVoucher.findUnique({
       where: { voucherNumber: data.voucherNumber },
@@ -88,14 +82,6 @@ export class VouchersService {
       throw new ConflictException(`Only PENDING vouchers can be edited (current status: ${voucher.status})`);
     }
 
-    if (data.accountCode && data.accountCode !== voucher.accountCode) {
-      const account = await this.prisma.chartOfAccount.findUnique({
-        where: { code: data.accountCode },
-      });
-      if (!account) {
-        throw new BadRequestException(`Account code ${data.accountCode} does not exist`);
-      }
-    }
 
     if (data.voucherNumber && data.voucherNumber !== voucher.voucherNumber) {
       const existing = await this.prisma.expenseVoucher.findUnique({

@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useMemo, Suspense, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { 
   Users, UserPlus, ShieldAlert, Search, 
   CheckCircle2, XCircle, Clock, ShieldCheck, UserCog, Activity,
@@ -42,6 +43,7 @@ function AdminDashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentTab = searchParams.get('tab') || 'users';
+  const { data: session } = useSession();
 
   // --- STATE MANAGEMENT ---
   const [users, setUsers] = useState<User[]>([]);
@@ -91,11 +93,14 @@ function AdminDashboardContent() {
   // --- FILTERING ---
   const filteredUsers = useMemo(() => {
     return users.filter(u => {
+      // Don't show the logged-in user themselves
+      if (session?.user?.email && u.email === session.user.email) return false;
+
       const matchesSearch = u.name.toLowerCase().includes(searchTerm.toLowerCase()) || u.email.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesRole = roleFilter === 'ALL' || u.role === roleFilter;
       return matchesSearch && matchesRole;
     });
-  }, [users, searchTerm, roleFilter]);
+  }, [users, searchTerm, roleFilter, session]);
 
   const activeMembersCount = users.filter(u => u.role === 'Member' && u.status === 'ACTIVE').length;
   const adminOfficersCount = users.filter(u => u.role !== 'Member' && u.status === 'ACTIVE').length;

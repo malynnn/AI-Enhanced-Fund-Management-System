@@ -10,24 +10,28 @@
         "hash": "15895297824425739243"
       },
       {
-        "file": "generate-token.js",
-        "hash": "1898505765782215749"
-      },
-      {
         "file": "nx.json",
         "hash": "4121383594453999496"
       },
       {
-        "file": "package-lock.json",
-        "hash": "12019422365034937228"
+        "file": "generate-token.js",
+        "hash": "1898505765782215749"
       },
       {
-        "file": "package.json",
-        "hash": "4153748138631961542"
+        "file": "test-funds.js",
+        "hash": "8282170862022240840"
+      },
+      {
+        "file": "test-db.js",
+        "hash": "6558472977001809391"
       },
       {
         "file": "rabbitmq.conf",
         "hash": "828595692993878749"
+      },
+      {
+        "file": "package-lock.json",
+        "hash": "11882196129125911742"
       },
       {
         "file": "rabbitmq_definitions.json",
@@ -38,16 +42,12 @@
         "hash": "11306467185678831637"
       },
       {
-        "file": "test-db.js",
-        "hash": "6558472977001809391"
-      },
-      {
-        "file": "test-funds.js",
-        "hash": "8282170862022240840"
-      },
-      {
         "file": "update_backend.js",
         "hash": "7643616574764783225"
+      },
+      {
+        "file": "package.json",
+        "hash": "4153748138631961542"
       }
     ],
     "projectFileMap": {
@@ -63,310 +63,6 @@
         {
           "file": "apps/expense-budget-svc/README.md",
           "hash": "13123434361241207768"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/app.controller.d.ts",
-          "hash": "5918110637397830421"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/app.controller.js",
-          "hash": "6150724987090056312"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/app.controller.js.map",
-          "hash": "4476731463460879712"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/app.module.d.ts",
-          "hash": "10127694934788833983"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/app.module.js",
-          "hash": "10312275791262079447"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/app.module.js.map",
-          "hash": "6428508873376257818"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/app.service.d.ts",
-          "hash": "12968058393495285153"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/app.service.js",
-          "hash": "13933834681286348768"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/app.service.js.map",
-          "hash": "9773167130242933773"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/budget/budget.controller.d.ts",
-          "hash": "3773669128321122660"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/budget/budget.controller.js",
-          "hash": "15443367644601106053"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/budget/budget.controller.js.map",
-          "hash": "5564219055484324139"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/budget/budget.module.d.ts",
-          "hash": "6786170100374678150"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/budget/budget.module.js",
-          "hash": "12086681647276720460"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/budget/budget.module.js.map",
-          "hash": "1643416595237370383"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/budget/budget.service.d.ts",
-          "hash": "9735273494281277848"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/budget/budget.service.js",
-          "hash": "15222298793946249840"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/budget/budget.service.js.map",
-          "hash": "16587422560981371711"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/main.d.ts",
-          "hash": "4595979742548113990"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/main.js",
-          "hash": "10190114946342412257"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/main.js.map",
-          "hash": "17047796646336827284"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/petty-cash/petty-cash.controller.d.ts",
-          "hash": "6030836895950787268"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/petty-cash/petty-cash.controller.js",
-          "hash": "9125974769072380257"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/petty-cash/petty-cash.controller.js.map",
-          "hash": "4166053787290529653"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/petty-cash/petty-cash.module.d.ts",
-          "hash": "3720533928984399293"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/petty-cash/petty-cash.module.js",
-          "hash": "17023013760375547068"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/petty-cash/petty-cash.module.js.map",
-          "hash": "1090219424511792842"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/petty-cash/petty-cash.service.d.ts",
-          "hash": "11911194234837656970"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/petty-cash/petty-cash.service.js",
-          "hash": "3415113290357214284"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/petty-cash/petty-cash.service.js.map",
-          "hash": "1137703171994164980"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/prisma.service.d.ts",
-          "hash": "18204600979772673744"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/prisma.service.js",
-          "hash": "16785520883452949172"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/prisma.service.js.map",
-          "hash": "18035662411482860250"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/vouchers/receipt.service.d.ts",
-          "hash": "10738854175491892871"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/vouchers/receipt.service.js",
-          "hash": "844943571160681214"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/vouchers/receipt.service.js.map",
-          "hash": "16636381102343195152"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/vouchers/vouchers.controller.d.ts",
-          "hash": "7775825649353896188"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/vouchers/vouchers.controller.js",
-          "hash": "2138517833539453720"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/vouchers/vouchers.controller.js.map",
-          "hash": "15050060539230755354"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/vouchers/vouchers.module.d.ts",
-          "hash": "9413965567405198603"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/vouchers/vouchers.module.js",
-          "hash": "12425588196129692948"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/vouchers/vouchers.module.js.map",
-          "hash": "11282556831913078183"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/vouchers/vouchers.service.d.ts",
-          "hash": "16322434296632936710"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/vouchers/vouchers.service.js",
-          "hash": "10306006269065066416"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/apps/expense-budget-svc/src/vouchers/vouchers.service.js.map",
-          "hash": "17766365060897601090"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/libs/auth/src/index.d.ts",
-          "hash": "16912785629403791483"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/libs/auth/src/index.js",
-          "hash": "12310400581186738685"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/libs/auth/src/index.js.map",
-          "hash": "12404191572287231487"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/libs/auth/src/jwt.guard.d.ts",
-          "hash": "16022491848180838832"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/libs/auth/src/jwt.guard.js",
-          "hash": "682277310302112203"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/libs/auth/src/jwt.guard.js.map",
-          "hash": "13491523961713278333"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/libs/auth/src/public.decorator.d.ts",
-          "hash": "10160153599894399641"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/libs/auth/src/public.decorator.js",
-          "hash": "14496932975947128043"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/libs/auth/src/public.decorator.js.map",
-          "hash": "6306718193181638102"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/libs/auth/src/roles.decorator.d.ts",
-          "hash": "17742190020098762909"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/libs/auth/src/roles.decorator.js",
-          "hash": "3749708892663664528"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/libs/auth/src/roles.decorator.js.map",
-          "hash": "437837395124730798"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/libs/events/src/disbursement.events.d.ts",
-          "hash": "9629715185980153219"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/libs/events/src/disbursement.events.js",
-          "hash": "4645223854606786813"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/libs/events/src/disbursement.events.js.map",
-          "hash": "17715418396905779582"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/libs/events/src/dues.events.d.ts",
-          "hash": "201248270634426393"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/libs/events/src/dues.events.js",
-          "hash": "13242716901856334842"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/libs/events/src/dues.events.js.map",
-          "hash": "3557559428017335564"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/libs/events/src/expense.events.d.ts",
-          "hash": "6923556030402949328"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/libs/events/src/expense.events.js",
-          "hash": "17998960120958454293"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/libs/events/src/expense.events.js.map",
-          "hash": "9891131609752504514"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/libs/events/src/index.d.ts",
-          "hash": "10828830527717214059"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/libs/events/src/index.js",
-          "hash": "17207711452071595751"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/libs/events/src/index.js.map",
-          "hash": "15455201736804139355"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/libs/events/src/queues.d.ts",
-          "hash": "12152371040750444265"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/libs/events/src/queues.js",
-          "hash": "11165720551351128963"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/libs/events/src/queues.js.map",
-          "hash": "6840746166128007765"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/libs/events/src/repayment.events.d.ts",
-          "hash": "13462581389356325582"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/libs/events/src/repayment.events.js",
-          "hash": "10181954078025632812"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/libs/events/src/repayment.events.js.map",
-          "hash": "2328262378178541043"
-        },
-        {
-          "file": "apps/expense-budget-svc/dist/tsconfig.build.tsbuildinfo",
-          "hash": "10296873651363941163"
         },
         {
           "file": "apps/expense-budget-svc/eslint.config.mjs",
@@ -444,7 +140,7 @@
         },
         {
           "file": "apps/expense-budget-svc/src/budget/budget.service.ts",
-          "hash": "9508645298748105985"
+          "hash": "17475217755160016831"
         },
         {
           "file": "apps/expense-budget-svc/src/main.ts",
@@ -480,7 +176,7 @@
         },
         {
           "file": "apps/expense-budget-svc/src/vouchers/vouchers.service.ts",
-          "hash": "16158629723441020549"
+          "hash": "1066840875128596739"
         },
         {
           "file": "apps/expense-budget-svc/test/app.e2e-spec.ts",
@@ -499,32 +195,38 @@
           "hash": "14016387625768405717"
         }
       ],
-      "@bdoea-fs/auth": [
+      "@backend/prisma": [
         {
-          "file": "libs/auth/package.json",
-          "hash": "3488429514912650610",
+          "file": "libs/prisma/.env",
+          "hash": "14972234033571226245"
+        },
+        {
+          "file": "libs/prisma/migrations/20260614185554_hardening_refactor/migration.sql",
+          "hash": "6393892184441622459"
+        },
+        {
+          "file": "libs/prisma/migrations/migration_lock.toml",
+          "hash": "11493296588214560035"
+        },
+        {
+          "file": "libs/prisma/package.json",
+          "hash": "5713889983202101603",
           "deps": [
-            "npm:@types/jsonwebtoken",
-            "npm:@nestjs/common@10.4.22",
-            "npm:@nestjs/core@10.4.22",
-            "npm:jsonwebtoken"
+            "npm:prisma",
+            "npm:@prisma/client"
           ]
         },
         {
-          "file": "libs/auth/src/index.ts",
-          "hash": "6301428067432535444"
+          "file": "libs/prisma/schema.prisma",
+          "hash": "10271816098992602505"
         },
         {
-          "file": "libs/auth/src/jwt.guard.ts",
-          "hash": "13635857488798282816"
+          "file": "libs/prisma/seed.js",
+          "hash": "1172806678443393787"
         },
         {
-          "file": "libs/auth/src/public.decorator.ts",
-          "hash": "10376415826596655091"
-        },
-        {
-          "file": "libs/auth/src/roles.decorator.ts",
-          "hash": "5293917905643579840"
+          "file": "libs/prisma/test-dashboard.js",
+          "hash": "5819181784683323771"
         }
       ],
       "ledger-accounts-svc": [
@@ -539,334 +241,6 @@
         {
           "file": "apps/ledger-accounts-svc/README.md",
           "hash": "13123434361241207768"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/accounts/accounts.controller.d.ts",
-          "hash": "2107877354759795164"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/accounts/accounts.controller.js",
-          "hash": "10083390827472903072"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/accounts/accounts.controller.js.map",
-          "hash": "8085256674717986507"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/accounts/accounts.module.d.ts",
-          "hash": "3859546861004237849"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/accounts/accounts.module.js",
-          "hash": "406081074769612114"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/accounts/accounts.module.js.map",
-          "hash": "6739130019086520404"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/accounts/accounts.service.d.ts",
-          "hash": "16218178357175062893"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/accounts/accounts.service.js",
-          "hash": "12221080963258845820"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/accounts/accounts.service.js.map",
-          "hash": "5996613196782935873"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/accounts/dto/create-account.dto.d.ts",
-          "hash": "8889217786812089497"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/accounts/dto/create-account.dto.js",
-          "hash": "13285434594347933312"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/accounts/dto/create-account.dto.js.map",
-          "hash": "4441853627680108139"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/accounts/dto/update-account.dto.d.ts",
-          "hash": "14319943508526868458"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/accounts/dto/update-account.dto.js",
-          "hash": "6617611303945216527"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/accounts/dto/update-account.dto.js.map",
-          "hash": "16198765839171076871"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/app.controller.d.ts",
-          "hash": "5918110637397830421"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/app.controller.js",
-          "hash": "9394139600018192182"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/app.controller.js.map",
-          "hash": "17614059396822416807"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/app.controller.spec.d.ts",
-          "hash": "4595979742548113990"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/app.controller.spec.js",
-          "hash": "13893066522936659293"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/app.controller.spec.js.map",
-          "hash": "17066989313347382196"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/app.module.d.ts",
-          "hash": "10127694934788833983"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/app.module.js",
-          "hash": "16339187500912238242"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/app.module.js.map",
-          "hash": "1310357717034327840"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/app.service.d.ts",
-          "hash": "12968058393495285153"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/app.service.js",
-          "hash": "13933834681286348768"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/app.service.js.map",
-          "hash": "9773167130242933773"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/dashboard/dashboard.controller.d.ts",
-          "hash": "1646067138471452493"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/dashboard/dashboard.controller.js",
-          "hash": "4606878157644771383"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/dashboard/dashboard.controller.js.map",
-          "hash": "15182484101172700260"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/dashboard/dashboard.module.d.ts",
-          "hash": "3091568269702048777"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/dashboard/dashboard.module.js",
-          "hash": "4915354030467311300"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/dashboard/dashboard.module.js.map",
-          "hash": "10712124823338939526"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/dashboard/dashboard.service.d.ts",
-          "hash": "12618593424346946595"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/dashboard/dashboard.service.js",
-          "hash": "10709721240230983089"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/dashboard/dashboard.service.js.map",
-          "hash": "2522056292551755921"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/funds/funds.controller.d.ts",
-          "hash": "5376790562130465914"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/funds/funds.controller.js",
-          "hash": "4369224688460733974"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/funds/funds.controller.js.map",
-          "hash": "2824761512769649187"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/funds/funds.module.d.ts",
-          "hash": "2237760632610690458"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/funds/funds.module.js",
-          "hash": "13399562203175711393"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/funds/funds.module.js.map",
-          "hash": "15939930048197207445"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/funds/funds.service.d.ts",
-          "hash": "16746841773502538103"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/funds/funds.service.js",
-          "hash": "3008134091789151856"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/funds/funds.service.js.map",
-          "hash": "15646955182036827945"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/main.d.ts",
-          "hash": "4595979742548113990"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/main.js",
-          "hash": "1356783945851576526"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/main.js.map",
-          "hash": "5249125852565047800"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/prisma.service.d.ts",
-          "hash": "6958910272408127385"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/prisma.service.js",
-          "hash": "3980906744063741837"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/apps/ledger-accounts-svc/src/prisma.service.js.map",
-          "hash": "11033183938549701872"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/libs/auth/src/index.d.ts",
-          "hash": "16912785629403791483"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/libs/auth/src/index.js",
-          "hash": "12310400581186738685"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/libs/auth/src/index.js.map",
-          "hash": "12404191572287231487"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/libs/auth/src/jwt.guard.d.ts",
-          "hash": "16022491848180838832"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/libs/auth/src/jwt.guard.js",
-          "hash": "8247084460370544789"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/libs/auth/src/jwt.guard.js.map",
-          "hash": "2626633519416980579"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/libs/auth/src/public.decorator.d.ts",
-          "hash": "10160153599894399641"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/libs/auth/src/public.decorator.js",
-          "hash": "14496932975947128043"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/libs/auth/src/public.decorator.js.map",
-          "hash": "6306718193181638102"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/libs/auth/src/roles.decorator.d.ts",
-          "hash": "17742190020098762909"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/libs/auth/src/roles.decorator.js",
-          "hash": "3749708892663664528"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/libs/auth/src/roles.decorator.js.map",
-          "hash": "437837395124730798"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/libs/events/src/disbursement.events.d.ts",
-          "hash": "9629715185980153219"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/libs/events/src/disbursement.events.js",
-          "hash": "4645223854606786813"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/libs/events/src/disbursement.events.js.map",
-          "hash": "17715418396905779582"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/libs/events/src/dues.events.d.ts",
-          "hash": "201248270634426393"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/libs/events/src/dues.events.js",
-          "hash": "13242716901856334842"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/libs/events/src/dues.events.js.map",
-          "hash": "3557559428017335564"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/libs/events/src/expense.events.d.ts",
-          "hash": "6923556030402949328"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/libs/events/src/expense.events.js",
-          "hash": "17998960120958454293"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/libs/events/src/expense.events.js.map",
-          "hash": "9891131609752504514"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/libs/events/src/index.d.ts",
-          "hash": "10828830527717214059"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/libs/events/src/index.js",
-          "hash": "17207711452071595751"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/libs/events/src/index.js.map",
-          "hash": "15455201736804139355"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/libs/events/src/queues.d.ts",
-          "hash": "12152371040750444265"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/libs/events/src/queues.js",
-          "hash": "11165720551351128963"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/libs/events/src/queues.js.map",
-          "hash": "6840746166128007765"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/libs/events/src/repayment.events.d.ts",
-          "hash": "13462581389356325582"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/libs/events/src/repayment.events.js",
-          "hash": "10181954078025632812"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/libs/events/src/repayment.events.js.map",
-          "hash": "2328262378178541043"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/dist/tsconfig.tsbuildinfo",
-          "hash": "13382423733301121895"
         },
         {
           "file": "apps/ledger-accounts-svc/eslint.config.mjs",
@@ -914,24 +288,12 @@
           ]
         },
         {
-          "file": "apps/ledger-accounts-svc/src/accounts/accounts.controller.ts",
-          "hash": "6263976682106916824"
+          "file": "apps/ledger-accounts-svc/src/admin/admin.controller.ts",
+          "hash": "1329618300289676005"
         },
         {
-          "file": "apps/ledger-accounts-svc/src/accounts/accounts.module.ts",
-          "hash": "9015399097690139053"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/src/accounts/accounts.service.ts",
-          "hash": "13542580318337817010"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/src/accounts/dto/create-account.dto.ts",
-          "hash": "17211488718728285028"
-        },
-        {
-          "file": "apps/ledger-accounts-svc/src/accounts/dto/update-account.dto.ts",
-          "hash": "6830442554377141046"
+          "file": "apps/ledger-accounts-svc/src/admin/admin.module.ts",
+          "hash": "2489100218299652194"
         },
         {
           "file": "apps/ledger-accounts-svc/src/app.controller.spec.ts",
@@ -943,7 +305,7 @@
         },
         {
           "file": "apps/ledger-accounts-svc/src/app.module.ts",
-          "hash": "6831103002911802403"
+          "hash": "17002887585684212907"
         },
         {
           "file": "apps/ledger-accounts-svc/src/app.service.ts",
@@ -998,6 +360,268 @@
           "hash": "15629315124803045982"
         }
       ],
+      "@bdoea-fs/auth": [
+        {
+          "file": "libs/auth/package.json",
+          "hash": "3488429514912650610",
+          "deps": [
+            "npm:@types/jsonwebtoken",
+            "npm:@nestjs/common@10.4.22",
+            "npm:@nestjs/core@10.4.22",
+            "npm:jsonwebtoken"
+          ]
+        },
+        {
+          "file": "libs/auth/src/index.ts",
+          "hash": "6301428067432535444"
+        },
+        {
+          "file": "libs/auth/src/jwt.guard.ts",
+          "hash": "13635857488798282816"
+        },
+        {
+          "file": "libs/auth/src/public.decorator.ts",
+          "hash": "10376415826596655091"
+        },
+        {
+          "file": "libs/auth/src/roles.decorator.ts",
+          "hash": "5293917905643579840"
+        }
+      ],
+      "fs-gateway": [
+        {
+          "file": "apps/fs-gateway/.env",
+          "hash": "13264848645380653682"
+        },
+        {
+          "file": "apps/fs-gateway/.prettierrc",
+          "hash": "14145419060237914883"
+        },
+        {
+          "file": "apps/fs-gateway/README.md",
+          "hash": "13123434361241207768"
+        },
+        {
+          "file": "apps/fs-gateway/eslint.config.mjs",
+          "hash": "17520456152920331010"
+        },
+        {
+          "file": "apps/fs-gateway/nest-cli.json",
+          "hash": "18272654682417215031"
+        },
+        {
+          "file": "apps/fs-gateway/package.json",
+          "hash": "12922602730766703078",
+          "deps": [
+            "npm:@eslint/eslintrc",
+            "npm:@eslint/js",
+            "npm:@nestjs/cli",
+            "npm:@nestjs/schematics",
+            "npm:@nestjs/testing",
+            "npm:@types/express",
+            "npm:@types/jest",
+            "npm:@types/node",
+            "npm:@types/supertest",
+            "npm:eslint",
+            "npm:eslint-config-prettier",
+            "npm:eslint-plugin-prettier",
+            "npm:globals",
+            "npm:jest",
+            "npm:prettier",
+            "npm:source-map-support",
+            "npm:supertest",
+            "npm:ts-jest",
+            "npm:ts-loader",
+            "npm:ts-node",
+            "npm:tsconfig-paths",
+            "npm:typescript",
+            "npm:typescript-eslint",
+            "npm:@nestjs/common",
+            "npm:@nestjs/core",
+            "npm:@nestjs/platform-express",
+            "npm:dotenv",
+            "npm:http-proxy-middleware",
+            "npm:reflect-metadata",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "apps/fs-gateway/src/app.controller.spec.ts",
+          "hash": "3407876829745233448"
+        },
+        {
+          "file": "apps/fs-gateway/src/app.controller.ts",
+          "hash": "1345450293891055440"
+        },
+        {
+          "file": "apps/fs-gateway/src/app.module.ts",
+          "hash": "16265499939673069483"
+        },
+        {
+          "file": "apps/fs-gateway/src/app.service.ts",
+          "hash": "15275323873054081339"
+        },
+        {
+          "file": "apps/fs-gateway/src/main.ts",
+          "hash": "13110304869613267003"
+        },
+        {
+          "file": "apps/fs-gateway/test/app.e2e-spec.ts",
+          "hash": "2340802501280067852"
+        },
+        {
+          "file": "apps/fs-gateway/test/jest-e2e.json",
+          "hash": "10645908491471703423"
+        },
+        {
+          "file": "apps/fs-gateway/tsconfig.build.json",
+          "hash": "9666801268768259513"
+        },
+        {
+          "file": "apps/fs-gateway/tsconfig.json",
+          "hash": "10839802465427973230"
+        }
+      ],
+      "@backend/events": [
+        {
+          "file": "libs/events/package.json",
+          "hash": "11085614766863040787"
+        },
+        {
+          "file": "libs/events/src/disbursement.events.ts",
+          "hash": "2111995452980701511"
+        },
+        {
+          "file": "libs/events/src/dues.events.ts",
+          "hash": "2375399455920311525"
+        },
+        {
+          "file": "libs/events/src/expense.events.ts",
+          "hash": "10705356029233274558"
+        },
+        {
+          "file": "libs/events/src/index.ts",
+          "hash": "14588380072258290940"
+        },
+        {
+          "file": "libs/events/src/queues.ts",
+          "hash": "10766963764754459864"
+        },
+        {
+          "file": "libs/events/src/repayment.events.ts",
+          "hash": "14392892817094167825"
+        }
+      ],
+      "dues-collection-svc": [
+        {
+          "file": "apps/dues-collection-svc/.env",
+          "hash": "9964621733119444632"
+        },
+        {
+          "file": "apps/dues-collection-svc/.prettierrc",
+          "hash": "14145419060237914883"
+        },
+        {
+          "file": "apps/dues-collection-svc/README.md",
+          "hash": "13123434361241207768"
+        },
+        {
+          "file": "apps/dues-collection-svc/eslint.config.mjs",
+          "hash": "17520456152920331010"
+        },
+        {
+          "file": "apps/dues-collection-svc/nest-cli.json",
+          "hash": "14715473604079880999"
+        },
+        {
+          "file": "apps/dues-collection-svc/package.json",
+          "hash": "8087592050124115692",
+          "deps": [
+            "npm:@eslint/eslintrc",
+            "npm:@eslint/js",
+            "npm:@nestjs/cli",
+            "npm:@nestjs/schematics",
+            "npm:@nestjs/testing",
+            "npm:@types/express",
+            "npm:@types/jest",
+            "npm:@types/node",
+            "npm:@types/supertest",
+            "npm:eslint",
+            "npm:eslint-config-prettier",
+            "npm:eslint-plugin-prettier",
+            "npm:globals",
+            "npm:jest",
+            "npm:nodemon",
+            "npm:prettier",
+            "npm:source-map-support",
+            "npm:supertest",
+            "npm:ts-jest",
+            "npm:ts-loader",
+            "npm:ts-node",
+            "npm:tsconfig-paths",
+            "npm:typescript",
+            "npm:typescript-eslint",
+            "npm:@nestjs/common",
+            "npm:@nestjs/core",
+            "npm:@nestjs/platform-express",
+            "npm:dotenv",
+            "npm:reflect-metadata",
+            "npm:rxjs"
+          ]
+        },
+        {
+          "file": "apps/dues-collection-svc/src/app.controller.spec.ts",
+          "hash": "3407876829745233448"
+        },
+        {
+          "file": "apps/dues-collection-svc/src/app.controller.ts",
+          "hash": "1345450293891055440"
+        },
+        {
+          "file": "apps/dues-collection-svc/src/app.module.ts",
+          "hash": "5035508583888203052"
+        },
+        {
+          "file": "apps/dues-collection-svc/src/app.service.ts",
+          "hash": "15275323873054081339"
+        },
+        {
+          "file": "apps/dues-collection-svc/src/dues/dues.controller.ts",
+          "hash": "997039060235819056"
+        },
+        {
+          "file": "apps/dues-collection-svc/src/dues/dues.module.ts",
+          "hash": "2895338508355435728"
+        },
+        {
+          "file": "apps/dues-collection-svc/src/dues/dues.service.ts",
+          "hash": "2077778337377549313"
+        },
+        {
+          "file": "apps/dues-collection-svc/src/main.ts",
+          "hash": "14139614414558878555"
+        },
+        {
+          "file": "apps/dues-collection-svc/src/prisma.service.ts",
+          "hash": "4211474778549379982"
+        },
+        {
+          "file": "apps/dues-collection-svc/test/app.e2e-spec.ts",
+          "hash": "2340802501280067852"
+        },
+        {
+          "file": "apps/dues-collection-svc/test/jest-e2e.json",
+          "hash": "10645908491471703423"
+        },
+        {
+          "file": "apps/dues-collection-svc/tsconfig.build.json",
+          "hash": "9666801268768259513"
+        },
+        {
+          "file": "apps/dues-collection-svc/tsconfig.json",
+          "hash": "2449769626339833829"
+        }
+      ],
       "disbursement-svc": [
         {
           "file": "apps/disbursement-svc/.env",
@@ -1010,310 +634,6 @@
         {
           "file": "apps/disbursement-svc/README.md",
           "hash": "13123434361241207768"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/app.controller.d.ts",
-          "hash": "5918110637397830421"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/app.controller.js",
-          "hash": "9394139600018192182"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/app.controller.js.map",
-          "hash": "17614059396822416807"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/app.module.d.ts",
-          "hash": "10127694934788833983"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/app.module.js",
-          "hash": "3593482091938528596"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/app.module.js.map",
-          "hash": "14921043758377010889"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/app.service.d.ts",
-          "hash": "12968058393495285153"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/app.service.js",
-          "hash": "13933834681286348768"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/app.service.js.map",
-          "hash": "9773167130242933773"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/disbursements/disbursements.controller.d.ts",
-          "hash": "2332556332590257982"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/disbursements/disbursements.controller.js",
-          "hash": "17763372777140897039"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/disbursements/disbursements.controller.js.map",
-          "hash": "1678161895066825864"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/disbursements/disbursements.module.d.ts",
-          "hash": "4365122949788282813"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/disbursements/disbursements.module.js",
-          "hash": "1008973546333281620"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/disbursements/disbursements.module.js.map",
-          "hash": "153616629307383142"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/disbursements/disbursements.service.d.ts",
-          "hash": "14119299249445617047"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/disbursements/disbursements.service.js",
-          "hash": "11959073284342117425"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/disbursements/disbursements.service.js.map",
-          "hash": "12072097109237460877"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/main.d.ts",
-          "hash": "4595979742548113990"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/main.js",
-          "hash": "17553556027381560912"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/main.js.map",
-          "hash": "11992109967575547536"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/prisma.service.d.ts",
-          "hash": "18204600979772673744"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/prisma.service.js",
-          "hash": "9590469560582253395"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/prisma.service.js.map",
-          "hash": "14876717456449896800"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/repayments/overpayments.controller.d.ts",
-          "hash": "8774755903133388389"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/repayments/overpayments.controller.js",
-          "hash": "6209591828837419019"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/repayments/overpayments.controller.js.map",
-          "hash": "5535529331130533108"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/repayments/repayments.controller.d.ts",
-          "hash": "2792908861905455875"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/repayments/repayments.controller.js",
-          "hash": "13010201394266384870"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/repayments/repayments.controller.js.map",
-          "hash": "11911299718082646218"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/repayments/repayments.module.d.ts",
-          "hash": "11676258428727747652"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/repayments/repayments.module.js",
-          "hash": "13523694640002390530"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/repayments/repayments.module.js.map",
-          "hash": "6215069887688403273"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/repayments/repayments.service.d.ts",
-          "hash": "2576480931640192256"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/repayments/repayments.service.js",
-          "hash": "2429115554869383870"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/repayments/repayments.service.js.map",
-          "hash": "10512525074196182524"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/write-offs/write-offs.controller.d.ts",
-          "hash": "14929782960341729398"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/write-offs/write-offs.controller.js",
-          "hash": "10232363819566761729"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/write-offs/write-offs.controller.js.map",
-          "hash": "15206838201087576695"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/write-offs/write-offs.module.d.ts",
-          "hash": "1692661145588171381"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/write-offs/write-offs.module.js",
-          "hash": "10545898561832121403"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/write-offs/write-offs.module.js.map",
-          "hash": "14751271124342492969"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/write-offs/write-offs.service.d.ts",
-          "hash": "1790493897001938119"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/write-offs/write-offs.service.js",
-          "hash": "13789635822390956798"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/apps/disbursement-svc/src/write-offs/write-offs.service.js.map",
-          "hash": "1424694844351909914"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/libs/auth/src/index.d.ts",
-          "hash": "16912785629403791483"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/libs/auth/src/index.js",
-          "hash": "12310400581186738685"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/libs/auth/src/index.js.map",
-          "hash": "12404191572287231487"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/libs/auth/src/jwt.guard.d.ts",
-          "hash": "16022491848180838832"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/libs/auth/src/jwt.guard.js",
-          "hash": "8247084460370544789"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/libs/auth/src/jwt.guard.js.map",
-          "hash": "2626633519416980579"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/libs/auth/src/public.decorator.d.ts",
-          "hash": "10160153599894399641"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/libs/auth/src/public.decorator.js",
-          "hash": "14496932975947128043"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/libs/auth/src/public.decorator.js.map",
-          "hash": "6306718193181638102"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/libs/auth/src/roles.decorator.d.ts",
-          "hash": "17742190020098762909"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/libs/auth/src/roles.decorator.js",
-          "hash": "3749708892663664528"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/libs/auth/src/roles.decorator.js.map",
-          "hash": "437837395124730798"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/libs/events/src/disbursement.events.d.ts",
-          "hash": "9629715185980153219"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/libs/events/src/disbursement.events.js",
-          "hash": "4645223854606786813"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/libs/events/src/disbursement.events.js.map",
-          "hash": "17715418396905779582"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/libs/events/src/dues.events.d.ts",
-          "hash": "201248270634426393"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/libs/events/src/dues.events.js",
-          "hash": "13242716901856334842"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/libs/events/src/dues.events.js.map",
-          "hash": "3557559428017335564"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/libs/events/src/expense.events.d.ts",
-          "hash": "6923556030402949328"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/libs/events/src/expense.events.js",
-          "hash": "17998960120958454293"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/libs/events/src/expense.events.js.map",
-          "hash": "9891131609752504514"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/libs/events/src/index.d.ts",
-          "hash": "10828830527717214059"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/libs/events/src/index.js",
-          "hash": "17207711452071595751"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/libs/events/src/index.js.map",
-          "hash": "15455201736804139355"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/libs/events/src/queues.d.ts",
-          "hash": "12152371040750444265"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/libs/events/src/queues.js",
-          "hash": "11165720551351128963"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/libs/events/src/queues.js.map",
-          "hash": "6840746166128007765"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/libs/events/src/repayment.events.d.ts",
-          "hash": "13462581389356325582"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/libs/events/src/repayment.events.js",
-          "hash": "10181954078025632812"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/libs/events/src/repayment.events.js.map",
-          "hash": "2328262378178541043"
-        },
-        {
-          "file": "apps/disbursement-svc/dist/tsconfig.build.tsbuildinfo",
-          "hash": "1689211236189839973"
         },
         {
           "file": "apps/disbursement-svc/eslint.config.mjs",
@@ -1441,558 +761,6 @@
         {
           "file": "apps/disbursement-svc/tsconfig.json",
           "hash": "14063722628189914786"
-        }
-      ],
-      "@backend/events": [
-        {
-          "file": "libs/events/package.json",
-          "hash": "11085614766863040787"
-        },
-        {
-          "file": "libs/events/src/disbursement.events.ts",
-          "hash": "2111995452980701511"
-        },
-        {
-          "file": "libs/events/src/dues.events.ts",
-          "hash": "2375399455920311525"
-        },
-        {
-          "file": "libs/events/src/expense.events.ts",
-          "hash": "10705356029233274558"
-        },
-        {
-          "file": "libs/events/src/index.ts",
-          "hash": "14588380072258290940"
-        },
-        {
-          "file": "libs/events/src/queues.ts",
-          "hash": "10766963764754459864"
-        },
-        {
-          "file": "libs/events/src/repayment.events.ts",
-          "hash": "14392892817094167825"
-        }
-      ],
-      "@backend/prisma": [
-        {
-          "file": "libs/prisma/.env",
-          "hash": "14972234033571226245"
-        },
-        {
-          "file": "libs/prisma/migrations/20260614185554_hardening_refactor/migration.sql",
-          "hash": "6393892184441622459"
-        },
-        {
-          "file": "libs/prisma/migrations/migration_lock.toml",
-          "hash": "11493296588214560035"
-        },
-        {
-          "file": "libs/prisma/package.json",
-          "hash": "7687406493105972694",
-          "deps": [
-            "npm:prisma",
-            "npm:@prisma/client"
-          ]
-        },
-        {
-          "file": "libs/prisma/schema.prisma",
-          "hash": "9328344429324187524"
-        },
-        {
-          "file": "libs/prisma/seed.js",
-          "hash": "6083994112360937950"
-        },
-        {
-          "file": "libs/prisma/test-dashboard.js",
-          "hash": "5819181784683323771"
-        }
-      ],
-      "dues-collection-svc": [
-        {
-          "file": "apps/dues-collection-svc/.env",
-          "hash": "9964621733119444632"
-        },
-        {
-          "file": "apps/dues-collection-svc/.prettierrc",
-          "hash": "14145419060237914883"
-        },
-        {
-          "file": "apps/dues-collection-svc/README.md",
-          "hash": "13123434361241207768"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/apps/dues-collection-svc/src/app.controller.d.ts",
-          "hash": "5918110637397830421"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/apps/dues-collection-svc/src/app.controller.js",
-          "hash": "9394139600018192182"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/apps/dues-collection-svc/src/app.controller.js.map",
-          "hash": "17614059396822416807"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/apps/dues-collection-svc/src/app.controller.spec.d.ts",
-          "hash": "4595979742548113990"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/apps/dues-collection-svc/src/app.controller.spec.js",
-          "hash": "13893066522936659293"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/apps/dues-collection-svc/src/app.controller.spec.js.map",
-          "hash": "17066989313347382196"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/apps/dues-collection-svc/src/app.module.d.ts",
-          "hash": "10127694934788833983"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/apps/dues-collection-svc/src/app.module.js",
-          "hash": "17795060825772786308"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/apps/dues-collection-svc/src/app.module.js.map",
-          "hash": "5211091937398864318"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/apps/dues-collection-svc/src/app.service.d.ts",
-          "hash": "12968058393495285153"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/apps/dues-collection-svc/src/app.service.js",
-          "hash": "13933834681286348768"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/apps/dues-collection-svc/src/app.service.js.map",
-          "hash": "9773167130242933773"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/apps/dues-collection-svc/src/dues/dues.controller.d.ts",
-          "hash": "13516791905429666886"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/apps/dues-collection-svc/src/dues/dues.controller.js",
-          "hash": "4332546718250659921"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/apps/dues-collection-svc/src/dues/dues.controller.js.map",
-          "hash": "18133436649525050415"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/apps/dues-collection-svc/src/dues/dues.module.d.ts",
-          "hash": "17048131064231938474"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/apps/dues-collection-svc/src/dues/dues.module.js",
-          "hash": "6597210750129833233"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/apps/dues-collection-svc/src/dues/dues.module.js.map",
-          "hash": "7055762824384214535"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/apps/dues-collection-svc/src/dues/dues.service.d.ts",
-          "hash": "6550957557444440120"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/apps/dues-collection-svc/src/dues/dues.service.js",
-          "hash": "15275526436466398371"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/apps/dues-collection-svc/src/dues/dues.service.js.map",
-          "hash": "12059891939982919342"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/apps/dues-collection-svc/src/main.d.ts",
-          "hash": "4595979742548113990"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/apps/dues-collection-svc/src/main.js",
-          "hash": "14063422157029782907"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/apps/dues-collection-svc/src/main.js.map",
-          "hash": "2976428712335120673"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/apps/dues-collection-svc/src/prisma.service.d.ts",
-          "hash": "6958910272408127385"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/apps/dues-collection-svc/src/prisma.service.js",
-          "hash": "17872401258364638260"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/apps/dues-collection-svc/src/prisma.service.js.map",
-          "hash": "11033183938549701872"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/libs/auth/src/index.d.ts",
-          "hash": "16912785629403791483"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/libs/auth/src/index.js",
-          "hash": "12310400581186738685"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/libs/auth/src/index.js.map",
-          "hash": "12404191572287231487"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/libs/auth/src/jwt.guard.d.ts",
-          "hash": "16022491848180838832"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/libs/auth/src/jwt.guard.js",
-          "hash": "8247084460370544789"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/libs/auth/src/jwt.guard.js.map",
-          "hash": "2626633519416980579"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/libs/auth/src/public.decorator.d.ts",
-          "hash": "10160153599894399641"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/libs/auth/src/public.decorator.js",
-          "hash": "14496932975947128043"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/libs/auth/src/public.decorator.js.map",
-          "hash": "6306718193181638102"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/libs/auth/src/roles.decorator.d.ts",
-          "hash": "17742190020098762909"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/libs/auth/src/roles.decorator.js",
-          "hash": "3749708892663664528"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/libs/auth/src/roles.decorator.js.map",
-          "hash": "437837395124730798"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/libs/events/src/disbursement.events.d.ts",
-          "hash": "9629715185980153219"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/libs/events/src/disbursement.events.js",
-          "hash": "4645223854606786813"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/libs/events/src/disbursement.events.js.map",
-          "hash": "17715418396905779582"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/libs/events/src/dues.events.d.ts",
-          "hash": "201248270634426393"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/libs/events/src/dues.events.js",
-          "hash": "13242716901856334842"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/libs/events/src/dues.events.js.map",
-          "hash": "3557559428017335564"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/libs/events/src/expense.events.d.ts",
-          "hash": "6923556030402949328"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/libs/events/src/expense.events.js",
-          "hash": "17998960120958454293"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/libs/events/src/expense.events.js.map",
-          "hash": "9891131609752504514"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/libs/events/src/index.d.ts",
-          "hash": "10828830527717214059"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/libs/events/src/index.js",
-          "hash": "17207711452071595751"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/libs/events/src/index.js.map",
-          "hash": "15455201736804139355"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/libs/events/src/queues.d.ts",
-          "hash": "12152371040750444265"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/libs/events/src/queues.js",
-          "hash": "11165720551351128963"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/libs/events/src/queues.js.map",
-          "hash": "6840746166128007765"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/libs/events/src/repayment.events.d.ts",
-          "hash": "13462581389356325582"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/libs/events/src/repayment.events.js",
-          "hash": "10181954078025632812"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/libs/events/src/repayment.events.js.map",
-          "hash": "2328262378178541043"
-        },
-        {
-          "file": "apps/dues-collection-svc/dist/tsconfig.tsbuildinfo",
-          "hash": "14061079651203126717"
-        },
-        {
-          "file": "apps/dues-collection-svc/eslint.config.mjs",
-          "hash": "17520456152920331010"
-        },
-        {
-          "file": "apps/dues-collection-svc/nest-cli.json",
-          "hash": "14715473604079880999"
-        },
-        {
-          "file": "apps/dues-collection-svc/package.json",
-          "hash": "8087592050124115692",
-          "deps": [
-            "npm:@eslint/eslintrc",
-            "npm:@eslint/js",
-            "npm:@nestjs/cli",
-            "npm:@nestjs/schematics",
-            "npm:@nestjs/testing",
-            "npm:@types/express",
-            "npm:@types/jest",
-            "npm:@types/node",
-            "npm:@types/supertest",
-            "npm:eslint",
-            "npm:eslint-config-prettier",
-            "npm:eslint-plugin-prettier",
-            "npm:globals",
-            "npm:jest",
-            "npm:nodemon",
-            "npm:prettier",
-            "npm:source-map-support",
-            "npm:supertest",
-            "npm:ts-jest",
-            "npm:ts-loader",
-            "npm:ts-node",
-            "npm:tsconfig-paths",
-            "npm:typescript",
-            "npm:typescript-eslint",
-            "npm:@nestjs/common",
-            "npm:@nestjs/core",
-            "npm:@nestjs/platform-express",
-            "npm:dotenv",
-            "npm:reflect-metadata",
-            "npm:rxjs"
-          ]
-        },
-        {
-          "file": "apps/dues-collection-svc/src/app.controller.spec.ts",
-          "hash": "3407876829745233448"
-        },
-        {
-          "file": "apps/dues-collection-svc/src/app.controller.ts",
-          "hash": "1345450293891055440"
-        },
-        {
-          "file": "apps/dues-collection-svc/src/app.module.ts",
-          "hash": "5035508583888203052"
-        },
-        {
-          "file": "apps/dues-collection-svc/src/app.service.ts",
-          "hash": "15275323873054081339"
-        },
-        {
-          "file": "apps/dues-collection-svc/src/dues/dues.controller.ts",
-          "hash": "9751036468682406717"
-        },
-        {
-          "file": "apps/dues-collection-svc/src/dues/dues.module.ts",
-          "hash": "2895338508355435728"
-        },
-        {
-          "file": "apps/dues-collection-svc/src/dues/dues.service.ts",
-          "hash": "3416887532218096161"
-        },
-        {
-          "file": "apps/dues-collection-svc/src/main.ts",
-          "hash": "14139614414558878555"
-        },
-        {
-          "file": "apps/dues-collection-svc/src/prisma.service.ts",
-          "hash": "4211474778549379982"
-        },
-        {
-          "file": "apps/dues-collection-svc/test/app.e2e-spec.ts",
-          "hash": "2340802501280067852"
-        },
-        {
-          "file": "apps/dues-collection-svc/test/jest-e2e.json",
-          "hash": "10645908491471703423"
-        },
-        {
-          "file": "apps/dues-collection-svc/tsconfig.build.json",
-          "hash": "9666801268768259513"
-        },
-        {
-          "file": "apps/dues-collection-svc/tsconfig.json",
-          "hash": "14063722628189914786"
-        }
-      ],
-      "fs-gateway": [
-        {
-          "file": "apps/fs-gateway/.env",
-          "hash": "13264848645380653682"
-        },
-        {
-          "file": "apps/fs-gateway/.prettierrc",
-          "hash": "14145419060237914883"
-        },
-        {
-          "file": "apps/fs-gateway/README.md",
-          "hash": "13123434361241207768"
-        },
-        {
-          "file": "apps/fs-gateway/dist/app.controller.d.ts",
-          "hash": "5918110637397830421"
-        },
-        {
-          "file": "apps/fs-gateway/dist/app.controller.js",
-          "hash": "6150724987090056312"
-        },
-        {
-          "file": "apps/fs-gateway/dist/app.controller.js.map",
-          "hash": "15997165805934693210"
-        },
-        {
-          "file": "apps/fs-gateway/dist/app.module.d.ts",
-          "hash": "14737983969344176542"
-        },
-        {
-          "file": "apps/fs-gateway/dist/app.module.js",
-          "hash": "7757488830564908403"
-        },
-        {
-          "file": "apps/fs-gateway/dist/app.module.js.map",
-          "hash": "15151062391788403677"
-        },
-        {
-          "file": "apps/fs-gateway/dist/app.service.d.ts",
-          "hash": "12968058393495285153"
-        },
-        {
-          "file": "apps/fs-gateway/dist/app.service.js",
-          "hash": "13933834681286348768"
-        },
-        {
-          "file": "apps/fs-gateway/dist/app.service.js.map",
-          "hash": "12742316532180350432"
-        },
-        {
-          "file": "apps/fs-gateway/dist/main.d.ts",
-          "hash": "4595979742548113990"
-        },
-        {
-          "file": "apps/fs-gateway/dist/main.js",
-          "hash": "13610404865049741741"
-        },
-        {
-          "file": "apps/fs-gateway/dist/main.js.map",
-          "hash": "12628808024758109018"
-        },
-        {
-          "file": "apps/fs-gateway/dist/tsconfig.build.tsbuildinfo",
-          "hash": "13903647686498865580"
-        },
-        {
-          "file": "apps/fs-gateway/eslint.config.mjs",
-          "hash": "17520456152920331010"
-        },
-        {
-          "file": "apps/fs-gateway/nest-cli.json",
-          "hash": "18272654682417215031"
-        },
-        {
-          "file": "apps/fs-gateway/package.json",
-          "hash": "12922602730766703078",
-          "deps": [
-            "npm:@eslint/eslintrc",
-            "npm:@eslint/js",
-            "npm:@nestjs/cli",
-            "npm:@nestjs/schematics",
-            "npm:@nestjs/testing",
-            "npm:@types/express",
-            "npm:@types/jest",
-            "npm:@types/node",
-            "npm:@types/supertest",
-            "npm:eslint",
-            "npm:eslint-config-prettier",
-            "npm:eslint-plugin-prettier",
-            "npm:globals",
-            "npm:jest",
-            "npm:prettier",
-            "npm:source-map-support",
-            "npm:supertest",
-            "npm:ts-jest",
-            "npm:ts-loader",
-            "npm:ts-node",
-            "npm:tsconfig-paths",
-            "npm:typescript",
-            "npm:typescript-eslint",
-            "npm:@nestjs/common",
-            "npm:@nestjs/core",
-            "npm:@nestjs/platform-express",
-            "npm:dotenv",
-            "npm:http-proxy-middleware",
-            "npm:reflect-metadata",
-            "npm:rxjs"
-          ]
-        },
-        {
-          "file": "apps/fs-gateway/src/app.controller.spec.ts",
-          "hash": "3407876829745233448"
-        },
-        {
-          "file": "apps/fs-gateway/src/app.controller.ts",
-          "hash": "1345450293891055440"
-        },
-        {
-          "file": "apps/fs-gateway/src/app.module.ts",
-          "hash": "18130364516335128400"
-        },
-        {
-          "file": "apps/fs-gateway/src/app.service.ts",
-          "hash": "15275323873054081339"
-        },
-        {
-          "file": "apps/fs-gateway/src/main.ts",
-          "hash": "5269815838016762219"
-        },
-        {
-          "file": "apps/fs-gateway/test/app.e2e-spec.ts",
-          "hash": "2340802501280067852"
-        },
-        {
-          "file": "apps/fs-gateway/test/jest-e2e.json",
-          "hash": "10645908491471703423"
-        },
-        {
-          "file": "apps/fs-gateway/tsconfig.build.json",
-          "hash": "9666801268768259513"
-        },
-        {
-          "file": "apps/fs-gateway/tsconfig.json",
-          "hash": "10839802465427973230"
         }
       ]
     }

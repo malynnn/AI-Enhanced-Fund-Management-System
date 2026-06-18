@@ -69,6 +69,13 @@ enum DuesStatus {
   CONFIRMED
 }
 
+enum CollectionType {
+  DUES
+  LOAN_PAYMENT
+  CONTRIBUTION
+}
+
+
 enum AccountType {
   Asset
   Liability
@@ -241,29 +248,14 @@ model DuesRecord {
   method          PaymentMethod
   referenceNumber String?       @map("reference_number")
   fundToCredit    String        @map("fund_to_credit")
-  status          DuesStatus    @default(PENDING)
-  createdAt       DateTime      @default(now()) @map("created_at")
-  updatedAt       DateTime      @updatedAt @map("updated_at")
+  status          DuesStatus     @default(PENDING)
+  collectionType  CollectionType @default(DUES)
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
 
   @@map("dues_records")
 }
 
-model ChartOfAccount {
-  id        String        @id @default(uuid())
-  code      String        @unique
-  name      String
-  type      AccountType
-  fund      String
-  status    AccountStatus @default(Active)
-  createdAt DateTime      @default(now()) @map("created_at")
-  updatedAt DateTime      @updatedAt @map("updated_at")
-
-  // Strict relations to dependent modules
-  vouchers         ExpenseVoucher[]
-  budgetCategories BudgetCategory[]
-
-  @@map("chart_of_accounts")
-}
 
 model ExpenseVoucher {
   id            String        @id @default(uuid())
@@ -280,9 +272,6 @@ model ExpenseVoucher {
   notes         String?
   createdAt     DateTime      @default(now()) @map("created_at")
   updatedAt     DateTime      @updatedAt @map("updated_at")
-
-  // Strict Referential Integrity against Chart of Accounts
-  account ChartOfAccount @relation(fields: [accountCode], references: [code], onDelete: Restrict)
 
   pettyCashTransactions PettyCashTransaction[]
 
@@ -314,9 +303,6 @@ model BudgetCategory {
   fiscalYear     Int      @map("fiscal_year")
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
-
-  // Enforced relationship to COA
-  account ChartOfAccount @relation(fields: [accountCode], references: [code], onDelete: Restrict)
 
   @@unique([accountCode, fiscalYear])
   @@map("budget_categories")

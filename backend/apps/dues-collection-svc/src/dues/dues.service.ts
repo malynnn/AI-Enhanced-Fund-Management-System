@@ -1,9 +1,9 @@
-import { Injectable, Logger, NotFoundException, ConflictException, Inject } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, ConflictException, Inject, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { DuesPayrollConfirmedEvent } from '@backend/events';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
-import { DuesStatus, PaymentMethod } from '@prisma/client';
+import { DuesStatus, PaymentMethod, CollectionType } from '@prisma/client';
 
 @Injectable()
 export class DuesService {
@@ -93,5 +93,105 @@ export class DuesService {
     }
 
     return updated;
+  }
+
+  async createCollection(payload: any) {
+    const {
+      memberId,
+      memberName,
+      collectionType,
+      amount,
+      method,
+      referenceNumber,
+      reference_number,
+      depositFund,
+    } = payload;
+
+    if (!memberId || !memberName || !collectionType || amount === undefined || !method) {
+      throw new BadRequestException('Missing required fields: memberId, memberName, collectionType, amount, method');
+    }
+
+    const numericAmount = Number(amount);
+    if (isNaN(numericAmount) || numericAmount <= 0) {
+      throw new BadRequestException('Amount must be a positive number');
+    }
+
+    // Validate enum types
+    if (!['DUES', 'LOAN_PAYMENT', 'CONTRIBUTION'].includes(collectionType)) {
+      throw new BadRequestException(`Invalid collectionType: ${collectionType}`);
+    }
+
+    const fundCodeMap: Record<string, string> = {
+      GENERAL_FUND: 'GF',
+      UNION_FUND: 'UF',
+      LOAN_FUND: 'LN',
+      FOREIGN_FUND: 'FA',
+      DEATH_ASSISTANCE_FUND: 'DA',
+      EMERGENCY_FUND: 'GF',
+    };
+
+    const targetFundCode = fundCodeMap[depositFund] || 'GF';
+
+    // Verify fund exists
+    const fund = await this.prisma.fund.findUnique({
+      where: { code: targetFundCode },
+    });
+    if (!fund) {
+      throw new BadRequestException(`Target fund with code ${targetFundCode} does not exist`);
+    }
+
+    const refNo = referenceNumber || reference_number || null;
+    const txId = `TXN-COL-${Math.floor(100000 + Math.random() * 900000)}`;
+    const now = new Date();
+    const currentMonth = `${now.toLocaleString('default', { month: 'short' })} ${now.getFullYear()}`;
+
+    return this.prisma.$transaction(async (tx) => {
+      if (collectionType === 'LOAN_PAYMENT') {
+        // Find latest completed disbursement request (active loan) for this member
+        const activeLoan = await tx.disbursementRequest.findFirst({
+          where: {
+            memberId: memberId,
+            status: 'COMPLETED',
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+        });
+
+        if (!activeLoan) {
+          throw new BadRequestException(`No active completed loan found for member ${memberId}`);
+        }
+
+        // Subtract the amount from outstanding balance (amount field)
+        const currentLoanBalance = Number(activeLoan.amount);
+        const newLoanBalance = Math.max(0, currentLoanBalance - numericAmount);
+
+        await tx.disbursementRequest.update({
+          where: { id: activeLoan.id },
+          data: { amount: newLoanBalance },
+        });
+
+        this.logger.log(`Subtracted ${numericAmount} from outstanding loan balance of member ${memberId} (ref: ${activeLoan.loanReference}). New balance: ${newLoanBalance}`);
+      }
+
+      // Create DuesRecord
+      const record = await tx.duesRecord.create({
+        data: {
+          transactionId: txId,
+          memberId: memberId,
+          name: memberName,
+          month: currentMonth,
+          amountPaid: numericAmount,
+          method: method as PaymentMethod,
+          referenceNumber: refNo,
+          fundToCredit: targetFundCode,
+          status: 'PENDING',
+          collectionType: collectionType as CollectionType,
+        },
+      });
+
+      this.logger.log(`Created collection record ${record.id} with type ${collectionType}`);
+      return record;
+    });
   }
 }

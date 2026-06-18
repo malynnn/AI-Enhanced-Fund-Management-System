@@ -24,6 +24,12 @@ export class DuesController {
     return this.duesService.confirmDues(id);
   }
 
+  @Post()
+  @Public()
+  createCollection(@Body() payload: any) {
+    return this.duesService.createCollection(payload);
+  }
+
   @MessagePattern(QUEUE_DUES)
   @MessagePattern('ms.dues.payroll_confirmed')
   async handleDuesEvent(@Payload() data: DuesPayrollConfirmedEvent, @Ctx() context: RmqContext) {

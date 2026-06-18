@@ -17,18 +17,6 @@ export class AppModule implements NestModule {
     this.logger.log(`Proxy config: disbursementSvcUrl=${disbursementSvcUrl}`);
     this.logger.log(`Proxy config: expenseSvcUrl=${expenseSvcUrl}`);
 
-    // ledger-accounts-svc (Accounts)
-    consumer
-      .apply(
-        createProxyMiddleware({
-          target: ledgerSvcUrl,
-          changeOrigin: true,
-          pathRewrite: { '^/': '/accounts/' },
-          on: { proxyReq: fixRequestBody },
-        }),
-      )
-      .forRoutes('/api/finance/accounts', '/api/finance/accounts/*path');
-
     // ledger-accounts-svc (Funds)
     consumer
       .apply(
@@ -53,7 +41,7 @@ export class AppModule implements NestModule {
       )
       .forRoutes('/api/finance/dashboard');
 
-    // dues-collection-svc
+    // dues-collection-svc (Dues and Collections)
     consumer
       .apply(
         createProxyMiddleware({
@@ -63,7 +51,12 @@ export class AppModule implements NestModule {
           on: { proxyReq: fixRequestBody },
         }),
       )
-      .forRoutes('/api/finance/dues', '/api/finance/dues/*path');
+      .forRoutes(
+        '/api/finance/dues',
+        '/api/finance/dues/*path',
+        '/api/finance/collections',
+        '/api/finance/collections/*path',
+      );
 
     // disbursement-svc (Disbursements)
     consumer
@@ -136,6 +129,18 @@ export class AppModule implements NestModule {
         }),
       )
       .forRoutes('/api/finance/petty-cash', '/api/finance/petty-cash/*path');
+
+    // ledger-accounts-svc (Admin / User Management) -> maps to /admin/
+    consumer
+      .apply(
+        createProxyMiddleware({
+          target: ledgerSvcUrl,
+          changeOrigin: true,
+          pathRewrite: { '^/': '/admin/' },
+          on: { proxyReq: fixRequestBody },
+        }),
+      )
+      .forRoutes('/api/admin', '/api/admin/*path');
   }
 }
 

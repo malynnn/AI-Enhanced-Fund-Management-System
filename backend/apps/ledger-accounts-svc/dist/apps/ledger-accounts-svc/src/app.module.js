@@ -13,9 +13,9 @@ const microservices_1 = require("@nestjs/microservices");
 const events_1 = require("@backend/events");
 const auth_1 = require("@bdoea-fs/auth");
 const prisma_service_1 = require("./prisma.service");
-const accounts_module_1 = require("./accounts/accounts.module");
 const funds_module_1 = require("./funds/funds.module");
 const dashboard_module_1 = require("./dashboard/dashboard.module");
+const admin_module_1 = require("./admin/admin.module");
 const rabbitMqClients = microservices_1.ClientsModule.register([
     { name: 'DUES_CLIENT', transport: microservices_1.Transport.RMQ, options: { urls: [process.env.RABBITMQ_URL || 'amqp://guest:guest@localhost:5672'], queue: events_1.QUEUE_DUES, queueOptions: { durable: true, arguments: { 'x-dead-letter-exchange': '', 'x-dead-letter-routing-key': `dlq.${events_1.QUEUE_DUES}` } } } },
     { name: 'DISBURSEMENTS_CLIENT', transport: microservices_1.Transport.RMQ, options: { urls: [process.env.RABBITMQ_URL || 'amqp://guest:guest@localhost:5672'], queue: events_1.QUEUE_DISBURSEMENTS, queueOptions: { durable: true, arguments: { 'x-dead-letter-exchange': '', 'x-dead-letter-routing-key': `dlq.${events_1.QUEUE_DISBURSEMENTS}` } } } },
@@ -28,7 +28,7 @@ let AppModule = class AppModule {
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [rabbitMqClients, accounts_module_1.AccountsModule, funds_module_1.FundsModule, dashboard_module_1.DashboardModule],
+        imports: [rabbitMqClients, funds_module_1.FundsModule, dashboard_module_1.DashboardModule, admin_module_1.AdminModule],
         providers: [
             prisma_service_1.PrismaService,
             {

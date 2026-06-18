@@ -17,10 +17,48 @@ async function main() {
   await prisma.pettyCashTransaction.deleteMany();
   await prisma.expenseVoucher.deleteMany();
   await prisma.budgetCategory.deleteMany();
-  await prisma.chartOfAccount.deleteMany();
   await prisma.fund.deleteMany();
+  await prisma.user.deleteMany();
 
   console.log('Seeding Database...');
+
+  // 0. Users (System accounts & Mock Members)
+  const mockMembers = [
+    { id: "M-2023-112", name: "DELA CRUZ, JUAN" },
+    { id: "M-2026-999", name: "VINLUAN, VEN" },
+    { id: "M-2020-028", name: "CRUZ, PATRICIA M." },
+    { id: "M-2021-055", name: "BAUTISTA, HENRY N." },
+    { id: "M-2022-041", name: "FLORES, ANA GRACE" },
+    { id: "M-2023-088", name: "CASTILLO, JORGE R." },
+    { id: "M-2024-012", name: "AQUINO, CECILIA V." },
+    { id: "M-2021-066", name: "NAVARRO, DENNIS L." },
+    { id: "M-2018-099", name: "RAMIREZ, DANTE G." },
+    { id: "M-2019-044", name: "SANTIAGO, ELENA M." },
+    { id: "M-2020-008", name: "DOMINGO, FELIPE K." },
+    { id: "M-2022-045", name: "SANTOS, MARIA LUZ" },
+    { id: "M-2024-078", name: "REYES, ARMANDO P." },
+    { id: "M-2021-033", name: "GARCIA, LORNA S." },
+    { id: "M-2023-099", name: "MENDOZA, ROBERTO C." },
+    { id: "M-2020-011", name: "TORRES, ELENA F." },
+    { id: "M-2022-067", name: "VILLANUEVA, MARK J." },
+    { id: "M-2023-031", name: "SORIANO, MARK T." },
+    { id: "M-2022-019", name: "PADILLA, ROSE ANN" }
+  ];
+
+  const usersToSeed = [
+    { id: 'u-admin-001', email: 'admin', password: 'password', role: 'ADMIN' },
+    { id: 'u-treasurer-001', email: 'treasurer', password: 'password', role: 'TREASURER' },
+    { id: 'u-president-001', email: 'president', password: 'password', role: 'PRESIDENT' },
+    { id: 'u-auditor-001', email: 'auditor', password: 'password', role: 'USER' },
+    ...mockMembers.map(m => ({
+      id: m.id,
+      email: m.id,
+      password: 'password',
+      role: 'USER'
+    }))
+  ];
+  await prisma.user.createMany({ data: usersToSeed });
+  console.log(`✅ Seeded ${usersToSeed.length} users.`);
 
   // 1. Funds
   const funds = [
@@ -34,12 +72,41 @@ async function main() {
 
   // 2. Fund Transactions (Ledger)
   const transactions = [
-    { fundId: 'GF', timestamp: new Date('2026-04-22'), description: 'Member Dues Batch Remittance', type: 'DEPOSIT', amount: 15000, referenceId: 'REF-8812' },
-    { fundId: 'LN', timestamp: new Date('2026-04-26'), description: 'Disbursement: VINLUAN, VEN', type: 'WITHDRAWAL', amount: 30000, referenceId: 'LN-2026-071' },
+    // General Fund
     { fundId: 'GF', timestamp: new Date('2026-04-20'), description: 'Office Supplies Vendor Payment', type: 'WITHDRAWAL', amount: 4500, referenceId: 'REF-8809' },
+    { fundId: 'GF', timestamp: new Date('2026-04-22'), description: 'Member Dues Batch Remittance', type: 'DEPOSIT', amount: 15000, referenceId: 'REF-8812' },
+    
+    // Union Fund
     { fundId: 'UF', timestamp: new Date('2026-04-18'), description: 'Union Assembly Expense', type: 'WITHDRAWAL', amount: 12000, referenceId: 'UN-2026-004' },
+    
+    // Foreign Assistance & Death Assistance
     { fundId: 'FA', timestamp: new Date('2026-04-15'), description: 'Foreign Grant Received', type: 'DEPOSIT', amount: 500000, referenceId: 'FG-8801' },
     { fundId: 'DA', timestamp: new Date('2026-04-10'), description: 'Death Claim Benefit Release', type: 'WITHDRAWAL', amount: 20000, referenceId: 'DC-2026-012' },
+
+    // Loans Fund - Disbursements (Withdrawals)
+    { fundId: 'LN', timestamp: new Date('2026-01-15'), description: 'Disbursement: RAMIREZ, DANTE G.', type: 'WITHDRAWAL', amount: 25000, referenceId: 'LN-2026-080' },
+    { fundId: 'LN', timestamp: new Date('2026-02-10'), description: 'Disbursement: SANTIAGO, ELENA M.', type: 'WITHDRAWAL', amount: 12000, referenceId: 'LN-2026-083' },
+    { fundId: 'LN', timestamp: new Date('2026-03-05'), description: 'Disbursement: DOMINGO, FELIPE K.', type: 'WITHDRAWAL', amount: 8000, referenceId: 'LN-2026-084' },
+    { fundId: 'LN', timestamp: new Date('2026-04-01'), description: 'Disbursement: VINLUAN, VEN', type: 'WITHDRAWAL', amount: 50000, referenceId: 'LN-2026-095' },
+    { fundId: 'LN', timestamp: new Date('2026-04-26'), description: 'Disbursement: DELA CRUZ, JUAN', type: 'WITHDRAWAL', amount: 30000, referenceId: 'LN-2026-071' },
+    { fundId: 'LN', timestamp: new Date('2026-05-03'), description: 'Disbursement: CRUZ, PATRICIA M.', type: 'WITHDRAWAL', amount: 25000, referenceId: 'LN-2026-072' },
+    { fundId: 'LN', timestamp: new Date('2026-05-10'), description: 'Disbursement: BAUTISTA, HENRY N.', type: 'WITHDRAWAL', amount: 80000, referenceId: 'LN-2026-073' },
+    { fundId: 'LN', timestamp: new Date('2026-05-15'), description: 'Disbursement: FLORES, ANA GRACE', type: 'WITHDRAWAL', amount: 15000, referenceId: 'LN-2026-074' },
+    { fundId: 'LN', timestamp: new Date('2026-05-20'), description: 'Disbursement: CASTILLO, JORGE R.', type: 'WITHDRAWAL', amount: 50000, referenceId: 'LN-2026-075' },
+    { fundId: 'LN', timestamp: new Date('2026-05-28'), description: 'Disbursement: AQUINO, CECILIA V.', type: 'WITHDRAWAL', amount: 35000, referenceId: 'LN-2026-076' },
+    { fundId: 'LN', timestamp: new Date('2026-06-02'), description: 'Disbursement: NAVARRO, DENNIS L.', type: 'WITHDRAWAL', amount: 120000, referenceId: 'LN-2026-077' },
+
+    // Loans Fund - Repayments (Deposits)
+    { fundId: 'LN', timestamp: new Date('2026-05-01'), description: 'Repayment: VINLUAN, VEN', type: 'DEPOSIT', amount: 5500, referenceId: 'LN-2026-095' },
+    { fundId: 'LN', timestamp: new Date('2026-05-05'), description: 'Repayment: DELA CRUZ, JUAN', type: 'DEPOSIT', amount: 5500, referenceId: 'LN-2026-071' },
+    { fundId: 'LN', timestamp: new Date('2026-05-15'), description: 'Repayment: FLORES, ANA GRACE', type: 'DEPOSIT', amount: 2600, referenceId: 'LN-2026-074' },
+    { fundId: 'LN', timestamp: new Date('2026-05-20'), description: 'Repayment: CRUZ, PATRICIA M.', type: 'DEPOSIT', amount: 3000, referenceId: 'LN-2026-072' },
+    { fundId: 'LN', timestamp: new Date('2026-06-01'), description: 'Repayment: VINLUAN, VEN', type: 'DEPOSIT', amount: 5500, referenceId: 'LN-2026-095' },
+    { fundId: 'LN', timestamp: new Date('2026-06-02'), description: 'Repayment: CASTILLO, JORGE R.', type: 'DEPOSIT', amount: 5550, referenceId: 'LN-2026-075' },
+    { fundId: 'LN', timestamp: new Date('2026-06-05'), description: 'Repayment: DELA CRUZ, JUAN', type: 'DEPOSIT', amount: 5500, referenceId: 'LN-2026-071' },
+    { fundId: 'LN', timestamp: new Date('2026-06-05'), description: 'Repayment: BAUTISTA, HENRY N.', type: 'DEPOSIT', amount: 8800, referenceId: 'LN-2026-073' },
+    { fundId: 'LN', timestamp: new Date('2026-06-06'), description: 'Repayment: AQUINO, CECILIA V.', type: 'DEPOSIT', amount: 10500, referenceId: 'LN-2026-076' },
+    { fundId: 'LN', timestamp: new Date('2026-06-10'), description: 'Repayment: NAVARRO, DENNIS L.', type: 'DEPOSIT', amount: 13200, referenceId: 'LN-2026-077' },
   ];
   // Seed extra transactions to match frontend txCount
   const mockTxCounts = { GF: 248, UF: 112, LN: 45, FA: 30, DA: 20 };
@@ -70,13 +137,17 @@ async function main() {
     { loanReference: 'LN-2026-081', memberId: 'M-2020-011', memberName: 'TORRES, ELENA F.',        amount: 45000,  paymentMethod: 'BANK_TRANSFER',    bankAccount: 'BDO-0033-6621-77', status: 'APPROVED',  authorizedBy: 'Treasurer Amante', fundId: 'LN', createdAt: new Date('2026-06-08') },
     { loanReference: 'LN-2026-082', memberId: 'M-2022-067', memberName: 'VILLANUEVA, MARK J.',     amount: 60000,  paymentMethod: 'BANK_TRANSFER',    bankAccount: 'BDO-0078-1190-33', status: 'APPROVED',  authorizedBy: 'Treasurer Amante', fundId: 'LN', createdAt: new Date('2026-06-09') },
     // COMPLETED — fully released
-    { loanReference: 'LN-2026-071', memberId: 'M-2019-004', memberName: 'VINLUAN, VEN A.',         amount: 30000,  paymentMethod: 'BANK_TRANSFER',    bankAccount: 'BDO-0011-3344-55', status: 'COMPLETED', authorizedBy: 'Treasurer Amante', fundId: 'LN', createdAt: new Date('2026-04-26') },
+    { loanReference: 'LN-2026-071', memberId: 'M-2023-112', memberName: 'DELA CRUZ, JUAN',         amount: 30000,  paymentMethod: 'BANK_TRANSFER',    bankAccount: 'BDO-0011-3344-55', status: 'COMPLETED', authorizedBy: 'Treasurer Amante', fundId: 'LN', createdAt: new Date('2026-04-26') },
     { loanReference: 'LN-2026-072', memberId: 'M-2020-028', memberName: 'CRUZ, PATRICIA M.',       amount: 25000,  paymentMethod: 'CASH',             bankAccount: 'CASH',             status: 'COMPLETED', authorizedBy: 'Treasurer Amante', fundId: 'LN', createdAt: new Date('2026-05-03') },
     { loanReference: 'LN-2026-073', memberId: 'M-2021-055', memberName: 'BAUTISTA, HENRY N.',      amount: 80000,  paymentMethod: 'BANK_TRANSFER',    bankAccount: 'BDO-0055-7733-22', status: 'COMPLETED', authorizedBy: 'Treasurer Amante', fundId: 'LN', createdAt: new Date('2026-05-10') },
     { loanReference: 'LN-2026-074', memberId: 'M-2022-041', memberName: 'FLORES, ANA GRACE',       amount: 15000,  paymentMethod: 'SALARY_DEDUCTION', bankAccount: 'N/A',              status: 'COMPLETED', authorizedBy: 'Treasurer Amante', fundId: 'LN', createdAt: new Date('2026-05-15') },
     { loanReference: 'LN-2026-075', memberId: 'M-2023-088', memberName: 'CASTILLO, JORGE R.',      amount: 50000,  paymentMethod: 'BANK_TRANSFER',    bankAccount: 'BDO-0022-9981-44', status: 'COMPLETED', authorizedBy: 'Treasurer Amante', fundId: 'LN', createdAt: new Date('2026-05-20') },
     { loanReference: 'LN-2026-076', memberId: 'M-2024-012', memberName: 'AQUINO, CECILIA V.',      amount: 35000,  paymentMethod: 'CHECK',            bankAccount: 'CHECK-2026-076',   status: 'COMPLETED', authorizedBy: 'Treasurer Amante', fundId: 'LN', createdAt: new Date('2026-05-28') },
     { loanReference: 'LN-2026-077', memberId: 'M-2021-066', memberName: 'NAVARRO, DENNIS L.',      amount: 120000, paymentMethod: 'BANK_TRANSFER',    bankAccount: 'BDO-0099-4455-11', status: 'COMPLETED', authorizedBy: 'Treasurer Amante', fundId: 'LN', createdAt: new Date('2026-06-02') },
+    { loanReference: 'LN-2026-080', memberId: 'M-2018-099', memberName: 'RAMIREZ, DANTE G.',       amount: 25000,  paymentMethod: 'BANK_TRANSFER',    bankAccount: 'BDO-0088-2233-11', status: 'COMPLETED', authorizedBy: 'Treasurer Amante', fundId: 'LN', createdAt: new Date('2026-01-15') },
+    { loanReference: 'LN-2026-083', memberId: 'M-2019-044', memberName: 'SANTIAGO, ELENA M.',      amount: 12000,  paymentMethod: 'CASH',             bankAccount: 'CASH',             status: 'COMPLETED', authorizedBy: 'Treasurer Amante', fundId: 'LN', createdAt: new Date('2026-02-10') },
+    { loanReference: 'LN-2026-084', memberId: 'M-2020-008', memberName: 'DOMINGO, FELIPE K.',      amount: 8000,   paymentMethod: 'CHECK',            bankAccount: 'CHECK-2026-084',   status: 'COMPLETED', authorizedBy: 'Treasurer Amante', fundId: 'LN', createdAt: new Date('2026-03-05') },
+    { loanReference: 'LN-2026-095', memberId: 'M-2026-999', memberName: 'VINLUAN, VEN',            amount: 50000,  paymentMethod: 'BANK_TRANSFER',    bankAccount: 'BDO-0099-3322-11', status: 'COMPLETED', authorizedBy: 'Treasurer Amante', fundId: 'LN', createdAt: new Date('2026-04-01') },
     // REJECTED
     { loanReference: 'LN-2026-085', memberId: 'M-2023-031', memberName: 'SORIANO, MARK T.',        amount: 200000, paymentMethod: 'BANK_TRANSFER',    bankAccount: 'BDO-0011-2233-99', status: 'REJECTED',  authorizedBy: 'Treasurer Amante', fundId: 'LN', createdAt: new Date('2026-06-05') },
     { loanReference: 'LN-2026-086', memberId: 'M-2022-019', memberName: 'PADILLA, ROSE ANN',       amount: 90000,  paymentMethod: 'BANK_TRANSFER',    bankAccount: 'BDO-0077-5566-00', status: 'REJECTED',  authorizedBy: 'Treasurer Amante', fundId: 'LN', createdAt: new Date('2026-06-07') },
@@ -85,12 +156,14 @@ async function main() {
 
   // 4. Loan Repayments — realistic repayment records
   const repayments = [
-    { loanReference: 'LN-2026-071', memberId: 'M-2019-004', memberName: 'VINLUAN, VEN A.',         amount: 5500,  principalAmount: 5000,  serviceFeeAmount: 500,  overpaymentAmount: 0, paymentMethod: 'SALARY_DEDUCTION', referenceNumber: 'SD-2026-0501', status: 'PROCESSED',           treasurerDecision: 'NONE', processedAt: new Date('2026-05-05') },
-    { loanReference: 'LN-2026-071', memberId: 'M-2019-004', memberName: 'VINLUAN, VEN A.',         amount: 5500,  principalAmount: 5000,  serviceFeeAmount: 500,  overpaymentAmount: 0, paymentMethod: 'SALARY_DEDUCTION', referenceNumber: 'SD-2026-0601', status: 'PROCESSED',           treasurerDecision: 'NONE', processedAt: new Date('2026-06-05') },
-    { loanReference: 'LN-2026-072', memberId: 'M-2020-028', memberName: 'CRUZ, PATRICIA M.',       amount: 3000,  principalAmount: 2750,  serviceFeeAmount: 250,  overpaymentAmount: 0, paymentMethod: 'BANK_TRANSFER',    referenceNumber: 'BT-0520-0041', status: 'PROCESSED',           treasurerDecision: 'NONE', processedAt: new Date('2026-05-20') },
-    { loanReference: 'LN-2026-073', memberId: 'M-2021-055', memberName: 'BAUTISTA, HENRY N.',      amount: 8800,  principalAmount: 8000,  serviceFeeAmount: 800,  overpaymentAmount: 0, paymentMethod: 'SALARY_DEDUCTION', referenceNumber: 'SD-2026-0551', status: 'PROCESSED',           treasurerDecision: 'NONE', processedAt: new Date('2026-06-05') },
+    { loanReference: 'LN-2026-095', memberId: 'M-2026-999', memberName: 'VINLUAN, VEN',            amount: 5500,  principalAmount: 5000,  serviceFeeAmount: 500,  overpaymentAmount: 0, paymentMethod: 'BANK_TRANSFER',    referenceNumber: 'BT-2026-0501', status: 'PROCESSED',           treasurerDecision: 'NONE', processedAt: new Date('2026-05-01') },
+    { loanReference: 'LN-2026-071', memberId: 'M-2023-112', memberName: 'DELA CRUZ, JUAN',         amount: 5500,  principalAmount: 5000,  serviceFeeAmount: 500,  overpaymentAmount: 0, paymentMethod: 'SALARY_DEDUCTION', referenceNumber: 'SD-2026-0501', status: 'PROCESSED',           treasurerDecision: 'NONE', processedAt: new Date('2026-05-05') },
     { loanReference: 'LN-2026-074', memberId: 'M-2022-041', memberName: 'FLORES, ANA GRACE',       amount: 2600,  principalAmount: 2100,  serviceFeeAmount: 500,  overpaymentAmount: 0, paymentMethod: 'SALARY_DEDUCTION', referenceNumber: 'SD-2026-0415', status: 'PROCESSED',           treasurerDecision: 'NONE', processedAt: new Date('2026-05-15') },
+    { loanReference: 'LN-2026-072', memberId: 'M-2020-028', memberName: 'CRUZ, PATRICIA M.',       amount: 3000,  principalAmount: 2750,  serviceFeeAmount: 250,  overpaymentAmount: 0, paymentMethod: 'BANK_TRANSFER',    referenceNumber: 'BT-0520-0041', status: 'PROCESSED',           treasurerDecision: 'NONE', processedAt: new Date('2026-05-20') },
+    { loanReference: 'LN-2026-095', memberId: 'M-2026-999', memberName: 'VINLUAN, VEN',            amount: 5500,  principalAmount: 5000,  serviceFeeAmount: 500,  overpaymentAmount: 0, paymentMethod: 'BANK_TRANSFER',    referenceNumber: 'BT-2026-0601', status: 'PROCESSED',           treasurerDecision: 'NONE', processedAt: new Date('2026-06-01') },
     { loanReference: 'LN-2026-075', memberId: 'M-2023-088', memberName: 'CASTILLO, JORGE R.',      amount: 5550,  principalAmount: 5000,  serviceFeeAmount: 550,  overpaymentAmount: 0, paymentMethod: 'BANK_TRANSFER',    referenceNumber: 'BT-0620-0090', status: 'PROCESSED',           treasurerDecision: 'NONE', processedAt: new Date('2026-06-02') },
+    { loanReference: 'LN-2026-071', memberId: 'M-2023-112', memberName: 'DELA CRUZ, JUAN',         amount: 5500,  principalAmount: 5000,  serviceFeeAmount: 500,  overpaymentAmount: 0, paymentMethod: 'SALARY_DEDUCTION', referenceNumber: 'SD-2026-0601', status: 'PROCESSED',           treasurerDecision: 'NONE', processedAt: new Date('2026-06-05') },
+    { loanReference: 'LN-2026-073', memberId: 'M-2021-055', memberName: 'BAUTISTA, HENRY N.',      amount: 8800,  principalAmount: 8000,  serviceFeeAmount: 800,  overpaymentAmount: 0, paymentMethod: 'SALARY_DEDUCTION', referenceNumber: 'SD-2026-0551', status: 'PROCESSED',           treasurerDecision: 'NONE', processedAt: new Date('2026-06-05') },
     { loanReference: 'LN-2026-076', memberId: 'M-2024-012', memberName: 'AQUINO, CECILIA V.',      amount: 10500, principalAmount: 9100,  serviceFeeAmount: 900,  overpaymentAmount: 500, paymentMethod: 'BANK_TRANSFER',    referenceNumber: 'BT-0606-0112', status: 'OVERPAYMENT_PENDING', treasurerDecision: 'NONE', processedAt: new Date('2026-06-06') },
     { loanReference: 'LN-2026-077', memberId: 'M-2021-066', memberName: 'NAVARRO, DENNIS L.',      amount: 13200, principalAmount: 12000, serviceFeeAmount: 1200, overpaymentAmount: 0, paymentMethod: 'SALARY_DEDUCTION', referenceNumber: 'SD-2026-0610', status: 'PROCESSED',           treasurerDecision: 'NONE', processedAt: new Date('2026-06-10') },
   ];
@@ -113,8 +186,8 @@ async function main() {
     },
     {
       transactionId: 'TXN-DUES-001',
-      memberId: 'M-2020-001',
-      name: 'ALCANTARA, MARIA J.',
+      memberId: 'M-2020-028',
+      name: 'CRUZ, PATRICIA M.',
       month: currentMonth,
       amountPaid: 500,
       method: 'BANK_TRANSFER',
@@ -124,30 +197,32 @@ async function main() {
     },
     {
       transactionId: 'TXN-DUES-002',
-      memberId: 'M-2021-022',
-      name: 'DELA CRUZ, JUAN P.',
+      memberId: 'M-2023-112',
+      name: 'DELA CRUZ, JUAN',
       month: currentMonth,
       amountPaid: 500,
       method: 'CASH',
       referenceNumber: 'CS-0615-0902',
       fundToCredit: 'GF',
-      status: 'PENDING'
+      status: 'PENDING',
+      collectionType: 'LOAN_PAYMENT'
     },
     {
       transactionId: 'TXN-DUES-003',
-      memberId: 'M-2022-045',
-      name: 'SANTOS, ROBERTO T.',
+      memberId: 'M-2023-112',
+      name: 'DELA CRUZ, JUAN',
       month: currentMonth,
       amountPaid: 450,
       method: 'SALARY_DEDUCTION',
       referenceNumber: 'SD-0615-0903',
       fundToCredit: 'GF',
-      status: 'PENDING'
+      status: 'PENDING',
+      collectionType: 'CONTRIBUTION'
     },
     {
       transactionId: 'TXN-DUES-004',
-      memberId: 'M-2023-012',
-      name: 'GONZALES, SHARON L.',
+      memberId: 'M-2021-055',
+      name: 'BAUTISTA, HENRY N.',
       month: currentMonth,
       amountPaid: 500,
       method: 'CHECK',
@@ -157,19 +232,19 @@ async function main() {
     },
     {
       transactionId: 'TXN-DUES-005',
-      memberId: 'M-2024-089',
-      name: 'REYES, CARLOS M.',
+      memberId: 'M-2023-112',
+      name: 'DELA CRUZ, JUAN',
       month: currentMonth,
       amountPaid: 600,
       method: 'BANK_TRANSFER',
       referenceNumber: 'BT-0615-0905',
       fundToCredit: 'GF',
-      status: 'PENDING'
+      status: 'CONFIRMED'
     },
     {
       transactionId: 'TXN-DUES-006',
-      memberId: 'M-2022-019',
-      name: 'TORRES, LIZA F.',
+      memberId: 'M-2022-041',
+      name: 'FLORES, ANA GRACE',
       month: 'May 2026',
       amountPaid: 500,
       method: 'BANK_TRANSFER',
@@ -179,12 +254,34 @@ async function main() {
     },
     {
       transactionId: 'TXN-DUES-007',
-      memberId: 'M-2022-020',
-      name: 'QUINTOS, ARNOLD S.',
+      memberId: 'M-2023-088',
+      name: 'CASTILLO, JORGE R.',
       month: 'May 2026',
       amountPaid: 500,
       method: 'BANK_TRANSFER',
       referenceNumber: 'BT-0515-0802',
+      fundToCredit: 'GF',
+      status: 'CONFIRMED'
+    },
+    {
+      transactionId: 'TXN-DUES-010',
+      memberId: 'M-2026-999',
+      name: 'VINLUAN, VEN',
+      month: currentMonth,
+      amountPaid: 500,
+      method: 'BANK_TRANSFER',
+      referenceNumber: 'BT-0615-0910',
+      fundToCredit: 'GF',
+      status: 'CONFIRMED'
+    },
+    {
+      transactionId: 'TXN-DUES-011',
+      memberId: 'M-2026-999',
+      name: 'VINLUAN, VEN',
+      month: 'May 2026',
+      amountPaid: 500,
+      method: 'BANK_TRANSFER',
+      referenceNumber: 'BT-0515-0911',
       fundToCredit: 'GF',
       status: 'CONFIRMED'
     }
@@ -194,20 +291,8 @@ async function main() {
   }
   console.log(`✅ Seeded ${duesRecords.length} dues records.`);
 
-  // 6. Chart of Accounts (including expense accounts for petty cash)
-  const accounts = [
-    { code: 'A-100', name: 'Cash in Bank',              type: 'Asset',   fund: 'General Fund', status: 'Active' },
-    { code: 'A-101', name: 'Petty Cash Fund',           type: 'Asset',   fund: 'General Fund', status: 'Active' },
-    { code: 'E-401', name: 'Office Supplies',           type: 'Expense', fund: 'General Fund', status: 'Active' },
-    { code: 'E-402', name: 'Travel & Transportation',   type: 'Expense', fund: 'General Fund', status: 'Active' },
-    { code: 'E-403', name: 'Meals & Representation',    type: 'Expense', fund: 'General Fund', status: 'Active' },
-    { code: 'E-404', name: 'Communication Expenses',    type: 'Expense', fund: 'General Fund', status: 'Active' },
-    { code: 'E-405', name: 'Utilities',                 type: 'Expense', fund: 'General Fund', status: 'Active' },
-    { code: 'E-406', name: 'Miscellaneous Expenses',    type: 'Expense', fund: 'General Fund', status: 'Active' },
-    { code: 'L-201', name: 'Accounts Payable',          type: 'Liability', fund: 'General Fund', status: 'Active' },
-    { code: 'I-301', name: 'Membership Dues Income',    type: 'Income', fund: 'General Fund', status: 'Active' },
-  ];
-  await prisma.chartOfAccount.createMany({ data: accounts });
+  // 6. Chart of Accounts (DELETED)
+  console.log('Skipping Chart of Accounts seeding...');
 
   // 7. Budget Categories (for Expenses & Petty Cash page)
   const budgetCategories = [
@@ -486,7 +571,7 @@ async function main() {
       authorizedBy: null
     },
     {
-      loanReference: 'LN-2026-081',
+      loanReference: 'LN-2026-083',
       memberId: 'M-2019-044',
       memberName: 'SANTIAGO, ELENA M.',
       amount: 12000,
@@ -496,7 +581,7 @@ async function main() {
       authorizedBy: 'President Office'
     },
     {
-      loanReference: 'LN-2026-082',
+      loanReference: 'LN-2026-084',
       memberId: 'M-2020-008',
       memberName: 'DOMINGO, FELIPE K.',
       amount: 8000,

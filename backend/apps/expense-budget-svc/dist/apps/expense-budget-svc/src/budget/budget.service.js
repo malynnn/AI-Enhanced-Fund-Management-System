@@ -59,12 +59,6 @@ let BudgetService = BudgetService_1 = class BudgetService {
         return this.enrich(category);
     }
     async create(data) {
-        const account = await this.prisma.chartOfAccount.findUnique({
-            where: { code: data.accountCode },
-        });
-        if (!account) {
-            throw new common_1.BadRequestException(`Account code ${data.accountCode} does not exist in ChartOfAccount`);
-        }
         const existing = await this.prisma.budgetCategory.findUnique({
             where: {
                 accountCode_fiscalYear: {

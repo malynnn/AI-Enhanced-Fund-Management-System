@@ -90,6 +90,77 @@ let DuesService = DuesService_1 = class DuesService {
         }
         return updated;
     }
+    async createCollection(payload) {
+        const { memberId, memberName, collectionType, amount, method, referenceNumber, reference_number, depositFund, } = payload;
+        if (!memberId || !memberName || !collectionType || amount === undefined || !method) {
+            throw new common_1.BadRequestException('Missing required fields: memberId, memberName, collectionType, amount, method');
+        }
+        const numericAmount = Number(amount);
+        if (isNaN(numericAmount) || numericAmount <= 0) {
+            throw new common_1.BadRequestException('Amount must be a positive number');
+        }
+        if (!['DUES', 'LOAN_PAYMENT', 'CONTRIBUTION'].includes(collectionType)) {
+            throw new common_1.BadRequestException(`Invalid collectionType: ${collectionType}`);
+        }
+        const fundCodeMap = {
+            GENERAL_FUND: 'GF',
+            UNION_FUND: 'UF',
+            LOAN_FUND: 'LN',
+            FOREIGN_FUND: 'FA',
+            DEATH_ASSISTANCE_FUND: 'DA',
+            EMERGENCY_FUND: 'GF',
+        };
+        const targetFundCode = fundCodeMap[depositFund] || 'GF';
+        const fund = await this.prisma.fund.findUnique({
+            where: { code: targetFundCode },
+        });
+        if (!fund) {
+            throw new common_1.BadRequestException(`Target fund with code ${targetFundCode} does not exist`);
+        }
+        const refNo = referenceNumber || reference_number || null;
+        const txId = `TXN-COL-${Math.floor(100000 + Math.random() * 900000)}`;
+        const now = new Date();
+        const currentMonth = `${now.toLocaleString('default', { month: 'short' })} ${now.getFullYear()}`;
+        return this.prisma.$transaction(async (tx) => {
+            if (collectionType === 'LOAN_PAYMENT') {
+                const activeLoan = await tx.disbursementRequest.findFirst({
+                    where: {
+                        memberId: memberId,
+                        status: 'COMPLETED',
+                    },
+                    orderBy: {
+                        createdAt: 'desc',
+                    },
+                });
+                if (!activeLoan) {
+                    throw new common_1.BadRequestException(`No active completed loan found for member ${memberId}`);
+                }
+                const currentLoanBalance = Number(activeLoan.amount);
+                const newLoanBalance = Math.max(0, currentLoanBalance - numericAmount);
+                await tx.disbursementRequest.update({
+                    where: { id: activeLoan.id },
+                    data: { amount: newLoanBalance },
+                });
+                this.logger.log(`Subtracted ${numericAmount} from outstanding loan balance of member ${memberId} (ref: ${activeLoan.loanReference}). New balance: ${newLoanBalance}`);
+            }
+            const record = await tx.duesRecord.create({
+                data: {
+                    transactionId: txId,
+                    memberId: memberId,
+                    name: memberName,
+                    month: currentMonth,
+                    amountPaid: numericAmount,
+                    method: method,
+                    referenceNumber: refNo,
+                    fundToCredit: targetFundCode,
+                    status: 'PENDING',
+                    collectionType: collectionType,
+                },
+            });
+            this.logger.log(`Created collection record ${record.id} with type ${collectionType}`);
+            return record;
+        });
+    }
 };
 exports.DuesService = DuesService;
 exports.DuesService = DuesService = DuesService_1 = __decorate([

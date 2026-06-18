@@ -30,6 +30,9 @@ let DuesController = DuesController_1 = class DuesController {
     confirmDues(id) {
         return this.duesService.confirmDues(id);
     }
+    createCollection(payload) {
+        return this.duesService.createCollection(payload);
+    }
     async handleDuesEvent(data, context) {
         const channel = context.getChannelRef();
         const originalMsg = context.getMessage();
@@ -61,6 +64,14 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], DuesController.prototype, "confirmDues", null);
+__decorate([
+    (0, common_1.Post)(),
+    (0, auth_1.Public)(),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], DuesController.prototype, "createCollection", null);
 __decorate([
     (0, microservices_1.MessagePattern)(events_1.QUEUE_DUES),
     (0, microservices_1.MessagePattern)('ms.dues.payroll_confirmed'),
