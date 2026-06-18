@@ -6,9 +6,9 @@ import { useState, useMemo, Suspense, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { 
-  Users, UserPlus, ShieldAlert, Search, 
-  CheckCircle2, XCircle, Clock, ShieldCheck, UserCog, Activity,
-  Ban, Loader2, Edit, Check
+  Users, UserPlus, Search, 
+  CheckCircle2, XCircle, Clock, ShieldCheck, UserCog,
+  Ban, Loader2, Check, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import Header from '@/components/Header';
 import ActionModal from '@/components/ActionModal';
@@ -31,14 +31,6 @@ interface PendingRequest {
   createdAt: string;
 }
 
-interface ActivityLog {
-  id: string;
-  user: string;
-  action: string;
-  type: 'SECURITY' | 'ALERT' | 'USER_MGMT';
-  createdAt: string;
-}
-
 function AdminDashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -48,11 +40,14 @@ function AdminDashboardContent() {
   // --- STATE MANAGEMENT ---
   const [users, setUsers] = useState<User[]>([]);
   const [pendingRequests, setPendingRequests] = useState<PendingRequest[]>([]);
-  const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
   
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('ALL');
+
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   // Modal States
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
@@ -69,16 +64,13 @@ function AdminDashboardContent() {
     try {
       const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
       
-      // Fetch all required admin data in parallel
-      const [usersRes, reqRes, actRes] = await Promise.all([
+      const [usersRes, reqRes] = await Promise.all([
         fetch(`${gatewayUrl}/api/admin/users`).catch(() => null),
-        fetch(`${gatewayUrl}/api/admin/requests`).catch(() => null),
-        fetch(`${gatewayUrl}/api/admin/activity`).catch(() => null)
+        fetch(`${gatewayUrl}/api/admin/requests`).catch(() => null)
       ]);
 
       if (usersRes?.ok) setUsers(await usersRes.json());
       if (reqRes?.ok) setPendingRequests(await reqRes.json());
-      if (actRes?.ok) setActivityLogs(await actRes.json());
     } catch (error) {
       console.error("Failed to fetch admin data", error);
     } finally {
@@ -90,7 +82,11 @@ function AdminDashboardContent() {
     fetchData();
   }, []);
 
-  // --- FILTERING ---
+  // --- FILTERING & PAGINATION ---
+  useEffect(() => {
+    setCurrentPage(1); // Reset to page 1 when filters change
+  }, [searchTerm, roleFilter]);
+
   const filteredUsers = useMemo(() => {
     return users.filter(u => {
       // Don't show the logged-in user themselves
@@ -101,6 +97,11 @@ function AdminDashboardContent() {
       return matchesSearch && matchesRole;
     });
   }, [users, searchTerm, roleFilter, session]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredUsers.length / itemsPerPage));
+  const paginatedUsers = useMemo(() => {
+    return filteredUsers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  }, [filteredUsers, currentPage]);
 
   const activeMembersCount = users.filter(u => u.role === 'Member' && u.status === 'ACTIVE').length;
   const adminOfficersCount = users.filter(u => u.role !== 'Member' && u.status === 'ACTIVE').length;
@@ -142,6 +143,8 @@ function AdminDashboardContent() {
   };
 
   const toggleUserStatus = (user: User) => {
+    if (user.role === 'Admin') return; // Extra protection guard
+    
     const isSuspending = user.status === 'ACTIVE';
     setActionModal({
       isOpen: true, status: 'idle', 
@@ -213,24 +216,24 @@ function AdminDashboardContent() {
             </div>
             <form onSubmit={submitNewUser} className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-1.5 text-left">Full Name</label>
+                <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-1.5 text-left">Full Name *</label>
                 <input required type="text" value={newUserForm.name} onChange={e => setNewUserForm({...newUserForm, name: e.target.value})} className="w-full rounded-xl px-4 py-3 text-sm border border-gray-200 outline-none focus:border-blue-500" placeholder="e.g. John Doe"/>
               </div>
               <div>
-                <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-1.5 text-left">Email / ID</label>
+                <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-1.5 text-left">Email / ID *</label>
                 <input required type="email" value={newUserForm.email} onChange={e => setNewUserForm({...newUserForm, email: e.target.value})} className="w-full rounded-xl px-4 py-3 text-sm border border-gray-200 outline-none focus:border-blue-500" placeholder="e.g. jdoe@bdoea.com"/>
               </div>
               <div>
-                <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-1.5 text-left">System Role</label>
+                <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-1.5 text-left">System Role *</label>
                 <select value={newUserForm.role} onChange={e => setNewUserForm({...newUserForm, role: e.target.value})} className="w-full rounded-xl px-4 py-3 text-sm border border-gray-200 outline-none focus:border-blue-500 appearance-none bg-white">
-                  <option value="Member">Member</option>
-                  <option value="Auditor">Auditor</option>
+                  <option value="Admin">Admin</option>
                   <option value="Treasurer">Treasurer</option>
-                  <option value="Superadmin">Superadmin</option>
+                  <option value="Auditor">Auditor</option>
+                  <option value="Member">Member</option>
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-1.5 text-left">Initial Password</label>
+                <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-1.5 text-left">Initial Password *</label>
                 <input required type="password" value={newUserForm.password} onChange={e => setNewUserForm({...newUserForm, password: e.target.value})} className="w-full rounded-xl px-4 py-3 text-sm border border-gray-200 outline-none focus:border-blue-500"/>
               </div>
               <div className="pt-4 border-t border-gray-100 flex gap-3">
@@ -259,9 +262,6 @@ function AdminDashboardContent() {
             <Clock size={18} /> Pending Approvals
             {pendingRequests.length > 0 && <span className="bg-amber-100 text-amber-700 text-[10px] px-1.5 py-0.5 rounded-full">{pendingRequests.length}</span>}
           </button>
-          <button onClick={() => handleTabChange('activity')} className={`pb-3 flex items-center gap-2 text-sm font-black translate-y-[2px] transition-colors ${currentTab === 'activity' ? 'text-[#04152d] border-b-4 border-[#04152d]' : 'text-gray-400 hover:text-gray-600'}`}>
-            <Activity size={18} /> Security & Audit Logs
-          </button>
         </div>
 
         {/* Tab Contents */}
@@ -285,7 +285,7 @@ function AdminDashboardContent() {
                       </div>
                       <select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)} className="py-2 pl-4 pr-8 rounded-xl bg-gray-50 border border-gray-200 text-sm font-bold outline-none cursor-pointer appearance-none">
                         <option value="ALL">All Roles</option>
-                        <option value="Superadmin">Superadmin</option>
+                        <option value="Admin">Admin</option>
                         <option value="Treasurer">Treasurer</option>
                         <option value="Auditor">Auditor</option>
                         <option value="Member">Member</option>
@@ -296,7 +296,7 @@ function AdminDashboardContent() {
                     </button>
                   </div>
 
-                  <div className="overflow-x-auto flex-1">
+                  <div className="overflow-x-auto w-full flex-1 flex flex-col">
                     <table className="w-full text-left whitespace-nowrap min-w-[800px]">
                       <thead className="bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)]">
                         <tr>
@@ -308,7 +308,7 @@ function AdminDashboardContent() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-50">
-                        {filteredUsers.length > 0 ? filteredUsers.map((user) => (
+                        {paginatedUsers.length > 0 ? paginatedUsers.map((user) => (
                           <tr key={user.id} className="hover:bg-gray-50 transition-colors">
                             <td className="px-6 py-4 text-left">
                               <div className="flex items-center gap-3">
@@ -335,9 +335,15 @@ function AdminDashboardContent() {
                               {new Date(user.joinedAt || new Date()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                             </td>
                             <td className="px-6 py-4 text-right">
-                              <button onClick={() => toggleUserStatus(user)} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${user.status === 'ACTIVE' ? 'bg-white border-red-200 text-red-600 hover:bg-red-50' : 'bg-white border-emerald-200 text-emerald-600 hover:bg-emerald-50'}`}>
-                                {user.status === 'ACTIVE' ? <><Ban size={14}/> Suspend</> : <><CheckCircle2 size={14}/> Activate</>}
-                              </button>
+                              {user.role === 'Admin' ? (
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-gray-400 bg-gray-50 cursor-not-allowed">
+                                  <ShieldCheck size={14} /> System Locked
+                                </span>
+                              ) : (
+                                <button onClick={() => toggleUserStatus(user)} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${user.status === 'ACTIVE' ? 'bg-white border-red-200 text-red-600 hover:bg-red-50' : 'bg-white border-emerald-200 text-emerald-600 hover:bg-emerald-50'}`}>
+                                  {user.status === 'ACTIVE' ? <><Ban size={14}/> Suspend</> : <><CheckCircle2 size={14}/> Activate</>}
+                                </button>
+                              )}
                             </td>
                           </tr>
                         )) : (
@@ -345,6 +351,19 @@ function AdminDashboardContent() {
                         )}
                       </tbody>
                     </table>
+                    
+                    {/* Pagination Controls */}
+                    {totalPages > 1 && !isLoading && (
+                      <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-gray-50/50 mt-auto">
+                        <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="inline-flex items-center justify-center gap-2 bg-white border border-gray-200 text-[#04152d] hover:bg-gray-50 font-bold py-2.5 px-4 rounded-xl text-xs transition-all disabled:opacity-50 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+                          <ChevronLeft size={16} /> Previous
+                        </button>
+                        <span className="text-[11px] font-black text-gray-500 uppercase tracking-widest">Page {currentPage} of {totalPages}</span>
+                        <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="inline-flex items-center justify-center gap-2 bg-white border border-gray-200 text-[#04152d] hover:bg-gray-50 font-bold py-2.5 px-4 rounded-xl text-xs transition-all disabled:opacity-50 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+                          Next <ChevronRight size={16} />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </>
               )}
@@ -387,35 +406,6 @@ function AdminDashboardContent() {
                       <p className="text-sm mt-1">No pending registrations require your approval.</p>
                     </div>
                   )}
-                </div>
-              )}
-
-              {/* ACTIVITY LOGS TAB */}
-              {currentTab === 'activity' && (
-                <div className="flex flex-col h-full">
-                  <div className="p-6 border-b border-gray-50 flex items-center gap-3">
-                    <Activity className="text-blue-500" size={20} />
-                    <h2 className="text-lg font-black text-[#04152d] text-left">Master Security Log</h2>
-                  </div>
-                  <div className="p-6 space-y-4 overflow-y-auto max-h-[600px]">
-                    {activityLogs.length > 0 ? activityLogs.map((log) => (
-                      <div key={log.id} className="flex items-start gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                        <div className={`p-2.5 rounded-xl shrink-0 ${log.type === 'ALERT' ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'}`}>
-                          {log.type === 'ALERT' ? <ShieldAlert size={20} /> : <Activity size={20} />}
-                        </div>
-                        <div className="flex-1 pt-1">
-                          <p className="text-sm font-bold text-[#04152d] text-left">{log.action}</p>
-                          <div className="flex items-center gap-3 mt-1.5">
-                            <span className="text-[11px] font-black text-gray-500 uppercase tracking-widest">{log.user}</span>
-                            <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
-                            <span className="text-xs font-medium text-gray-400">{new Date(log.createdAt || new Date()).toLocaleString()}</span>
-                          </div>
-                        </div>
-                      </div>
-                    )) : (
-                      <div className="text-center text-gray-400 py-10 font-bold">No activity logs recorded.</div>
-                    )}
-                  </div>
                 </div>
               )}
             </>

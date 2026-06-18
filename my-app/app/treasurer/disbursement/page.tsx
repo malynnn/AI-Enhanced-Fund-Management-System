@@ -4,11 +4,11 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { 
-  CheckCircle, Eye, Printer, X, FileText, Clock, Check, Send, 
+  CheckCircle, Eye, Printer, X, FileText, Clock, Check, 
   AlertTriangle, Download, Loader, Ban, ChevronLeft, ChevronRight,
-  Search, Filter, CreditCard, Wallet, Tag
+  Search, Filter, Wallet, Tag, Calendar
 } from 'lucide-react';
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, Tooltip, ResponsiveContainer } from 'recharts';
 import Header from '@/components/Header';
 import ActionModal from '@/components/ActionModal';
 
@@ -27,7 +27,8 @@ interface Disbursement {
   rejectedReason?: string;
   reason?: string; 
   disbursementType?: string; 
-  fundSource?: string;       
+  fundSource?: string;
+  referenceNumber?: string;       
 }
 
 export default function DisbursementPage() {
@@ -38,10 +39,12 @@ export default function DisbursementPage() {
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const voucherRef = useRef<HTMLDivElement>(null);
 
+  // Global Action Modal
   const [actionModal, setActionModal] = useState<{
     isOpen: boolean; title: string; message: string; status: 'idle' | 'loading' | 'success' | 'error'; resultMsg?: string;
   }>({ isOpen: false, title: '', message: '', status: 'idle' });
   
+  // Rejection & Auth Modals
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
   const [isRejecting, setIsRejecting] = useState(false);
@@ -53,17 +56,18 @@ export default function DisbursementPage() {
     disbursementType: 'LOAN_RELEASE'
   });
 
+  // Filters
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('ALL');
-  const [filterMethod, setFilterMethod] = useState('ALL');
   const [filterType, setFilterType] = useState('ALL');
+  const [filterMonth, setFilterMonth] = useState('');
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, filterStatus, filterMethod, filterType]);
+  }, [searchTerm, filterStatus, filterType, filterMonth]);
 
   const fetchDisbursements = async () => {
     try {
@@ -77,6 +81,8 @@ export default function DisbursementPage() {
           disbursementType: d.disbursementType || 'LOAN_RELEASE',
           fundSource: d.fundSource || 'PENDING'
         }));
+        // Sort by newest first
+        formatted.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         setDisbursements(formatted);
       }
     } catch (err) {
@@ -86,29 +92,97 @@ export default function DisbursementPage() {
     }
   };
 
-  useEffect(() => {
-    fetchDisbursements();
-  }, []);
+  useEffect(() => { fetchDisbursements(); }, []);
 
   const filteredDisbursements = useMemo(() => {
     return disbursements.filter(d => {
-      const matchesSearch = d.loanReference.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                            d.memberName.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = d.loanReference?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                            d.memberName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            d.memberId?.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesStatus = filterStatus === 'ALL' ? true : d.status === filterStatus;
-      const matchesMethod = filterMethod === 'ALL' ? true : d.paymentMethod === filterMethod;
       const matchesType = filterType === 'ALL' ? true : d.disbursementType === filterType;
+      const matchesMonth = filterMonth === '' ? true : d.createdAt.startsWith(filterMonth);
       
-      return matchesSearch && matchesStatus && matchesMethod && matchesType;
+      return matchesSearch && matchesStatus && matchesType && matchesMonth;
     });
-  }, [disbursements, searchTerm, filterStatus, filterMethod, filterType]);
-
-  const uniqueMethods = Array.from(new Set(disbursements.map(d => d.paymentMethod)));
+  }, [disbursements, searchTerm, filterStatus, filterType, filterMonth]);
 
   const totalPages = Math.max(1, Math.ceil(filteredDisbursements.length / itemsPerPage));
-  const paginatedDisbursements = filteredDisbursements.slice(
-    (currentPage - 1) * itemsPerPage, 
-    currentPage * itemsPerPage
-  );
+  const paginatedDisbursements = filteredDisbursements.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  // --- EXISTING HANDLERS ---
+  const triggerAccept = (disb: Disbursement) => {
+    setSelectedForAction(disb);
+    let autoFund = 'GENERAL_FUND';
+    if (disb.disbursementType === 'LOAN_RELEASE') autoFund = 'LOAN_FUND';
+    if (disb.disbursementType === 'DEATH_ASSISTANCE') autoFund = 'DEATH_ASSISTANCE_FUND';
+    
+    setAuthFormData({
+      fundSource: autoFund,
+      disbursementType: disb.disbursementType || 'LOAN_RELEASE'
+    });
+    setIsAuthModalOpen(true);
+  };
+
+  const handleAcceptConfirm = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedForAction) return;
+    setIsAuthorizing(true);
+    
+    try {
+      const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
+      const res = await fetch(`${gatewayUrl}/api/finance/disbursements/${selectedForAction.id}/confirm`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          authorizedBy: 'Treasurer Romalyn Amante',
+          fundSource: authFormData.fundSource,
+          disbursementType: authFormData.disbursementType
+        })
+      });
+      
+      if (res.ok) {
+        await fetchDisbursements();
+        setIsAuthModalOpen(false);
+        setActionModal({ isOpen: true, title: 'Authorization Successful', message: '', status: 'success', resultMsg: `Disbursement for ${selectedForAction.memberName} has been successfully tracked and released from the ${authFormData.fundSource.replace('_', ' ')}.` });
+      } else throw new Error("Backend failed to confirm");
+    } catch (err) {
+      setIsAuthModalOpen(false);
+      setActionModal({ isOpen: true, title: 'Authorization Failed', message: '', status: 'error', resultMsg: 'An error occurred while communicating with the server.' });
+    } finally {
+      setIsAuthorizing(false);
+    }
+  };
+
+  const triggerReject = (disb: Disbursement) => {
+    setSelectedForAction(disb);
+    setRejectReason('');
+    setIsRejectModalOpen(true);
+  };
+
+  const handleRejectConfirm = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedForAction || !rejectReason.trim()) return;
+    
+    setIsRejecting(true);
+    try {
+      const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
+      const res = await fetch(`${gatewayUrl}/api/finance/disbursements/${selectedForAction.id}/reject`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ reason: rejectReason, authorizedBy: 'Treasurer Romalyn Amante' })
+      });
+      
+      if (res.ok) {
+        await fetchDisbursements();
+        setIsRejectModalOpen(false);
+        setActionModal({ isOpen: true, title: 'Disbursement Rejected', message: '', status: 'success', resultMsg: `The disbursement request for ${selectedForAction.memberName} has been rejected.` });
+      } else throw new Error("Backend failed to reject the disbursement request.");
+    } catch (err: any) {
+      setIsRejectModalOpen(false);
+      setActionModal({ isOpen: true, title: 'Rejection Failed', message: '', status: 'error', resultMsg: err.message || 'An error occurred.' });
+    } finally {
+      setIsRejecting(false);
+    }
+  };
 
   const downloadVoucherPDF = async () => {
     if (!selectedVoucher) return;
@@ -138,13 +212,9 @@ export default function DisbursementPage() {
             reader.readAsDataURL(blob);
           });
         }
-      } catch (err) {
-        console.error('Failed to load logo in Base64:', err);
-      }
+      } catch (err) { console.error('Failed to load logo in Base64:', err); }
 
-      const postingDate = new Date(selectedVoucher.createdAt).toLocaleDateString('en-PH', {
-        year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
-      });
+      const postingDate = new Date(selectedVoucher.createdAt).toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
       const amount = Number(selectedVoucher.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 });
       
       const authorizedByRaw = selectedVoucher.authorizedBy || 'PENDING';
@@ -153,98 +223,92 @@ export default function DisbursementPage() {
       const fundDisplay = selectedVoucher.fundSource?.replace('_', ' ') || 'GENERAL FUND';
       
       const voucherHTML = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Disbursement Voucher</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Segoe UI', Arial, sans-serif; color: #1a202c; padding: 30px; font-size: 13px; }
-    .voucher-container { border: 1px solid #cbd5e1; padding: 40px; border-radius: 12px; position: relative; }
-    .voucher-container::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, #021124 0%, #005a9c 50%, #e6b012 100%); border-top-left-radius: 12px; border-top-right-radius: 12px; }
-    .header { text-align: center; border-bottom: 2px dashed #e2e8f0; padding-bottom: 22px; margin-bottom: 28px; }
-    .logo-container { display: flex; justify-content: center; margin-bottom: 12px; }
-    .logo { height: 55px; object-fit: contain; }
-    .org-name { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: #021124; }
-    .title-badge { display: inline-block; margin-top: 16px; background: #021124; color: #ffffff; font-size: 11px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; padding: 6px 28px; border-radius: 30px; border: 2px solid #e6b012; }
-    .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 40px; margin-bottom: 28px; background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; }
-    .label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 4px; }
-    .value { font-weight: 700; font-size: 13px; color: #021124; }
-    .payee-block { grid-column: 1 / -1; border-top: 1px solid #e2e8f0; padding-top: 12px; margin-top: 4px; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-    thead th { background: #021124; padding: 12px 16px; text-align: left; font-size: 10px; font-weight: 800; text-transform: uppercase; color: #ffffff; }
-    tbody td { padding: 18px 16px; border-bottom: 1px solid #cbd5e1; text-align: left; }
-    .amount-cell { font-size: 22px; font-weight: 900; color: #15803d; text-align: left; }
-    .signatures { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 30px; margin-top: 40px; }
-    .sig-block { text-align: center; }
-    .sig-label { font-size: 11px; font-weight: 800; text-transform: uppercase; color: #04152d; margin-bottom: 50px; letter-spacing: 1px; }
-    .sig-line { border-top: 1px solid #04152d; padding-top: 8px; width: 100%; }
-    .name { font-size: 11px; font-weight: 800; color: #04152d; text-transform: uppercase; letter-spacing: 0.5px; }
-    .title { font-size: 10px; font-weight: 700; color: #04152d; text-transform: uppercase; margin-top: 4px; }
-  </style>
-</head>
-<body>
-  <div class="voucher-container">
-    <div class="header">
-      ${logoBase64 ? `<div class="logo-container"><img src="${logoBase64}" alt="Logo" class="logo" /></div>` : ''}
-      <div class="org-name">Banco de Oro Employees Association (BDOEA)</div>
-      <div class="title-badge">Disbursement Voucher</div>
-    </div>
-    <div class="details-grid">
-      <div><div class="label">Voucher Reference</div><div class="value">${selectedVoucher.id}</div></div>
-      <div><div class="label">Posting Date</div><div class="value">${postingDate}</div></div>
-      <div><div class="label">Disbursement Category</div><div class="value" style="color: #0369a1;">${typeDisplay}</div></div>
-      <div><div class="label">Deducted From Fund</div><div class="value" style="color: #b45309;">${fundDisplay}</div></div>
-      <div class="payee-block"><div class="label">Payee</div><div class="value">${selectedVoucher.memberName} (ID: ${selectedVoucher.memberId})</div></div>
-    </div>
-    <table>
-      <thead><tr><th style="text-align: left;">Particulars</th><th style="text-align: left;">Amount (PHP)</th></tr></thead>
-      <tbody>
-        <tr><td style="text-align: left;">Disbursement release for reference: ${selectedVoucher.loanReference}. <br><span style="font-size: 10px; color: #64748b; font-weight: 500;">Method: ${selectedVoucher.paymentMethod} (${selectedVoucher.bankAccount})</span></td><td class="amount-cell">₱${amount}</td></tr>
-      </tbody>
-    </table>
-    
-    <div class="signatures">
-      <div class="sig-block">
-        <div class="sig-label">Prepared By</div>
-        <div class="sig-line">
-          <div class="name">Loan App System</div>
-          <div class="title">LAS Authorized Personnel</div>
-        </div>
-      </div>
-      <div class="sig-block">
-        <div class="sig-label">Confirmed By</div>
-        <div class="sig-line">
-          <div class="name">${cleanAuthorizedBy}</div>
-          <div class="title">Treasurer</div>
-        </div>
-      </div>
-      <div class="sig-block">
-        <div class="sig-label">Received By Payee</div>
-        <div class="sig-line">
-          <div class="name">${selectedVoucher.memberName}</div>
-          <div class="title">Member</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</body>
-</html>`;
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8" />
+          <title>Disbursement Voucher</title>
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { font-family: 'Segoe UI', Arial, sans-serif; color: #1a202c; padding: 30px; font-size: 13px; }
+            .voucher-container { border: 1px solid #cbd5e1; padding: 40px; border-radius: 12px; position: relative; }
+            .voucher-container::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, #021124 0%, #005a9c 50%, #e6b012 100%); border-top-left-radius: 12px; border-top-right-radius: 12px; }
+            .header { text-align: center; border-bottom: 2px dashed #e2e8f0; padding-bottom: 22px; margin-bottom: 28px; }
+            .logo-container { display: flex; justify-content: center; margin-bottom: 12px; }
+            .logo { height: 55px; object-fit: contain; }
+            .org-name { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: #021124; }
+            .title-badge { display: inline-block; margin-top: 16px; background: #021124; color: #ffffff; font-size: 11px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; padding: 6px 28px; border-radius: 30px; border: 2px solid #e6b012; }
+            .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 40px; margin-bottom: 28px; background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; }
+            .label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 4px; }
+            .value { font-weight: 700; font-size: 13px; color: #021124; }
+            .payee-block { grid-column: 1 / -1; border-top: 1px solid #e2e8f0; padding-top: 12px; margin-top: 4px; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+            thead th { background: #021124; padding: 12px 16px; text-align: left; font-size: 10px; font-weight: 800; text-transform: uppercase; color: #ffffff; }
+            tbody td { padding: 18px 16px; border-bottom: 1px solid #cbd5e1; text-align: left; }
+            .amount-cell { font-size: 22px; font-weight: 900; color: #15803d; text-align: left; }
+            .signatures { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 30px; margin-top: 40px; }
+            .sig-block { text-align: center; }
+            .sig-label { font-size: 11px; font-weight: 800; text-transform: uppercase; color: #04152d; margin-bottom: 50px; letter-spacing: 1px; }
+            .sig-line { border-top: 1px solid #04152d; padding-top: 8px; width: 100%; }
+            .name { font-size: 11px; font-weight: 800; color: #04152d; text-transform: uppercase; letter-spacing: 0.5px; }
+            .title { font-size: 10px; font-weight: 700; color: #04152d; text-transform: uppercase; margin-top: 4px; }
+          </style>
+        </head>
+        <body>
+          <div class="voucher-container">
+            <div class="header">
+              ${logoBase64 ? `<div class="logo-container"><img src="${logoBase64}" alt="Logo" class="logo" /></div>` : ''}
+              <div class="org-name">Banco de Oro Employees Association (BDOEA)</div>
+              <div class="title-badge">Disbursement Voucher</div>
+            </div>
+            <div class="details-grid">
+              <div><div class="label">Voucher Reference</div><div class="value">${selectedVoucher.id}</div></div>
+              <div><div class="label">Posting Date</div><div class="value">${postingDate}</div></div>
+              <div><div class="label">Disbursement Category</div><div class="value" style="color: #0369a1;">${typeDisplay}</div></div>
+              <div><div class="label">Deducted From Fund</div><div class="value" style="color: #b45309;">${fundDisplay}</div></div>
+              <div class="payee-block"><div class="label">Payee</div><div class="value">${selectedVoucher.memberName} (ID: ${selectedVoucher.memberId})</div></div>
+            </div>
+            <table>
+              <thead><tr><th style="text-align: left;">Particulars</th><th style="text-align: left;">Amount (PHP)</th></tr></thead>
+              <tbody>
+                <tr><td style="text-align: left;">Disbursement release for reference: ${selectedVoucher.loanReference}. <br><span style="font-size: 10px; color: #64748b; font-weight: 500;">Method: ${selectedVoucher.paymentMethod} (${selectedVoucher.bankAccount})</span></td><td class="amount-cell">₱${amount}</td></tr>
+              </tbody>
+            </table>
+            
+            <div class="signatures">
+              <div class="sig-block">
+                <div class="sig-label">Prepared By</div>
+                <div class="sig-line">
+                  <div class="name">System Admin</div>
+                  <div class="title">BDOEA Officer</div>
+                </div>
+              </div>
+              <div class="sig-block">
+                <div class="sig-label">Confirmed By</div>
+                <div class="sig-line">
+                  <div class="name">${cleanAuthorizedBy}</div>
+                  <div class="title">Treasurer</div>
+                </div>
+              </div>
+              <div class="sig-block">
+                <div class="sig-label">Received By Payee</div>
+                <div class="sig-line">
+                  <div class="name">${selectedVoucher.memberName}</div>
+                  <div class="title">Member</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </body>
+        </html>`;
 
       const doc = iframe.contentWindow?.document || iframe.contentDocument;
       if (!doc) throw new Error('Cannot access iframe document');
       
-      doc.open();
-      doc.write(voucherHTML);
-      doc.close();
-
+      doc.open(); doc.write(voucherHTML); doc.close();
       await new Promise((resolve) => setTimeout(resolve, 150));
 
-      const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
-        import('html2canvas'),
-        import('jspdf'),
-      ]);
+      const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([ import('html2canvas'), import('jspdf') ]);
 
       const canvas = await html2canvas(doc.body, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
       const imgData = canvas.toDataURL('image/png');
@@ -258,7 +322,6 @@ export default function DisbursementPage() {
       pdf.addImage(imgData, 'PNG', margin, margin, imgWidth, imgHeight);
       pdf.save(`Disbursement-Voucher-${selectedVoucher.loanReference}.pdf`);
     } catch (err) {
-      console.error('PDF generation failed:', err);
       alert('Failed to generate PDF. Please try again.');
     } finally {
       if (document.body.contains(iframe)) document.body.removeChild(iframe);
@@ -267,94 +330,6 @@ export default function DisbursementPage() {
   };
 
   const printVoucher = () => window.print();
-
-  const triggerAccept = (disb: Disbursement) => {
-    setSelectedForAction(disb);
-    setAuthFormData({
-      fundSource: 'GENERAL_FUND',
-      disbursementType: disb.disbursementType || 'LOAN_RELEASE'
-    });
-    setIsAuthModalOpen(true);
-  };
-
-  const handleAcceptConfirm = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedForAction) return;
-    setIsAuthorizing(true);
-    
-    try {
-      const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
-      const res = await fetch(`${gatewayUrl}/api/finance/disbursements/${selectedForAction.id}/confirm`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          authorizedBy: 'Treasurer Romalyn Amante',
-          fundSource: authFormData.fundSource,
-          disbursementType: authFormData.disbursementType
-        })
-      });
-      
-      if (res.ok) {
-        await fetchDisbursements();
-        setIsAuthModalOpen(false);
-        setActionModal({
-          isOpen: true,
-          title: 'Authorization Successful',
-          message: '',
-          status: 'success',
-          resultMsg: `Disbursement for ${selectedForAction.memberName} has been successfully tracked and released from the ${authFormData.fundSource.replace('_', ' ')}.`
-        });
-      } else {
-        throw new Error("Backend failed to confirm");
-      }
-    } catch (err) {
-      console.error('Error confirming disbursement:', err);
-      setIsAuthModalOpen(false);
-      setActionModal({ isOpen: true, title: 'Authorization Failed', message: '', status: 'error', resultMsg: 'An error occurred while communicating with the server.' });
-    } finally {
-      setIsAuthorizing(false);
-    }
-  };
-
-  const triggerReject = (disb: Disbursement) => {
-    setSelectedForAction(disb);
-    setRejectReason('');
-    setIsRejectModalOpen(true);
-  };
-
-  const handleRejectConfirm = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedForAction || !rejectReason.trim()) return;
-    
-    setIsRejecting(true);
-    try {
-      const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
-      const res = await fetch(`${gatewayUrl}/api/finance/disbursements/${selectedForAction.id}/reject`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reason: rejectReason, authorizedBy: 'Treasurer Romalyn Amante' })
-      });
-      
-      if (res.ok) {
-        await fetchDisbursements();
-        setIsRejectModalOpen(false);
-        setActionModal({
-          isOpen: true,
-          title: 'Disbursement Rejected',
-          message: '',
-          status: 'success',
-          resultMsg: `The disbursement request for ${selectedForAction.memberName} has been rejected.`
-        });
-      } else {
-        throw new Error("Backend failed to reject the disbursement request.");
-      }
-    } catch (err: any) {
-      setIsRejectModalOpen(false);
-      setActionModal({ isOpen: true, title: 'Rejection Failed', message: '', status: 'error', resultMsg: err.message || 'An error occurred.' });
-    } finally {
-      setIsRejecting(false);
-    }
-  };
 
   const pendingCount = disbursements.filter(d => d.status === 'PENDING').length;
   const completedCount = disbursements.filter(d => d.status === 'COMPLETED').length;
@@ -398,7 +373,11 @@ export default function DisbursementPage() {
                       className="w-full rounded-xl px-4 py-3 text-sm bg-white border-[1.5px] border-[#dde3ee] focus:border-[#04152d] outline-none transition-colors font-bold text-[#04152d] cursor-pointer"
                     >
                       <option value="LOAN_RELEASE">Loan Release</option>
-                      <option value="MEMBER_BENEFIT">Member Benefit / Assistance</option>
+                      <option value="DEATH_ASSISTANCE">Death Assistance</option>
+                      <option value="EMERGENCY_ASSISTANCE">Emergency / Calamity</option>
+                      <option value="FOREIGN_ASSISTANCE">Foreign Assistance</option>
+                      <option value="MEMBER_BENEFIT">Member Benefit</option>
+                      <option value="REFUND">Refund</option>
                     </select>
                   </div>
                   <div>
@@ -421,7 +400,7 @@ export default function DisbursementPage() {
                   <button type="submit" disabled={isAuthorizing} className="inline-flex items-center justify-center gap-2 bg-emerald-600 text-white font-bold py-2.5 px-6 rounded-xl text-sm shadow-[0_6px_0_rgba(5,70,40,0.45),0_4px_18px_rgba(16,185,129,0.35)] hover:-translate-y-[1px] active:translate-y-[4px] active:shadow-[0_2px_0_rgba(5,70,40,0.45),0_2px_8px_rgba(16,185,129,0.25)] transition-all disabled:opacity-50 disabled:cursor-not-allowed">
                     {isAuthorizing ? <><Loader size={16} className="animate-spin" /> Authorizing...</> : 'Confirm & Release'}
                   </button>
-                  <button type="button" onClick={() => setIsAuthModalOpen(false)} disabled={isAuthorizing} className="inline-flex items-center justify-center gap-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 font-bold py-2.5 px-5 rounded-xl text-sm transition-all duration-150 disabled:opacity-50">Cancel</button>
+                  <button type="button" onClick={() => setIsAuthModalOpen(false)} disabled={isAuthorizing} className="inline-flex items-center justify-center gap-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 font-bold py-2.5 px-5 rounded-xl text-sm transition-all duration-150 disabled:opacity-50 shadow-[0_4px_0_rgba(229,231,235,1)] active:translate-y-[2px] active:shadow-[0_2px_0_rgba(229,231,235,1)] border-2 border-gray-200 bg-white">Cancel</button>
                 </div>
               </form>
             </div>
@@ -448,10 +427,10 @@ export default function DisbursementPage() {
                   <textarea required value={rejectReason} onChange={e => setRejectReason(e.target.value)} rows={3} placeholder="E.g., Invalid bank details provided..." className="w-full rounded-xl px-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] focus:border-red-500 outline-none transition-colors font-medium text-[#04152d] resize-none" />
                 </div>
                 <div className="pt-4 border-t border-gray-100 flex justify-start gap-3 flex-row-reverse">
-                  <button type="submit" disabled={isRejecting || !rejectReason.trim()} className="inline-flex items-center justify-center gap-2 bg-red-500 text-white font-bold py-2.5 px-6 rounded-xl text-sm shadow-[0_6px_0_rgba(153,27,27,0.45),0_4px_18px_rgba(220,38,38,0.35)] transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                  <button type="submit" disabled={isRejecting || !rejectReason.trim()} className="inline-flex items-center justify-center gap-2 bg-red-500 text-white font-bold py-2.5 px-6 rounded-xl text-sm shadow-[0_6px_0_rgba(153,27,27,0.45),0_4px_18px_rgba(220,38,38,0.35)] active:translate-y-[4px] active:shadow-[0_2px_0_rgba(153,27,27,0.45)] transition-all disabled:opacity-50 disabled:cursor-not-allowed">
                     {isRejecting ? <><Loader size={16} className="animate-spin" /> Rejecting...</> : 'Confirm Rejection'}
                   </button>
-                  <button type="button" onClick={() => setIsRejectModalOpen(false)} disabled={isRejecting} className="inline-flex items-center justify-center gap-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 font-bold py-2.5 px-5 rounded-xl text-sm transition-all duration-150 disabled:opacity-50">Cancel</button>
+                  <button type="button" onClick={() => setIsRejectModalOpen(false)} disabled={isRejecting} className="inline-flex items-center justify-center gap-2 text-gray-600 font-bold py-2.5 px-5 rounded-xl text-sm transition-all duration-150 disabled:opacity-50 bg-white border-2 border-gray-200 shadow-[0_4px_0_rgba(229,231,235,1)] active:translate-y-[2px] active:shadow-[0_2px_0_rgba(229,231,235,1)]">Cancel</button>
                 </div>
               </form>
             </div>
@@ -462,7 +441,7 @@ export default function DisbursementPage() {
 
         <main className="p-4 md:p-8 max-w-[1600px] w-full mx-auto space-y-6 flex-1 print:p-0 print:m-0 print:max-w-none">
           <div className="flex flex-col gap-6 mb-8 w-full">
-              
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
               <div className="bg-white rounded-2xl p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 flex flex-col justify-center animate-slide-up" style={{ animationDelay: '0.05s' }}>
                 <div className="flex items-center gap-4">
@@ -513,31 +492,59 @@ export default function DisbursementPage() {
             <div className="bg-white rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 overflow-hidden flex flex-col min-h-[400px] w-full animate-slide-up" style={{ animationDelay: '0.2s' }}>
               
               <div className="p-6 border-b border-gray-100 flex flex-col gap-5 bg-white/50">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <h2 className="text-xl font-black text-[#04152d] text-left">Treasurer Confirmation Queue</h2>
-                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600 shadow-[inset_0_0_0_1.5px_rgba(107,114,128,0.2)] font-mono">{filteredDisbursements.length} Records</span>
-                  </div>
-                </div>
-
+                
                 <div className="flex flex-wrap gap-3 items-center">
                   <div className="flex-1 min-w-[250px] relative">
                     <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input type="text" placeholder="Search Reference or Member..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full rounded-xl pl-10 pr-4 py-2 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] focus:border-[#04152d] outline-none transition-colors font-bold text-[#04152d]" />
+                    <input type="text" placeholder="Search Reference or Member..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full rounded-xl pl-10 pr-4 py-2.5 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] focus:border-[#04152d] outline-none transition-colors font-bold text-[#04152d]" />
+                  </div>
+                  
+                  {/* Calendar / Month Picker Filter */}
+                  <div className="relative inline-flex items-center w-full sm:w-auto min-w-[160px] bg-white border-[1.5px] border-[#dde3ee] rounded-xl overflow-hidden focus-within:border-[#04152d] transition-colors">
+                    <div className="pl-4 pr-2 flex items-center pointer-events-none">
+                      <Calendar size={14} className="text-gray-400" />
+                    </div>
+                    <div className="relative flex-1">
+                      <input 
+                        type="month" 
+                        value={filterMonth} 
+                        onChange={(e) => setFilterMonth(e.target.value)} 
+                        className="w-full py-2.5 text-sm outline-none font-bold text-[#04152d] bg-transparent cursor-pointer opacity-0 absolute inset-0 z-10" 
+                      />
+                      <div className="py-2.5 text-sm font-bold text-[#04152d] pointer-events-none truncate pr-2">
+                        {filterMonth ? new Date(filterMonth + '-01').toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'All Time'}
+                      </div>
+                    </div>
+                    {filterMonth ? (
+                      <button 
+                        onClick={() => setFilterMonth('')} 
+                        className="pr-4 pl-2 text-gray-400 hover:text-red-500 z-20 transition-colors"
+                      >
+                        <X size={14} />
+                      </button>
+                    ) : (
+                      <div className="pr-4 pl-2 pointer-events-none">
+                        <Calendar size={14} className="text-gray-400" />
+                      </div>
+                    )}
                   </div>
 
                   <div className="relative inline-block w-full sm:w-auto min-w-[150px]">
                     <Tag size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                    <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="w-full rounded-xl pl-10 pr-8 py-2 text-sm bg-white border-[1.5px] border-[#dde3ee] focus:border-[#04152d] outline-none transition-colors appearance-none font-bold text-[#04152d] cursor-pointer">
+                    <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="w-full rounded-xl pl-10 pr-8 py-2.5 text-sm bg-white border-[1.5px] border-[#dde3ee] focus:border-[#04152d] outline-none transition-colors appearance-none font-bold text-[#04152d] cursor-pointer">
                       <option value="ALL">All Categories</option>
                       <option value="LOAN_RELEASE">Loan Release</option>
+                      <option value="DEATH_ASSISTANCE">Death Assistance</option>
+                      <option value="EMERGENCY_ASSISTANCE">Emergency / Calamity</option>
+                      <option value="FOREIGN_ASSISTANCE">Foreign Assistance</option>
                       <option value="MEMBER_BENEFIT">Member Benefit</option>
+                      <option value="REFUND">Refund</option>
                     </select>
                   </div>
 
                   <div className="relative inline-block w-full sm:w-auto min-w-[150px]">
                     <Filter size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                    <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="w-full rounded-xl pl-10 pr-8 py-2 text-sm bg-white border-[1.5px] border-[#dde3ee] focus:border-[#04152d] outline-none transition-colors appearance-none font-bold text-[#04152d] cursor-pointer">
+                    <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="w-full rounded-xl pl-10 pr-8 py-2.5 text-sm bg-white border-[1.5px] border-[#dde3ee] focus:border-[#04152d] outline-none transition-colors appearance-none font-bold text-[#04152d] cursor-pointer">
                       <option value="ALL">All Status</option>
                       <option value="PENDING">Pending Review</option>
                       <option value="COMPLETED">Completed</option>
@@ -566,7 +573,7 @@ export default function DisbursementPage() {
                         <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] text-left">Payee (Member)</th>
                         <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] text-left">Category</th>
                         <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] text-left">Method & Bank</th>
-                        <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] text-left">Amount</th>
+                        <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] text-right">Amount</th>
                         <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] text-left">Status</th>
                         <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] text-left">Actions</th>
                       </tr>
@@ -576,7 +583,7 @@ export default function DisbursementPage() {
                         <tr key={disb.id} className="hover:bg-[#e8edf8]/60 transition-colors duration-100">
                           <td className="px-6 py-5 text-sm text-gray-700 text-left">
                             <div className="font-mono font-medium text-[#04152d]">{disb.loanReference}</div>
-                            <span className="text-[10px] text-gray-400 font-mono block mt-0.5">{disb.id.substring(0, 8)}...</span>
+                            <span className="text-[10px] text-gray-400 font-mono block mt-0.5">{new Date(disb.createdAt).toLocaleDateString()}</span>
                           </td>
                           
                           <td className="px-6 py-5 text-sm text-gray-700 text-left">
@@ -586,7 +593,7 @@ export default function DisbursementPage() {
 
                           <td className="px-6 py-5 text-sm text-gray-700 text-left">
                             <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest ${
-                              disb.disbursementType === 'MEMBER_BENEFIT' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'
+                              disb.disbursementType === 'LOAN_RELEASE' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'
                             }`}>
                               {disb.disbursementType?.replace('_', ' ')}
                             </span>
@@ -600,7 +607,7 @@ export default function DisbursementPage() {
                             <span className="text-[10px] text-gray-500 uppercase tracking-widest mt-1 block text-left">{disb.paymentMethod}</span>
                           </td>
                           
-                          <td className="px-6 py-5 text-sm text-left font-black text-emerald-700 text-base">
+                          <td className="px-6 py-5 text-right font-black text-emerald-700 text-base">
                             ₱{Number(disb.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                           </td>
                           
@@ -634,11 +641,11 @@ export default function DisbursementPage() {
 
               {totalPages > 1 && !isLoading && (
                 <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-gray-50/50 mt-auto">
-                  <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="inline-flex items-center justify-center gap-2 bg-white border border-gray-200 text-[#04152d] hover:bg-gray-50 font-bold py-2.5 px-4 rounded-xl text-xs transition-all disabled:opacity-50 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+                  <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="inline-flex items-center justify-center gap-2 bg-white border border-gray-200 text-[#04152d] hover:bg-gray-50 font-bold py-2.5 px-4 rounded-xl text-xs transition-all disabled:opacity-50 shadow-[0_4px_0_rgba(229,231,235,1)] active:translate-y-[2px] active:shadow-[0_2px_0_rgba(229,231,235,1)]">
                     <ChevronLeft size={16} /> Previous
                   </button>
                   <span className="text-[11px] font-black text-gray-500 uppercase tracking-widest">Page {currentPage} of {totalPages}</span>
-                  <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="inline-flex items-center justify-center gap-2 bg-white border border-gray-200 text-[#04152d] hover:bg-gray-50 font-bold py-2.5 px-4 rounded-xl text-xs transition-all disabled:opacity-50 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+                  <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="inline-flex items-center justify-center gap-2 bg-white border border-gray-200 text-[#04152d] hover:bg-gray-50 font-bold py-2.5 px-4 rounded-xl text-xs transition-all disabled:opacity-50 shadow-[0_4px_0_rgba(229,231,235,1)] active:translate-y-[2px] active:shadow-[0_2px_0_rgba(229,231,235,1)]">
                     Next <ChevronRight size={16} />
                   </button>
                 </div>
@@ -649,7 +656,7 @@ export default function DisbursementPage() {
       </div>
 
       {selectedVoucher && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#04152d]/60 backdrop-blur-sm print:bg-transparent print:static print:block print:inset-auto animate-fade-in p-4 print:p-0">
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-[#04152d]/60 backdrop-blur-sm print:bg-transparent print:static print:block print:inset-auto animate-fade-in p-4 print:p-0">
           <div className="bg-white w-full max-w-3xl rounded-[24px] shadow-2xl flex flex-col max-h-[95vh] print:max-h-none print:shadow-none print:border-none print:rounded-none print:mx-auto animate-pop overflow-hidden print:overflow-visible">
             
             <div className="flex items-center justify-between p-5 border-b border-gray-100 print:hidden bg-gray-50/80">
@@ -657,8 +664,8 @@ export default function DisbursementPage() {
               <div className="flex gap-3">
                 {selectedVoucher.status === 'COMPLETED' && (
                   <>
-                    <button onClick={printVoucher} className="inline-flex items-center justify-center gap-2 border-2 border-[#04152d] text-[#04152d] hover:bg-[#04152d] hover:text-white font-bold py-2.5 px-5 rounded-xl text-sm transition-all duration-150"><Printer size={16} /> Print</button>
-                    <button onClick={downloadVoucherPDF} disabled={isGeneratingPDF} className="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-5 rounded-xl text-sm shadow-[0_5px_0_rgba(5,70,40,0.45),0_4px_14px_rgba(16,185,129,0.3)] transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                    <button onClick={printVoucher} className="inline-flex items-center justify-center gap-2 border-2 border-[#04152d] text-[#04152d] hover:bg-[#04152d] hover:text-white font-bold py-2.5 px-5 rounded-xl text-sm shadow-[0_4px_0_rgba(2,6,15,0.55)] active:translate-y-[2px] active:shadow-[0_2px_0_rgba(2,6,15,0.55)] transition-all duration-150"><Printer size={16} /> Print</button>
+                    <button onClick={downloadVoucherPDF} disabled={isGeneratingPDF} className="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-5 rounded-xl text-sm shadow-[0_6px_0_rgba(5,70,40,0.45)] active:translate-y-[4px] active:shadow-[0_2px_0_rgba(5,70,40,0.45)] transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                       {isGeneratingPDF ? <><Loader size={16} className="animate-spin" /> Generating...</> : <><Download size={16} /> PDF</>}
                     </button>
                   </>
@@ -705,7 +712,7 @@ export default function DisbursementPage() {
                 <thead>
                   <tr className="bg-[#04152d] text-white border-y-2 border-[#04152d] print:bg-white print:text-[#04152d]">
                     <th className="py-3.5 px-5 text-left text-[10px] font-black uppercase tracking-widest rounded-tl-lg print:border-b-2 print:border-[#04152d]">Particulars / Narrative</th>
-                    <th className="py-3.5 px-5 text-left text-[10px] font-black uppercase tracking-widest rounded-tr-lg print:border-b-2 print:border-[#04152d]">Debit Amount (PHP)</th>
+                    <th className="py-3.5 px-5 text-right text-[10px] font-black uppercase tracking-widest rounded-tr-lg print:border-b-2 print:border-[#04152d]">Debit Amount (PHP)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -714,7 +721,7 @@ export default function DisbursementPage() {
                       Disbursement release for reference: <span className="font-black text-[#04152d]">{selectedVoucher.loanReference}</span>. <br/>
                       <span className="text-xs text-gray-500 font-medium italic mt-2 block text-left">Method: {selectedVoucher.paymentMethod} ({selectedVoucher.bankAccount})</span>
                     </td>
-                    <td className="py-6 px-5 text-left font-black text-2xl text-emerald-700 align-top print:text-[#04152d]">₱{Number(selectedVoucher.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                    <td className="py-6 px-5 text-right font-black text-2xl text-emerald-700 align-top print:text-[#04152d]">₱{Number(selectedVoucher.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                   </tr>
                 </tbody>
               </table>
@@ -723,8 +730,8 @@ export default function DisbursementPage() {
                 <div className="flex flex-col items-center text-center">
                   <p className="block text-[11px] font-black text-[#04152d] uppercase tracking-[0.1em] mb-12 text-left">Prepared By</p>
                   <div className="w-full border-t border-[#04152d] pt-3">
-                    <p className="font-black text-xs text-[#04152d] uppercase tracking-wide text-left">Loan App System</p>
-                    <p className="text-[10px] text-[#04152d] font-bold uppercase mt-1 text-left">LAS Authorized Personnel</p>
+                    <p className="font-black text-xs text-[#04152d] uppercase tracking-wide text-left">System Admin</p>
+                    <p className="text-[10px] text-[#04152d] font-bold uppercase mt-1 text-left">BDOEA Officer</p>
                   </div>
                 </div>
                 <div className="flex flex-col items-center text-center">

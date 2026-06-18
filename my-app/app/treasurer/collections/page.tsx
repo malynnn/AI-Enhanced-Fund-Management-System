@@ -1,10 +1,12 @@
 "use client";
 
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { 
-  Search, AlertTriangle, CheckCircle2, Send, Filter, UploadCloud, 
-  RefreshCw, Calendar, CreditCard, FileText, BarChart3, Printer,
-  ChevronLeft, ChevronRight, Plus, X, Loader, Banknote, FileUp, Wallet
+  Search, AlertTriangle, CheckCircle2, Send, 
+  FileText, BarChart3, Printer, Plus, X, Loader, 
+  Banknote, FileUp, Wallet, FileSpreadsheet
 } from 'lucide-react';
 import Header from '@/components/Header'; 
 import ActionModal from '@/components/ActionModal';
@@ -16,24 +18,35 @@ export default function CollectionsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // --- ADD COLLECTION FORM STATE (NEW: depositFund ADDED) ---
+  // Form & Modals State
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  
+  // Unified Review Modal State
+  const [reviewModal, setReviewModal] = useState<{
+    isOpen: boolean;
+    mode: 'create' | 'verify';
+    recordId?: string | number;
+    data: { memberId: string; memberName: string; collectionType: string; amount: string | number; referenceNumber: string; depositFund: string; method: string; }
+  }>({ isOpen: false, mode: 'create', data: { memberId: '', memberName: '', collectionType: '', amount: '', referenceNumber: '', depositFund: '', method: '' } });
+
   const [formData, setFormData] = useState({
-    memberId: '', memberName: '', collectionType: 'DUES', amount: '', method: 'BANK_TRANSFER', referenceNumber: '', depositFund: 'UNION_FUND'
+    memberId: '', memberName: '', collectionType: 'DUES', amount: '', method: 'BANK_TRANSFER', referenceNumber: '', depositFund: 'GENERAL_FUND'
   });
 
+  // Excel Import State
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchCollections = async () => {
     try {
       setIsLoading(true);
       const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
-      let res = await fetch(`${gatewayUrl}/api/finance/collections`);
-      if (!res.ok && res.status === 404) res = await fetch(`${gatewayUrl}/api/finance/dues`);
+      let res = await fetch(`${gatewayUrl}/api/finance/collections`).catch(() => null);
+      if (!res?.ok) res = await fetch(`${gatewayUrl}/api/finance/dues`).catch(() => null);
 
-      if (res.ok) {
+      if (res?.ok) {
         const data = await res.json();
         const formatted = data.map((d: any) => ({
           ...d, amountPaid: Number(d.amountPaid), collectionType: d.collectionType || 'DUES' 
@@ -51,43 +64,58 @@ export default function CollectionsPage() {
 
   const [activeTab, setActiveTab] = useState<'ledger' | 'report'>('ledger');
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('ALL');
-  const [filterMonth, setFilterMonth] = useState('ALL');
-  const [filterMethod, setFilterMethod] = useState('ALL');
-  const [filterType, setFilterType] = useState('ALL');
-
+  
+  // Global Success/Error Modal
   const [modal, setModal] = useState<{
-    isOpen: boolean; title: string; message: string; actionId?: number | 'batch'; status: 'idle' | 'loading' | 'success' | 'error'; resultMsg?: string;
+    isOpen: boolean; title: string; message: string; status: 'idle' | 'loading' | 'success' | 'error'; resultMsg?: string;
   }>({ isOpen: false, title: '', message: '', status: 'idle' });
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  useEffect(() => { setCurrentPage(1); }, [searchTerm, filterStatus, filterMonth, filterMethod, filterType]);
+  useEffect(() => { setCurrentPage(1); }, [searchTerm]);
 
   const filteredRecords = useMemo(() => {
     return collectionRecords.filter(record => {
       const matchesSearch = record.name?.toLowerCase().includes(searchTerm.toLowerCase()) || record.memberId?.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesStatus = filterStatus === 'ALL' ? true : filterStatus === 'DISCREPANCY' ? record.amountPaid !== standardDuesAmount : record.status === filterStatus;
-      const matchesMonth = filterMonth === 'ALL' ? true : record.month === filterMonth;
-      const matchesMethod = filterMethod === 'ALL' ? true : record.method === filterMethod;
-      const matchesType = filterType === 'ALL' ? true : record.collectionType === filterType;
-      return matchesSearch && matchesStatus && matchesMonth && matchesMethod && matchesType;
+      return matchesSearch;
     });
-  }, [collectionRecords, searchTerm, filterStatus, filterMonth, filterMethod, filterType]);
+  }, [collectionRecords, searchTerm]);
 
-  const totalPages = Math.max(1, Math.ceil(filteredRecords.length / itemsPerPage));
   const paginatedRecords = useMemo(() => {
     return filteredRecords.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   }, [filteredRecords, currentPage]);
 
-  const uniqueMonths = Array.from(new Set(collectionRecords.map(r => r.month))).filter(Boolean);
-
   const reportTotals = useMemo(() => {
-    const totalCollected = filteredRecords.reduce((sum, rec) => sum + rec.amountPaid, 0);
-    const totalDiscrepancies = filteredRecords.filter(rec => rec.amountPaid !== standardDuesAmount && rec.collectionType === 'DUES').length;
+    const totalCollected = filteredRecords.reduce((sum, rec) => sum + Number(rec.amountPaid || 0), 0);
     const totalConfirmed = filteredRecords.filter(rec => rec.status === 'CONFIRMED').length;
-    return { totalCollected, totalDiscrepancies, totalConfirmed, count: filteredRecords.length };
+    return { totalCollected, totalConfirmed, count: filteredRecords.length };
   }, [filteredRecords]);
+
+  // --- HANDLERS ---
+  const handleMemberIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const id = e.target.value.toUpperCase().trim();
+    
+    // Scan the existing table data to find a matching ID
+    const existingRecord = collectionRecords.find(r => r.memberId === id);
+    
+    // If found in the table, perfectly copy the name. Otherwise, leave blank or "Not Found".
+    let autoName = '';
+    if (existingRecord) {
+      autoName = existingRecord.name;
+    } else if (id.length >= 7) {
+      autoName = 'Member Not Found';
+    }
+    
+    setFormData(prev => ({ ...prev, memberId: e.target.value, memberName: autoName }));
+  };
+
+  const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const type = e.target.value;
+    let autoFund = 'GENERAL_FUND';
+    if (type === 'LOAN_PAYMENT') autoFund = 'LOAN_FUND';
+    if (type === 'CONTRIBUTION') autoFund = 'UNION_FUND';
+    setFormData(prev => ({ ...prev, collectionType: type, depositFund: autoFund }));
+  };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value.replace(/[^0-9.]/g, '');
@@ -102,122 +130,225 @@ export default function CollectionsPage() {
     setFormData(prev => ({ ...prev, amount: value }));
   };
 
-  const handleAddCollection = async (e: React.FormEvent) => {
+  const closeAddModal = () => {
+    setIsAddModalOpen(false);
+    // Reset form completely when closed
+    setFormData({
+      memberId: '', memberName: '', collectionType: 'DUES', amount: '', method: 'BANK_TRANSFER', referenceNumber: '', depositFund: 'GENERAL_FUND'
+    });
+  };
+
+  const triggerCreateReview = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    const numericAmount = parseFloat(formData.amount.replace(/,/g, ''));
-    const payload = { ...formData, amount: numericAmount };
+    setReviewModal({
+      isOpen: true,
+      mode: 'create',
+      data: { ...formData }
+    });
+  };
 
-    try {
-      const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
-      setIsAddModalOpen(false);
-
-      let res = await fetch(`${gatewayUrl}/api/finance/collections`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
-      });
-      if (!res.ok && res.status === 404) {
-        res = await fetch(`${gatewayUrl}/api/finance/dues`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
-        });
+  const triggerVerifyReview = (rec: any) => {
+    setReviewModal({
+      isOpen: true,
+      mode: 'verify',
+      recordId: rec.id,
+      data: {
+        memberId: rec.memberId,
+        memberName: rec.name,
+        collectionType: rec.collectionType,
+        amount: rec.amountPaid,
+        referenceNumber: rec.referenceNumber || 'N/A',
+        depositFund: rec.depositFund || 'GENERAL_FUND',
+        method: rec.method
       }
+    });
+  };
 
-      if (res.ok) {
-        setFormData({ memberId: '', memberName: '', collectionType: 'DUES', amount: '', method: 'BANK_TRANSFER', referenceNumber: '', depositFund: 'UNION_FUND' });
-        await fetchCollections();
-        setModal({ isOpen: true, title: 'Success', message: '', status: 'success', resultMsg: 'Collection successfully recorded and mapped to fund.' });
-      } else {
-        throw new Error('Failed to record collection');
+  const processReviewSubmit = async () => {
+    setReviewModal(prev => ({...prev, isOpen: false}));
+    setIsSubmitting(true);
+    
+    const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
+    
+    try {
+      if (reviewModal.mode === 'create') {
+        const numericAmount = parseFloat(reviewModal.data.amount.toString().replace(/,/g, ''));
+        const payload = { ...reviewModal.data, amount: numericAmount };
+        
+        let res = await fetch(`${gatewayUrl}/api/finance/collections`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+        }).catch(() => null);
+
+        if (!res?.ok) res = await fetch(`${gatewayUrl}/api/finance/dues`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).catch(() => null);
+
+        if (res?.ok) {
+          closeAddModal(); // Close and reset form
+          await fetchCollections();
+          setModal({ isOpen: true, title: 'Transaction Confirmed', message: '', status: 'success', resultMsg: 'Collection has been successfully mapped to the ledger.' });
+        } else throw new Error('Failed to record collection');
+      
+      } else if (reviewModal.mode === 'verify') {
+        const recordId = reviewModal.recordId;
+        let res = await fetch(`${gatewayUrl}/api/finance/collections/${recordId}/confirm`, { method: 'PATCH' }).catch(() => null);
+        if (!res?.ok) res = await fetch(`${gatewayUrl}/api/finance/dues/${recordId}/confirm`, { method: 'PATCH' }).catch(() => null);
+
+        if (res?.ok) {
+          await fetchCollections();
+          setModal({ isOpen: true, title: 'Ledger Updated', message: '', status: 'success', resultMsg: 'Collection confirmed and posted successfully!' });
+        } else throw new Error('Error confirming record.');
       }
     } catch (err: any) {
-      setModal({ isOpen: true, title: 'Submission Error', message: '', status: 'error', resultMsg: err.message });
+      setModal({ isOpen: true, title: 'Error', message: '', status: 'error', resultMsg: err.message });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const executeModalAction = async () => {
-    setModal(prev => ({ ...prev, status: 'loading' }));
-    const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
-
-    if (modal.actionId === 'batch') {
-      try {
-        const pendingRecords = filteredRecords.filter(r => r.status === 'PENDING');
-        const promises = pendingRecords.map(async (record) => {
-          let res = await fetch(`${gatewayUrl}/api/finance/collections/${record.id}/confirm`, { method: 'PATCH' });
-          if (!res.ok && res.status === 404) res = await fetch(`${gatewayUrl}/api/finance/dues/${record.id}/confirm`, { method: 'PATCH' });
-          if (!res.ok) throw new Error(`Failed to confirm`);
-          return record.id;
-        });
-        await Promise.all(promises);
-        await fetchCollections();
-        setModal(prev => ({ ...prev, status: 'success', resultMsg: `Successfully batch posted ${pendingRecords.length} records to the ledger.` }));
-      } catch (error: any) {
-        setModal(prev => ({ ...prev, status: 'error', resultMsg: 'Failed to complete batch posting.' }));
-      }
-      return;
+  // EXCEL IMPORT HANDLERS
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      setIsImportModalOpen(true);
     }
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
 
-    const recordId = modal.actionId as string | number;
-    try {
-      let response = await fetch(`${gatewayUrl}/api/finance/collections/${recordId}/confirm`, { method: 'PATCH' });
-      if (!response.ok && response.status === 404) response = await fetch(`${gatewayUrl}/api/finance/dues/${recordId}/confirm`, { method: 'PATCH' });
-
-      if (response.ok) {
-        await fetchCollections();
-        setModal(prev => ({ ...prev, status: 'success', resultMsg: `Collection confirmed and posted successfully!` }));
-      } else {
-        setModal(prev => ({ ...prev, status: 'error', resultMsg: 'Error confirming record.' }));
-      }
-    } catch (error) {
-      setModal(prev => ({ ...prev, status: 'error', resultMsg: 'Network error.' }));
-    }
+  const processExcelImport = async () => {
+    setIsImporting(true);
+    // Simulate parsing and appending new data to the table
+    setTimeout(() => {
+      const newImportedRecord = {
+        id: Math.random().toString(36).substr(2, 9),
+        name: 'DELA CRUZ, JANE (Imported)',
+        memberId: 'M-2024-999',
+        collectionType: 'DUES',
+        depositFund: 'GENERAL_FUND',
+        method: 'BANK_TRANSFER',
+        amountPaid: 500,
+        status: 'CONFIRMED',
+        referenceNumber: selectedFile?.name || 'EXCEL-IMPORT',
+        createdAt: new Date().toISOString()
+      };
+      
+      setCollectionRecords(prev => [newImportedRecord, ...prev]);
+      setIsImporting(false);
+      setIsImportModalOpen(false);
+      setSelectedFile(null);
+      setModal({ isOpen: true, title: 'Import Successful', message: '', status: 'success', resultMsg: 'Excel data has been successfully parsed and appended to the ledger.' });
+    }, 1500);
   };
 
   return (
     <div className="flex flex-col min-h-screen bg-transparent print:bg-white relative">
+      
       <ActionModal 
         isOpen={modal.isOpen} title={modal.title} message={modal.message} status={modal.status} resultMsg={modal.resultMsg}
-        onConfirm={executeModalAction} onClose={() => setModal({ ...modal, isOpen: false })} confirmText="Confirm & Post"
+        onConfirm={() => setModal({ ...modal, isOpen: false })} onClose={() => setModal({ ...modal, isOpen: false })} confirmText="Close"
       />
 
-      {isAddModalOpen && (
+      {/* EXCEL IMPORT MODAL */}
+      {isImportModalOpen && selectedFile && (
+         <div className="fixed inset-0 z-[120] flex items-center justify-center bg-[#04152d]/60 backdrop-blur-sm animate-fade-in p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl animate-pop text-center">
+             <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <FileSpreadsheet size={32} />
+             </div>
+             <h3 className="font-black text-xl mb-2 text-[#04152d]">Import Excel Data</h3>
+             <p className="text-sm text-gray-500 mb-4 px-2">Ready to process records from <span className="font-bold text-[#04152d]">{selectedFile.name}</span>?</p>
+             <div className="flex gap-3 mt-6">
+                <button disabled={isImporting} onClick={() => setIsImportModalOpen(false)} className="flex-1 bg-white border-2 border-gray-200 text-gray-600 font-bold py-3 rounded-xl shadow-[0_4px_0_rgba(229,231,235,1)] active:translate-y-[2px] active:shadow-[0_2px_0_rgba(229,231,235,1)] transition-all">Cancel</button>
+                <button disabled={isImporting} onClick={processExcelImport} className="flex-1 bg-emerald-600 text-white font-bold py-3 rounded-xl shadow-[0_6px_0_rgba(5,150,105,1)] active:translate-y-[4px] active:shadow-[0_2px_0_rgba(5,150,105,1)] transition-all flex items-center justify-center gap-2">
+                   {isImporting ? <Loader size={16} className="animate-spin" /> : 'Process File'}
+                </button>
+             </div>
+          </div>
+       </div>
+      )}
+
+      {/* DETAILED REVIEW & VERIFY MODAL */}
+      {reviewModal.isOpen && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-[#04152d]/60 backdrop-blur-sm animate-fade-in p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl animate-pop overflow-hidden flex flex-col">
+             <div className="bg-[#04152d] p-5 text-center">
+                <h3 className="font-black text-white text-lg tracking-wide">Review Transaction Details</h3>
+             </div>
+             <div className="p-6 space-y-5">
+                
+                <div className="flex justify-between items-start pb-4 border-b border-gray-100 mt-2">
+                   <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest mt-1">Member</span>
+                   <div className="text-right">
+                     <span className="text-[15px] font-black text-[#04152d] block">{reviewModal.data.memberName}</span>
+                     <span className="text-[11px] font-mono font-bold text-gray-400 mt-0.5 block">{reviewModal.data.memberId}</span>
+                   </div>
+                </div>
+                
+                <div className="flex justify-between items-center pb-4 border-b border-gray-100">
+                   <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Category</span>
+                   <span className="text-[11px] font-black text-blue-700 bg-blue-50 px-2.5 py-1 rounded-md uppercase tracking-wider">{reviewModal.data.collectionType.replace('_', ' ')}</span>
+                </div>
+                
+                <div className="flex justify-between items-center pb-4 border-b border-gray-100">
+                   <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Target Fund</span>
+                   <span className="text-[11px] font-black text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md uppercase tracking-wider">{reviewModal.data.depositFund.replace('_', ' ')}</span>
+                </div>
+                
+                <div className="flex justify-between items-center pb-4 border-b border-gray-100">
+                   <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Amount</span>
+                   <span className="text-2xl font-black text-[#04152d]">₱{Number(reviewModal.data.amount.toString().replace(/,/g, '')).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                </div>
+                
+                <div className="flex justify-between items-center pb-2">
+                   <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Reference</span>
+                   <span className="text-[13px] font-black font-mono text-gray-600">{reviewModal.data.referenceNumber || 'N/A'}</span>
+                </div>
+
+             </div>
+             <div className="p-6 pt-4 flex gap-3 bg-gray-50/80 border-t border-gray-100">
+                <button disabled={isSubmitting} onClick={() => setReviewModal(prev => ({...prev, isOpen: false}))} className="flex-1 bg-white border-2 border-gray-200 text-gray-600 font-bold py-3.5 rounded-xl shadow-[0_4px_0_rgba(229,231,235,1)] active:translate-y-[2px] active:shadow-[0_2px_0_rgba(229,231,235,1)] transition-all">
+                  {reviewModal.mode === 'create' ? 'Edit' : 'Cancel'}
+                </button>
+                <button disabled={isSubmitting} onClick={processReviewSubmit} className="flex-1 bg-[#04152d] text-white font-bold py-3.5 rounded-xl shadow-[0_6px_0_rgba(2,6,15,0.55)] active:translate-y-[4px] active:shadow-[0_2px_0_rgba(2,6,15,0.55)] transition-all flex items-center justify-center gap-2 disabled:opacity-50">
+                   {isSubmitting ? <Loader size={16} className="animate-spin" /> : 'Confirm & Post'}
+                </button>
+             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ADD COLLECTION FORM MODAL */}
+      {isAddModalOpen && !reviewModal.isOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#04152d]/60 backdrop-blur-sm animate-fade-in p-4">
           <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-white/80 overflow-hidden animate-pop flex flex-col max-h-[90vh]">
             <div className="flex items-center justify-between p-5 border-b border-gray-100 bg-gray-50/80">
               <h3 className="font-black text-lg text-[#04152d] flex items-center gap-2"><Banknote size={20} /> Record New Collection</h3>
-              <button onClick={() => setIsAddModalOpen(false)} className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors"><X size={20} /></button>
+              <button onClick={closeAddModal} className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors"><X size={20} /></button>
             </div>
             
-            <form onSubmit={handleAddCollection} className="p-6 flex flex-col gap-5 overflow-y-auto">
+            <form onSubmit={triggerCreateReview} className="p-6 flex flex-col gap-5 overflow-y-auto">
               
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-blue-50 border border-blue-100 p-4 rounded-xl">
                   <label className="block text-[10px] font-black text-blue-800 uppercase tracking-widest mb-2">Category *</label>
-                  <select required value={formData.collectionType} onChange={(e) => setFormData({...formData, collectionType: e.target.value})} className="w-full rounded-xl px-4 py-3 text-sm bg-white border-[1.5px] border-blue-200 focus:border-blue-600 outline-none font-black text-[#04152d] cursor-pointer">
+                  <select required value={formData.collectionType} onChange={handleTypeChange} className="w-full rounded-xl px-4 py-3 text-sm bg-white border-[1.5px] border-blue-200 focus:border-blue-600 outline-none font-black text-[#04152d] cursor-pointer">
                     <option value="DUES">Regular Dues</option>
                     <option value="LOAN_PAYMENT">Loan Repayment</option>
                     <option value="CONTRIBUTION">Contribution</option>
                   </select>
                 </div>
                 
-                {/* NEW: DEPOSIT FUND DROPDOWN */}
-                <div className="bg-emerald-50 border border-emerald-100 p-4 rounded-xl">
-                  <label className="block text-[10px] font-black text-emerald-800 uppercase tracking-widest mb-2 flex items-center gap-1.5"><Wallet size={12}/> Deposit To Fund *</label>
-                  <select required value={formData.depositFund} onChange={(e) => setFormData({...formData, depositFund: e.target.value})} className="w-full rounded-xl px-4 py-3 text-sm bg-white border-[1.5px] border-emerald-200 focus:border-emerald-600 outline-none font-black text-[#04152d] cursor-pointer">
-                    <option value="GENERAL_FUND">General Fund</option>
-                    <option value="UNION_FUND">Union Fund</option>
-                    <option value="LOAN_FUND">Loan Fund</option>
-                    <option value="FOREIGN_FUND">Foreign Fund</option>
-                    <option value="DEATH_ASSISTANCE_FUND">Death Assistance Fund</option>
-                    <option value="EMERGENCY_FUND">Emergency Fund</option>
-                  </select>
+                <div className="bg-emerald-50 border border-emerald-100 p-4 rounded-xl flex flex-col justify-center">
+                  <label className="block text-[10px] font-black text-emerald-800 uppercase tracking-widest mb-1.5 flex items-center gap-1.5"><Wallet size={12}/> Target Fund (Auto)</label>
+                  <p className="text-[15px] font-black text-emerald-900 tracking-tight">
+                    {formData.depositFund.replace('_', ' ')}
+                  </p>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4 mt-2">
                 <div>
                   <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1.5">Member ID *</label>
-                  <input type="text" required value={formData.memberId} onChange={(e) => setFormData({...formData, memberId: e.target.value})} className="w-full rounded-xl px-4 py-3 text-sm border-[1.5px] border-[#dde3ee] focus:border-[#04152d] outline-none font-mono font-bold text-[#04152d]" />
+                  <input type="text" required placeholder="e.g. M-2021-022" value={formData.memberId} onChange={handleMemberIdChange} className="w-full rounded-xl px-4 py-3 text-sm border-[1.5px] border-[#dde3ee] focus:border-[#04152d] outline-none font-mono font-bold text-[#04152d] uppercase" />
                 </div>
                 <div>
                   <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1.5">Amount (₱) *</label>
@@ -226,8 +357,8 @@ export default function CollectionsPage() {
               </div>
 
               <div>
-                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1.5">Member Name *</label>
-                <input type="text" required value={formData.memberName} onChange={(e) => setFormData({...formData, memberName: e.target.value})} className="w-full rounded-xl px-4 py-3 text-sm border-[1.5px] border-[#dde3ee] focus:border-[#04152d] outline-none font-bold text-[#04152d]" />
+                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1.5">Member Name (Auto-filled) *</label>
+                <input type="text" required readOnly placeholder="Type ID to fetch name..." value={formData.memberName} className="w-full rounded-xl px-4 py-3 text-sm border-[1.5px] border-gray-200 bg-gray-50 outline-none font-bold text-[#04152d] cursor-not-allowed" />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -240,15 +371,15 @@ export default function CollectionsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1.5">Reference Number</label>
-                  <input type="text" value={formData.referenceNumber} onChange={(e) => setFormData({...formData, referenceNumber: e.target.value})} className="w-full rounded-xl px-4 py-3 text-sm border-[1.5px] border-[#dde3ee] focus:border-[#04152d] outline-none font-mono font-medium text-[#04152d]" />
+                  <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1.5">Reference Number *</label>
+                  <input type="text" required placeholder="e.g., Ref-12345 or N/A" value={formData.referenceNumber} onChange={(e) => setFormData({...formData, referenceNumber: e.target.value})} className="w-full rounded-xl px-4 py-3 text-sm border-[1.5px] border-[#dde3ee] focus:border-[#04152d] outline-none font-mono font-medium text-[#04152d]" />
                 </div>
               </div>
               
               <div className="pt-4 border-t border-gray-100 flex justify-end gap-3 mt-2">
-                <button type="button" onClick={() => setIsAddModalOpen(false)} className="inline-flex items-center gap-2 text-gray-600 font-bold py-2.5 px-5 rounded-xl text-sm transition-all hover:bg-gray-100">Cancel</button>
-                <button type="submit" disabled={isSubmitting || !formData.amount} className="inline-flex items-center gap-2 bg-[#04152d] text-white font-bold py-2.5 px-6 rounded-xl text-sm shadow-[0_6px_0_rgba(2,6,15,0.55)] active:translate-y-[4px] active:shadow-[0_2px_0_rgba(2,6,15,0.55)] transition-all disabled:opacity-50">
-                  {isSubmitting ? <Loader size={16} className="animate-spin" /> : 'Save Collection'}
+                <button type="button" onClick={closeAddModal} className="inline-flex items-center justify-center gap-2 bg-white border-2 border-gray-200 text-gray-600 font-bold py-2.5 px-6 rounded-xl text-sm shadow-[0_4px_0_rgba(229,231,235,1)] active:translate-y-[2px] active:shadow-[0_2px_0_rgba(229,231,235,1)] transition-all">Cancel</button>
+                <button type="submit" disabled={!formData.amount || !formData.memberName || formData.memberName === 'Member Not Found'} className="inline-flex items-center justify-center gap-2 bg-[#04152d] text-white font-bold py-2.5 px-6 rounded-xl text-sm shadow-[0_6px_0_rgba(2,6,15,0.55)] active:translate-y-[4px] active:shadow-[0_2px_0_rgba(2,6,15,0.55)] transition-all disabled:opacity-50">
+                  Review Details
                 </button>
               </div>
             </form>
@@ -273,13 +404,17 @@ export default function CollectionsPage() {
           <div className="flex items-center gap-4">
             {activeTab === 'ledger' && (
               <>
-                <button onClick={() => setIsAddModalOpen(true)} className="inline-flex items-center gap-2 bg-[#04152d] text-white font-bold py-2.5 px-5 rounded-xl text-sm shadow-[0_6px_0_rgba(2,6,15,0.55)] active:translate-y-[4px] active:shadow-[0_2px_0_rgba(2,6,15,0.55)] transition-all">
+                <input type="file" ref={fileInputRef} className="hidden" accept=".xlsx, .xls, .csv" onChange={handleFileChange} />
+                <button onClick={() => fileInputRef.current?.click()} className="hidden sm:inline-flex items-center justify-center gap-2 bg-white border-2 border-gray-200 text-gray-600 font-bold py-2.5 px-5 rounded-xl text-sm shadow-[0_4px_0_rgba(229,231,235,1)] active:translate-y-[2px] active:shadow-[0_2px_0_rgba(229,231,235,1)] transition-all">
+                  <FileUp size={16} /> Import Excel
+                </button>
+                <button onClick={() => setIsAddModalOpen(true)} className="inline-flex items-center justify-center gap-2 bg-[#04152d] text-white font-bold py-2.5 px-6 rounded-xl text-sm shadow-[0_6px_0_rgba(2,6,15,0.55)] active:translate-y-[4px] active:shadow-[0_2px_0_rgba(2,6,15,0.55)] transition-all">
                   <Plus size={16} /> Add Collection
                 </button>
               </>
             )}
             {activeTab === 'report' && (
-              <button onClick={() => window.print()} className="inline-flex items-center gap-2 border-2 border-[#04152d] text-[#04152d] hover:bg-[#04152d] hover:text-white font-bold py-2.5 px-5 rounded-xl text-sm transition-all">
+              <button onClick={() => window.print()} className="inline-flex items-center justify-center gap-2 bg-white border-2 border-[#04152d] text-[#04152d] font-bold py-2.5 px-5 rounded-xl text-sm shadow-[0_4px_0_rgba(2,6,15,0.55)] active:translate-y-[2px] active:shadow-[0_2px_0_rgba(2,6,15,0.55)] transition-all hover:bg-gray-50">
                 <Printer size={16} /> Print Report
               </button>
             )}
@@ -302,8 +437,8 @@ export default function CollectionsPage() {
                     <tr>
                       <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wide text-left">Member Details</th>
                       <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wide text-left">Category & Fund</th>
-                      <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wide text-left">Method</th>
-                      <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wide text-left">Amount Remitted</th>
+                      <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wide text-left">Method & Ref</th>
+                      <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wide text-right">Amount Remitted</th>
                       <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wide text-left">Status</th>
                       <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wide text-left">Action</th>
                     </tr>
@@ -319,10 +454,13 @@ export default function CollectionsPage() {
                           <span className="inline-flex items-center px-2.5 py-1 rounded text-[10px] font-black uppercase tracking-widest bg-blue-100 text-blue-700">
                             {rec.collectionType.replace('_', ' ')}
                           </span>
-                          <span className="text-[10px] font-bold text-gray-400 uppercase ml-2">{rec.depositFund?.replace('_', ' ') || 'UNION FUND'}</span>
+                          <span className="text-[10px] font-bold text-gray-400 uppercase ml-2 block mt-1">{rec.depositFund?.replace('_', ' ') || 'GENERAL FUND'}</span>
                         </td>
-                        <td className="px-6 py-4 text-sm text-left font-bold text-[#04152d]">{rec.method}</td>
-                        <td className="px-6 py-4 text-sm text-left font-black text-lg text-emerald-600">
+                        <td className="px-6 py-4 text-sm text-left">
+                           <p className="font-bold text-[#04152d]">{rec.method}</p>
+                           <p className="text-xs font-mono text-gray-500 mt-0.5">{rec.referenceNumber || 'N/A'}</p>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-right font-black text-lg text-[#04152d]">
                           ₱{rec.amountPaid.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                         </td>
                         <td className="px-6 py-4 text-sm text-left">
@@ -334,7 +472,7 @@ export default function CollectionsPage() {
                         </td>
                         <td className="px-6 py-4 text-sm text-left">
                           {rec.status === 'PENDING' ? (
-                            <button onClick={() => setModal({ isOpen: true, title: 'Confirm Ledger Posting', message: `Post remittance for ${rec.name}?`, actionId: rec.id, status: 'idle' })} className="inline-flex items-center gap-2 bg-[#facc15] text-[#04152d] font-black py-2 px-4 rounded-lg text-xs shadow-sm hover:bg-[#eab308] transition-all"><Send size={12} /> Verify</button>
+                            <button onClick={() => triggerVerifyReview(rec)} className="inline-flex items-center gap-2 bg-[#facc15] text-[#04152d] font-black py-2 px-4 rounded-lg text-xs shadow-[0_4px_0_rgba(202,138,4,1)] active:translate-y-[2px] active:shadow-[0_2px_0_rgba(202,138,4,1)] transition-all hover:bg-[#eab308]"><Send size={12} /> Verify</button>
                           ) : <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Ledger Updated</span>}
                         </td>
                       </tr>

@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect } from 'react';
 import { 
-  Settings, Save, Building2, Percent, 
+  Save, Building2, Percent, 
   WalletCards, ShieldCheck, Loader2, AlertCircle, CheckCircle2
 } from 'lucide-react';
 import Header from '@/components/Header';
@@ -96,13 +96,7 @@ export default function AdminSettingsPage() {
 
       <main className="p-4 md:p-6 max-w-[1200px] w-full mx-auto space-y-6 animate-fade-in flex-1">
         
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
-          <div>
-            <h1 className="text-2xl font-black text-[#04152d] flex items-center gap-3">
-              <Settings className="text-gray-400" /> System Configuration
-            </h1>
-            <p className="text-sm text-gray-500 font-medium mt-1">Manage global financial parameters and system access rules.</p>
-          </div>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-4 mb-2">
           <button 
             onClick={handleSaveSettings}
             disabled={isLoading || isSaving}
@@ -161,39 +155,6 @@ export default function AdminSettingsPage() {
                     className="w-full rounded-xl px-4 py-3 text-sm font-bold border border-gray-200 outline-none focus:border-blue-500 bg-gray-50 focus:bg-white transition-colors" 
                   />
                 </div>
-              </div>
-            </div>
-
-            {/* Access & Security */}
-            <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 overflow-hidden">
-              <div className="p-6 border-b border-gray-50 flex items-center gap-3 bg-gray-50/50">
-                <div className="p-2 bg-purple-100 text-purple-600 rounded-lg"><ShieldCheck size={18} /></div>
-                <h2 className="text-lg font-black text-[#04152d]">Access & Security Rules</h2>
-              </div>
-              <div className="p-6 space-y-6">
-                
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
-                  <div>
-                    <h3 className="text-sm font-bold text-[#04152d]">Require Admin Approval for New Members</h3>
-                    <p className="text-xs text-gray-500 mt-1">If enabled, new sign-ups are placed in the "Pending Approvals" queue.</p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" className="sr-only peer" checked={config.requireAdminApprovalForMembers} onChange={e => setConfig({...config, requireAdminApprovalForMembers: e.target.checked})} />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
-                  </label>
-                </div>
-
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
-                  <div>
-                    <h3 className="text-sm font-bold text-[#04152d]">Accept New Loan Applications</h3>
-                    <p className="text-xs text-gray-500 mt-1">If disabled, members will not be able to submit new external loan requests.</p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" className="sr-only peer" checked={config.allowNewLoans} onChange={e => setConfig({...config, allowNewLoans: e.target.checked})} />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
-                  </label>
-                </div>
-
               </div>
             </div>
 

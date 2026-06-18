@@ -3,26 +3,32 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useMemo, useEffect } from 'react';
-import { Search, Layers, ShieldCheck, TrendingUp, TrendingDown, Wallet } from 'lucide-react';
+import { Search, ShieldCheck, TrendingUp, TrendingDown, Wallet, Calendar, X } from 'lucide-react';
 import { PieChart, Pie, Tooltip, ResponsiveContainer } from 'recharts';
 import Header from '@/components/Header'; 
+import ActionModal from '@/components/ActionModal';
 
 export default function AuditorFundPage() {
   const [funds, setFunds] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterMonth, setFilterMonth] = useState('');
 
-  // --- LIVE BACKEND FETCH ---
-  const fetchRealFundsData = async () => {
+  // --- LIVE BACKEND FETCH WITH TIMEFRAME FILTER ---
+  const fetchRealFundsData = async (month?: string) => {
     try {
       setIsLoading(true);
       const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
-      const res = await fetch(`${gatewayUrl}/api/finance/funds`);
+      
+      // Pass the selected month to the backend to get historical balances if applicable
+      const url = month ? `${gatewayUrl}/api/finance/funds?month=${month}` : `${gatewayUrl}/api/finance/funds`;
+      
+      const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
         const mappedData = data.map((f: any) => ({
           id: f.code || f.id,
           name: f.name,
-          type: (f.code === 'GF' || f.code === 'UF') ? 'Operational' : 'Restricted',
           status: 'Active',
           totalIn: Number(f.totalIn ?? 0),
           totalOut: Number(f.totalOut ?? 0),
@@ -37,22 +43,17 @@ export default function AuditorFundPage() {
     }
   };
 
+  // Re-fetch data whenever the month filter changes
   useEffect(() => {
-    fetchRealFundsData();
-  }, []);
-
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState('ALL');
+    fetchRealFundsData(filterMonth);
+  }, [filterMonth]);
 
   const filteredFunds = useMemo(() => {
     return funds.filter(f => {
-      const matchSearch = f.name.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchType = filterType === 'ALL' || f.type === filterType;
-      return matchSearch && matchType && f.status === 'Active';
+      const matchSearch = f.name.toLowerCase().includes(searchTerm.toLowerCase()) || f.id.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchSearch && f.status === 'Active';
     });
-  }, [funds, searchTerm, filterType]);
-
-  const uniqueTypes = Array.from(new Set(funds.map(f => f.type)));
+  }, [funds, searchTerm]);
   
   // --- ANALYTICS MATH ---
   const totalAssets = funds.filter(f => f.status === 'Active').reduce((sum, f) => sum + f.balance, 0);
@@ -146,12 +147,34 @@ export default function AuditorFundPage() {
             />
           </div>
           
-          <div className="relative inline-block w-full sm:w-auto min-w-[160px]">
-            <Layers size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-            <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="w-full rounded-xl pl-11 pr-10 py-3 text-sm bg-white border-[1.5px] border-[#dde3ee] focus:border-[#04152d] outline-none font-bold text-[#04152d] appearance-none cursor-pointer">
-              <option value="ALL">All Classifications</option>
-              {uniqueTypes.map(t => <option key={t as string} value={t as string}>{t as string}</option>)}
-            </select>
+          {/* Calendar / Month Picker Filter */}
+          <div className="relative inline-flex items-center w-full sm:w-auto min-w-[160px] bg-white border-[1.5px] border-[#dde3ee] rounded-xl overflow-hidden focus-within:border-[#04152d] transition-colors">
+            <div className="pl-4 pr-2 flex items-center pointer-events-none">
+              <Calendar size={14} className="text-gray-400" />
+            </div>
+            <div className="relative flex-1">
+              <input 
+                type="month" 
+                value={filterMonth} 
+                onChange={(e) => setFilterMonth(e.target.value)} 
+                className="w-full py-3 text-sm outline-none font-bold text-[#04152d] bg-transparent cursor-pointer opacity-0 absolute inset-0 z-10" 
+              />
+              <div className="py-3 text-sm font-bold text-[#04152d] pointer-events-none truncate pr-2">
+                {filterMonth ? new Date(filterMonth + '-01').toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'All Time'}
+              </div>
+            </div>
+            {filterMonth ? (
+              <button 
+                onClick={() => setFilterMonth('')} 
+                className="pr-4 pl-2 text-gray-400 hover:text-red-500 z-20 transition-colors"
+              >
+                <X size={14} />
+              </button>
+            ) : (
+              <div className="pr-4 pl-2 pointer-events-none">
+                <Calendar size={14} className="text-gray-400" />
+              </div>
+            )}
           </div>
         </div>
 
@@ -163,10 +186,6 @@ export default function AuditorFundPage() {
               <h2 className="text-xl font-black text-[#04152d] text-left">Fund Overview</h2>
               <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600 shadow-[inset_0_0_0_1.5px_rgba(107,114,128,0.2)] font-mono">{filteredFunds.length} Active Pots</span>
             </div>
-            
-            <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 uppercase tracking-widest">
-              <ShieldCheck size={14} /> Read-Only
-            </span>
           </div>
           
           <div className="overflow-x-auto w-full">
@@ -174,7 +193,6 @@ export default function AuditorFundPage() {
               <thead className="bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] sticky top-0 z-10">
                 <tr>
                   <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wide text-left">Fund Name</th>
-                  <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wide text-left">Classification</th>
                   <th className="px-6 py-4 text-xs font-black text-emerald-600 uppercase tracking-wide text-right">Collections (In)</th>
                   <th className="px-6 py-4 text-xs font-black text-red-600 uppercase tracking-wide text-right">Disbursements (Out)</th>
                   <th className="px-6 py-4 text-xs font-black text-[#04152d] uppercase tracking-wide text-right pr-6">Running Balance</th>
@@ -182,17 +200,12 @@ export default function AuditorFundPage() {
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {isLoading ? (
-                  <tr><td colSpan={5} className="px-6 py-16 text-center text-gray-400 font-medium text-sm text-left">Loading fund data from database...</td></tr>
-                ) : filteredFunds.map((fund) => (
+                  <tr><td colSpan={4} className="px-6 py-16 text-center text-gray-400 font-medium text-sm text-left">Loading fund data from database...</td></tr>
+                ) : filteredFunds.length > 0 ? filteredFunds.map((fund) => (
                   <tr key={fund.id} className="hover:bg-[#e8edf8]/60 transition-colors duration-100">
                     <td className="px-6 py-5 text-left">
                       <p className="font-bold text-[#04152d] text-sm">{fund.name}</p>
                       <p className="font-mono text-xs text-gray-400 mt-0.5">{fund.id}</p>
-                    </td>
-                    <td className="px-6 py-5 text-left text-sm text-gray-600">
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-widest bg-gray-100 text-gray-700">
-                        {fund.type}
-                      </span>
                     </td>
                     <td className="px-6 py-5 text-right font-medium text-emerald-600 text-sm">
                       + ₱{fund.totalIn.toLocaleString(undefined, { minimumFractionDigits: 2 })}
@@ -206,7 +219,9 @@ export default function AuditorFundPage() {
                       </span>
                     </td>
                   </tr>
-                ))}
+                )) : (
+                  <tr><td colSpan={4} className="px-6 py-16 text-center text-gray-400 font-medium text-sm">No funds found matching your search.</td></tr>
+                )}
               </tbody>
             </table>
           </div>
