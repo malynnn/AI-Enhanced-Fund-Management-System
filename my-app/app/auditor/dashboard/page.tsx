@@ -57,7 +57,6 @@ function AuditorDashboardContent() {
   }, [funds]);
 
   const activeTransactions = selectedFund ? ledger.filter(tx => tx.fundId === selectedFund.id) : [];
-  const totalLiquidity = funds.reduce((acc, curr) => acc + curr.balance, 0);
 
   const fundStyles: Record<string, string> = {
     'GF': 'bg-[#04152d] text-white', 
@@ -195,7 +194,7 @@ function AuditorDashboardContent() {
                         </div>
                       </div>
 
-                      {/* Read-only status badge instead of actionable button */}
+                      {/* Read-only status badge */}
                       <div className="bg-amber-50 border border-amber-200 text-amber-700 rounded-xl px-5 py-3 font-bold text-sm flex items-center gap-2 shadow-sm">
                         <Clock size={16} className="text-amber-600" /> 
                         Awaiting Action
@@ -277,37 +276,6 @@ function AuditorDashboardContent() {
 
           {/* Right Column Analytics */}
           <div className="xl:col-span-1 space-y-6">
-            
-            <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 p-6">
-              <div className="flex justify-between items-center mb-5 pb-4">
-                 <h2 className="text-xl font-black text-[#04152d] text-left">Liquidity Summary</h2>
-              </div>
-              
-              <div className="mb-6">
-                <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 text-left">Total Active Balance</span>
-                <p className="text-4xl font-black text-[#04152d] tracking-tight text-left">₱{totalLiquidity.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
-              </div>
-
-              <div className="space-y-4 pt-4 border-t border-gray-50">
-                {funds.map((fund, idx) => (
-                  <div key={fund.id} className="flex justify-between items-center">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center opacity-80" style={{ backgroundColor: CHART_COLORS[idx % CHART_COLORS.length] }}>
-                        <CreditCard size={14} className="text-white" />
-                      </div>
-                      <div>
-                        <div className="text-xs font-bold text-[#04152d] text-left">{fund.name}</div>
-                        <div className="text-[10px] text-gray-500 text-left">Status: <span className="text-[#10b981] font-bold">Active</span></div>
-                      </div>
-                    </div>
-                    <div className="text-sm font-black text-[#04152d] text-right">
-                      ₱{fund.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
             <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 p-6">
               <h2 className="text-xl font-black text-[#04152d] mb-2 pb-4 border-b border-gray-50 text-left">Fund Distribution</h2>
               
@@ -340,7 +308,6 @@ function AuditorDashboardContent() {
                 </ResponsiveContainer>
               </div>
             </div>
-
           </div>
         </div>
         </>

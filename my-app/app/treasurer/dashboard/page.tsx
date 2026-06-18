@@ -16,7 +16,6 @@ function TreasurerDashboardContent() {
   const [pendingDisbursements, setPendingDisbursements] = useState<any[]>([]);
   const [selectedFund, setSelectedFund] = useState<any>(null);
   
-  // Note: Internal variables kept as duesOverview to match backend JSON payload, but UI text is changed.
   const [duesOverview, setDuesOverview] = useState({ collectedThisMonth: 0, targetThisMonth: 0, collectionRate: 0, unpaidMembers: 0 });
   const [loansOverview, setLoansOverview] = useState({ activeLoans: 0, totalReceivables: 0, pendingApplications: 0 });
   const [isLoading, setIsLoading] = useState(true);
@@ -32,7 +31,6 @@ function TreasurerDashboardContent() {
         const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
         const res = await fetch(`${gatewayUrl}/api/finance/dashboard`);
         
-        // Defensive Parsing Fix to prevent crash on Proxy Error
         const rawText = await res.text();
         if (!res.ok) {
           console.error("Backend Error:", rawText);
@@ -87,7 +85,7 @@ function TreasurerDashboardContent() {
         fundId: txn.fund_id,
         date: txn.date,
         desc: `Disbursement: ${txn.member_name}`,
-        type: 'CASH_OUT', // Explicitly using CASH_OUT instead of Debit
+        type: 'CASH_OUT',
         amount: txn.amount,
         ref: `DV-${txn.disbursement_txn_id.split('-')[2]}` 
       }, ...prev]);
@@ -103,9 +101,7 @@ function TreasurerDashboardContent() {
   };
 
   const activeTransactions = selectedFund ? ledger.filter(tx => tx.fundId === selectedFund.id) : [];
-  const totalLiquidity = funds.reduce((acc, curr) => acc + curr.balance, 0);
 
-  // Fallback styling for dynamically generated funds
   const fundStyles: Record<string, string> = {
     'GF': 'bg-[#04152d] text-white', 
     'UF': 'bg-[#10b981] text-white', 
@@ -139,281 +135,238 @@ function TreasurerDashboardContent() {
           </div>
         ) : (
           <>
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-          {funds.map((fund) => (
-            <div key={fund.id} className={`relative isolate overflow-hidden rounded-[20px] p-5 shadow-sm ${fundStyles[fund.id] || 'bg-[#04152d] text-white'}`}>
-              <div className="relative z-10">
-                <h3 className="text-[11px] font-bold uppercase tracking-widest opacity-90 mb-2 truncate text-left">{fund.name}</h3>
-                <p className="text-2xl lg:text-[28px] font-black tracking-tight truncate text-left">
-                  ₱{fund.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                </p>
-              </div>
-              <Wallet className="absolute -bottom-4 -right-4 w-24 h-24 opacity-10 transform -rotate-12 z-0" />
-            </div>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-          
-          <div className="xl:col-span-2 space-y-6">
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              
-              <div className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-blue-50 p-2.5 rounded-xl text-blue-600">
-                      <WalletCards size={24} strokeWidth={2.5} />
-                    </div>
-                    {/* RENAMED: Dues Collection -> Collections */}
-                    <h2 className="text-lg font-black text-[#04152d] text-left">Collections</h2>
-                  </div>
-                </div>
-                <div>
-                  <div className="flex justify-between items-end mb-2">
-                    <div>
-                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5 text-left">Collections this month</p>
-                      <p className="text-2xl font-black text-[#04152d] text-left">₱{duesOverview.collectedThisMonth.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
-                    </div>
-                    <p className="text-sm font-bold text-blue-600">{duesOverview.collectionRate}%</p>
-                  </div>
-                  <div className="w-full bg-gray-100 rounded-full h-1.5 mb-3 overflow-hidden">
-                    <div className="bg-blue-600 h-1.5 rounded-full" style={{ width: `${duesOverview.collectionRate}%` }}></div>
-                  </div>
-                  <div className="flex justify-between items-center text-xs font-medium text-gray-500">
-                    <span>Target: ₱{duesOverview.targetThisMonth.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                    <span className="flex items-center gap-1 text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md"><Activity size={12}/> {duesOverview.unpaidMembers} Pending</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-emerald-50 p-2.5 rounded-xl text-emerald-600">
-                      <CircleDollarSign size={24} strokeWidth={2.5} />
-                    </div>
-                    {/* RENAMED: Loan Ledger -> Member Loan Ledgers */}
-                    <h2 className="text-lg font-black text-[#04152d] text-left">Member Loan Ledgers</h2>
-                  </div>
-                </div>
-                <div>
-                  <div className="flex justify-between items-end mb-2">
-                    <div>
-                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5 text-left">Total Receivables</p>
-                      <p className="text-2xl font-black text-[#04152d] text-left">₱{loansOverview.totalReceivables.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
-                    </div>
-                    <p className="text-sm font-bold text-emerald-600">{loansOverview.activeLoans} Active</p>
-                  </div>
-                  <div className="mt-5 flex justify-between items-center text-xs font-medium text-gray-500 border-t border-gray-50 pt-3">
-                    <span>Current Portfolio Status</span>
-                    {loansOverview.pendingApplications > 0 && (
-                      <span className="flex items-center gap-1 text-red-600 bg-red-50 px-2 py-0.5 rounded-md font-bold">
-                        {loansOverview.pendingApplications} Pending Approvals
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
-            {pendingDisbursements.length > 0 && (
-              <div className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100">
-                <div className="flex flex-wrap gap-4 items-center justify-between mb-6">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-[#fff8e1] p-2.5 rounded-xl text-[#f59e0b]">
-                      <Clock size={24} strokeWidth={2.5} />
-                    </div>
-                    <div>
-                      {/* RENAMED: Pending LAS Disbursements -> Pending Disbursements */}
-                      <h2 className="text-xl font-black text-[#04152d] text-left">Pending Disbursements</h2>
-                      <p className="text-sm text-gray-500 font-medium text-left">Payloads requiring confirmation</p>
-                    </div>
-                  </div>
-                  <div className="px-4 py-1.5 rounded-full border border-[#f59e0b] text-[#f59e0b] font-bold text-xs uppercase tracking-widest flex items-center gap-2">
-                    <ShieldCheck size={14} /> ENCRYPTED
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  {pendingDisbursements.map((txn) => (
-                    <div key={txn.disbursement_txn_id} className="bg-[#f8faff] rounded-2xl border border-blue-100/60 p-6 flex flex-col md:flex-row justify-between items-center gap-6">
-                      
-                      <div className="flex flex-wrap gap-x-12 gap-y-4 flex-1">
-                        <div className="flex flex-col max-w-[120px]">
-                          <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 text-left">Member</span>
-                          <p className="text-sm font-black text-[#04152d] leading-snug text-left">{txn.member_name.replace(', ', ',\n')}</p>
-                          <p className="text-[11px] font-bold text-[#3b82f6] mt-1 text-left">{txn.loan_ref}</p>
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 text-left">Amount</span>
-                          <p className="text-xl font-black text-[#ef4444] tracking-tighter text-left">₱{txn.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 text-left">Target Fund</span>
-                          <p className="text-sm font-black text-[#04152d] text-left">{txn.fund_to_debit}</p>
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 text-left">Authorization</span>
-                          <p className="text-xs font-medium text-gray-500 text-left">{txn.authorised_by}</p>
-                        </div>
-                      </div>
-
-                      <button 
-                        onClick={() => triggerDisbursementConfirm(txn)}
-                        className="bg-white border border-gray-200 text-[#04152d] hover:bg-gray-50 rounded-xl px-5 py-3 font-bold text-sm flex items-center gap-2 shadow-sm transition-all"
-                      >
-                        <CheckCircle2 size={18} className="text-[#04152d]" /> 
-                        Generate DV
-                      </button>
-                      
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 overflow-hidden flex flex-col min-h-[400px]">
-              <div className="p-6 pb-4 border-b border-gray-50 flex flex-wrap gap-4 justify-between items-center bg-white">
-                <div>
-                  <div className="flex items-center gap-3 relative">
-                    <div className="relative inline-block w-full sm:w-auto">
-                      <select
-                        value={selectedFund?.id || ''}
-                        onChange={(e) => {
-                          const target = funds.find(f => f.id === e.target.value);
-                          if (target) setSelectedFund(target);
-                        }}
-                        className="appearance-none bg-white border border-gray-200 text-[#04152d] text-xl font-black pl-5 pr-12 py-3 rounded-[14px] focus:ring-2 focus:ring-blue-500/20 outline-none shadow-sm cursor-pointer hover:bg-gray-50 transition-all w-full sm:w-auto"
-                      >
-                        {funds.map((fund) => (
-                          <option key={fund.id} value={fund.id}>{fund.name} Ledger</option>
-                        ))}
-                      </select>
-                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#04152d]">
-                        <svg className="fill-current h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
-                      </div>
-                    </div>
-                  </div>
-                  <p className="text-sm text-gray-500 font-medium mt-3 ml-1 text-left">Monthly transaction history</p>
-                </div>
-                
-                <div className="flex items-center gap-4 text-xs font-bold text-gray-500">
-                  <span className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-[#10b981]"></div> Collection (Cash In)</span>
-                  <span className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-[#ef4444]"></div> Disbursement (Cash Out)</span>
-                </div>
-              </div>
-              
-              <div className="overflow-x-auto flex-1 p-2">
-                <table className="w-full text-left text-sm">
-                  <thead>
-                    <tr>
-                      <th className="py-3 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50 text-left">Date</th>
-                      <th className="py-3 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50 text-left">Transaction Detail</th>
-                      <th className="py-3 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50 text-left">Amount</th>
-                      <th className="py-3 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50 text-left">Reference</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-50">
-                    {activeTransactions.length > 0 ? activeTransactions.map((tx) => (
-                      <tr key={tx.id} className="hover:bg-gray-50/50 transition-colors">
-                        <td className="py-4 px-6 text-gray-500 font-medium text-sm whitespace-nowrap text-left">{tx.date}</td>
-                        <td className="py-4 px-6 text-sm text-left">
-                          <div className="flex items-center gap-3">
-                            <div className={`w-2 h-2 rounded-full flex-shrink-0 ${tx.type === 'CASH_IN' || tx.type === 'Credit' ? 'bg-[#10b981]' : 'bg-[#ef4444]'}`}></div>
-                            <span className="font-medium text-[#04152d]">{tx.desc}</span>
-                          </div>
-                        </td>
-                        <td className="py-4 px-6 font-semibold text-[#04152d] text-sm whitespace-nowrap text-left">
-                          {tx.type === 'CASH_OUT' || tx.type === 'Debit' ? '- ' : '+ '}₱{tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                        </td>
-                        <td className="py-4 px-6 font-mono text-xs text-[#3b82f6] cursor-pointer hover:underline whitespace-nowrap text-left">
-                          {tx.ref}
-                        </td>
-                      </tr>
-                    )) : (
-                      <tr>
-                        <td colSpan={4} className="py-16 text-center text-gray-400 font-medium text-sm text-left">
-                          No transactions recorded for this fund.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-          </div>
-
-          <div className="xl:col-span-1 space-y-6">
-            
-            <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 p-6">
-              <div className="flex justify-between items-center mb-5 pb-4">
-                 <h2 className="text-xl font-black text-[#04152d] text-left">Liquidity Summary</h2>
-              </div>
-              
-              <div className="mb-6">
-                <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 text-left">Total Active Balance</span>
-                <p className="text-4xl font-black text-[#04152d] tracking-tight text-left">₱{totalLiquidity.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
-              </div>
-
-              <div className="space-y-4 pt-4 border-t border-gray-50">
-                {funds.map((fund, idx) => (
-                  <div key={fund.id} className="flex justify-between items-center">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center opacity-80" style={{ backgroundColor: CHART_COLORS[idx % CHART_COLORS.length] }}>
-                        <CreditCard size={14} className="text-white" />
-                      </div>
-                      <div>
-                        <div className="text-xs font-bold text-[#04152d] text-left">{fund.name}</div>
-                        <div className="text-[10px] text-gray-500 text-left">Status: <span className="text-[#10b981] font-bold">Active</span></div>
-                      </div>
-                    </div>
-                    <div className="text-sm font-semibold text-[#04152d] text-left">
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+              {funds.map((fund) => (
+                <div key={fund.id} className={`relative isolate overflow-hidden rounded-[20px] p-5 shadow-sm ${fundStyles[fund.id] || 'bg-[#04152d] text-white'}`}>
+                  <div className="relative z-10">
+                    <h3 className="text-[11px] font-bold uppercase tracking-widest opacity-90 mb-2 truncate text-left">{fund.name}</h3>
+                    <p className="text-2xl lg:text-[28px] font-black tracking-tight truncate text-left">
                       ₱{fund.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    </p>
+                  </div>
+                  <Wallet className="absolute -bottom-4 -right-4 w-24 h-24 opacity-10 transform -rotate-12 z-0" />
+                </div>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+              <div className="xl:col-span-2 space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="bg-blue-50 p-2.5 rounded-xl text-blue-600">
+                          <WalletCards size={24} strokeWidth={2.5} />
+                        </div>
+                        <h2 className="text-lg font-black text-[#04152d] text-left">Collections</h2>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between items-end mb-2">
+                        <div>
+                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5 text-left">Collections this month</p>
+                          <p className="text-2xl font-black text-[#04152d] text-left">₱{duesOverview.collectedThisMonth.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                        </div>
+                        <p className="text-sm font-bold text-blue-600">{duesOverview.collectionRate}%</p>
+                      </div>
+                      <div className="w-full bg-gray-100 rounded-full h-1.5 mb-3 overflow-hidden">
+                        <div className="bg-blue-600 h-1.5 rounded-full" style={{ width: `${duesOverview.collectionRate}%` }}></div>
+                      </div>
+                      <div className="flex justify-between items-center text-xs font-medium text-gray-500">
+                        <span>Target: ₱{duesOverview.targetThisMonth.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                        <span className="flex items-center gap-1 text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md"><Activity size={12}/> {duesOverview.unpaidMembers} Pending</span>
+                      </div>
                     </div>
                   </div>
-                ))}
+
+                  <div className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="bg-emerald-50 p-2.5 rounded-xl text-emerald-600">
+                          <CircleDollarSign size={24} strokeWidth={2.5} />
+                        </div>
+                        <h2 className="text-lg font-black text-[#04152d] text-left">Member Loan Ledgers</h2>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between items-end mb-2">
+                        <div>
+                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5 text-left">Total Receivables</p>
+                          <p className="text-2xl font-black text-[#04152d] text-left">₱{loansOverview.totalReceivables.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                        </div>
+                        <p className="text-sm font-bold text-emerald-600">{loansOverview.activeLoans} Active</p>
+                      </div>
+                      <div className="mt-5 flex justify-between items-center text-xs font-medium text-gray-500 border-t border-gray-50 pt-3">
+                        <span>Current Portfolio Status</span>
+                        {loansOverview.pendingApplications > 0 && (
+                          <span className="flex items-center gap-1 text-red-600 bg-red-50 px-2 py-0.5 rounded-md font-bold">
+                            {loansOverview.pendingApplications} Pending Approvals
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {pendingDisbursements.length > 0 && (
+                  <div className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100">
+                    <div className="flex flex-wrap gap-4 items-center justify-between mb-6">
+                      <div className="flex items-center gap-3">
+                        <div className="bg-[#fff8e1] p-2.5 rounded-xl text-[#f59e0b]">
+                          <Clock size={24} strokeWidth={2.5} />
+                        </div>
+                        <div>
+                          <h2 className="text-xl font-black text-[#04152d] text-left">Pending Disbursements</h2>
+                          <p className="text-sm text-gray-500 font-medium text-left">Payloads requiring confirmation</p>
+                        </div>
+                      </div>
+                      <div className="px-4 py-1.5 rounded-full border border-[#f59e0b] text-[#f59e0b] font-bold text-xs uppercase tracking-widest flex items-center gap-2">
+                        <ShieldCheck size={14} /> ENCRYPTED
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      {pendingDisbursements.map((txn) => (
+                        <div key={txn.disbursement_txn_id} className="bg-[#f8faff] rounded-2xl border border-blue-100/60 p-6 flex flex-col md:flex-row justify-between items-center gap-6">
+                          <div className="flex flex-wrap gap-x-12 gap-y-4 flex-1">
+                            <div className="flex flex-col max-w-[120px]">
+                              <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 text-left">Member</span>
+                              <p className="text-sm font-black text-[#04152d] leading-snug text-left">{txn.member_name.replace(', ', ',\n')}</p>
+                              <p className="text-[11px] font-bold text-[#3b82f6] mt-1 text-left">{txn.loan_ref}</p>
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 text-left">Amount</span>
+                              <p className="text-xl font-black text-[#ef4444] tracking-tighter text-left">₱{txn.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 text-left">Target Fund</span>
+                              <p className="text-sm font-black text-[#04152d] text-left">{txn.fund_to_debit}</p>
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 text-left">Authorization</span>
+                              <p className="text-xs font-medium text-gray-500 text-left">{txn.authorised_by}</p>
+                            </div>
+                          </div>
+                          <button 
+                            onClick={() => triggerDisbursementConfirm(txn)}
+                            className="bg-white border border-gray-200 text-[#04152d] hover:bg-gray-50 rounded-xl px-5 py-3 font-bold text-sm flex items-center gap-2 shadow-sm transition-all"
+                          >
+                            <CheckCircle2 size={18} className="text-[#04152d]" /> 
+                            Generate DV
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 overflow-hidden flex flex-col min-h-[400px]">
+                  <div className="p-6 pb-4 border-b border-gray-50 flex flex-wrap gap-4 justify-between items-center bg-white">
+                    <div>
+                      <div className="flex items-center gap-3 relative">
+                        <div className="relative inline-block w-full sm:w-auto">
+                          <select
+                            value={selectedFund?.id || ''}
+                            onChange={(e) => {
+                              const target = funds.find(f => f.id === e.target.value);
+                              if (target) setSelectedFund(target);
+                            }}
+                            className="appearance-none bg-white border border-gray-200 text-[#04152d] text-xl font-black pl-5 pr-12 py-3 rounded-[14px] focus:ring-2 focus:ring-blue-500/20 outline-none shadow-sm cursor-pointer hover:bg-gray-50 transition-all w-full sm:w-auto"
+                          >
+                            {funds.map((fund) => (
+                              <option key={fund.id} value={fund.id}>{fund.name} Ledger</option>
+                            ))}
+                          </select>
+                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#04152d]">
+                            <svg className="fill-current h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-500 font-medium mt-3 ml-1 text-left">Monthly transaction history</p>
+                    </div>
+                    
+                    <div className="flex items-center gap-4 text-xs font-bold text-gray-500">
+                      <span className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-[#10b981]"></div> Collection (Cash In)</span>
+                      <span className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-[#ef4444]"></div> Disbursement (Cash Out)</span>
+                    </div>
+                  </div>
+                  
+                  <div className="overflow-x-auto flex-1 p-2">
+                    <table className="w-full text-left text-sm">
+                      <thead>
+                        <tr>
+                          <th className="py-3 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50 text-left">Date</th>
+                          <th className="py-3 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50 text-left">Transaction Detail</th>
+                          <th className="py-3 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50 text-left">Amount</th>
+                          <th className="py-3 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50 text-left">Reference</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-50">
+                        {activeTransactions.length > 0 ? activeTransactions.map((tx) => (
+                          <tr key={tx.id} className="hover:bg-gray-50/50 transition-colors">
+                            <td className="py-4 px-6 text-gray-500 font-medium text-sm whitespace-nowrap text-left">{tx.date}</td>
+                            <td className="py-4 px-6 text-sm text-left">
+                              <div className="flex items-center gap-3">
+                                <div className={`w-2 h-2 rounded-full flex-shrink-0 ${tx.type === 'CASH_IN' || tx.type === 'Credit' ? 'bg-[#10b981]' : 'bg-[#ef4444]'}`}></div>
+                                <span className="font-medium text-[#04152d]">{tx.desc}</span>
+                              </div>
+                            </td>
+                            <td className="py-4 px-6 font-semibold text-[#04152d] text-sm whitespace-nowrap text-left">
+                              {tx.type === 'CASH_OUT' || tx.type === 'Debit' ? '- ' : '+ '}₱{tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                            </td>
+                            <td className="py-4 px-6 font-mono text-xs text-[#3b82f6] cursor-pointer hover:underline whitespace-nowrap text-left">
+                              {tx.ref}
+                            </td>
+                          </tr>
+                        )) : (
+                          <tr>
+                            <td colSpan={4} className="py-16 text-center text-gray-400 font-medium text-sm text-left">
+                              No transactions recorded for this fund.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <div className="xl:col-span-1 space-y-6">
+                <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 p-6">
+                  <h2 className="text-xl font-black text-[#04152d] mb-2 pb-4 border-b border-gray-50 text-left">Fund Distribution</h2>
+                  
+                  <div className="h-[300px] w-full mt-4">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
+                      <PieChart>
+                        <Pie
+                          data={chartData}
+                          dataKey="balance"
+                          nameKey="name"
+                          cx="50%"
+                          cy="40%"
+                          innerRadius={55}
+                          outerRadius={80}
+                          paddingAngle={3}
+                        />
+                        <Tooltip 
+                          formatter={(value: any) => `₱${Number(value).toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
+                          contentStyle={{ borderRadius: '12px', border: '1px solid #f3f4f6', boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}
+                        />
+                        <Legend 
+                          verticalAlign="bottom" 
+                          align="center"
+                          height={80}
+                          iconType="circle" 
+                          iconSize={12} 
+                          wrapperStyle={{ fontSize: '12px', fontWeight: 'bold', color: '#4b5563', paddingTop: '20px' }}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
               </div>
             </div>
-
-            <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 p-6">
-              <h2 className="text-xl font-black text-[#04152d] mb-2 pb-4 border-b border-gray-50 text-left">Fund Distribution</h2>
-              
-              <div className="h-[300px] w-full mt-4">
-                <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
-                  <PieChart>
-                    <Pie
-                      data={chartData}
-                      dataKey="balance"
-                      nameKey="name"
-                      cx="50%"
-                      cy="40%"
-                      innerRadius={55}
-                      outerRadius={80}
-                      paddingAngle={3}
-                    />
-                    <Tooltip 
-                      formatter={(value: any) => `₱${Number(value).toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
-                      contentStyle={{ borderRadius: '12px', border: '1px solid #f3f4f6', boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}
-                    />
-                    <Legend 
-                      verticalAlign="bottom" 
-                      align="center"
-                      height={80}
-                      iconType="circle" 
-                      iconSize={12} 
-                      wrapperStyle={{ fontSize: '12px', fontWeight: 'bold', color: '#4b5563', paddingTop: '20px' }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-          </div>
-        </div>
-        </>
+          </>
         )}
       </div>
     </div>
