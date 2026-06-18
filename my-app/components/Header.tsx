@@ -30,6 +30,8 @@ const PAGE_TITLES: Record<string, string> = {
   '/treasurer/disbursement':  'Disbursement',
   '/treasurer/loans':         'Loan Ledger',
   '/treasurer/funds':         'Funds',
+  '/admin/dashboard':         'User Management',
+  '/admin/settings':          'Settings',
   '/auditor/dashboard':       'Audit Oversight',
   '/profile':                 'Settings',
   '/events':                  'Events',

@@ -46,9 +46,10 @@ function LoginForm() {
           router.push("/member/dashboard");
         } else if (userRole === "Auditor") {
           router.push("/auditor/dashboard");
-        } else {
-          // Admin, Treasurer, Officer go to the Treasurer workspace
+        } else if (userRole === "Treasurer") {
           router.push("/treasurer/dashboard");
+        } else {
+          router.push("/admin/dashboard");
         }
         router.refresh();
       }, 1500);
@@ -75,7 +76,7 @@ function LoginForm() {
         <div className="bg-[#f8f9fa] w-full max-w-md rounded-md p-10 lg:p-12 shadow-xl">
           
           <h2 className="text-[2.5rem] leading-none font-bold text-black mb-8 tracking-tight">
-            Log In
+            Log In (Mock)
           </h2>
 
           {/* Error Display */}
@@ -99,7 +100,7 @@ function LoginForm() {
 
           <form onSubmit={handleLogin} className="space-y-5">
             <div>
-              <label className="block text-sm text-gray-700 mb-1.5">Employee ID / Email</label>
+              <label className="block text-sm text-gray-700 mb-1.5">Employee ID</label>
               <input
                 type="text"
                 required
@@ -107,7 +108,7 @@ function LoginForm() {
                 onChange={(e) => setUsername(e.target.value)}
                 disabled={!!detectedRole}
                 className="w-full p-3 bg-white border border-gray-200 rounded text-sm focus:ring-2 focus:ring-[#021124] outline-none transition-all disabled:opacity-50"
-                placeholder="Example: member, admin, treasurer, auditor, superadmin"
+                placeholder="Example: member, admin, treasurer, auditor"
               />
             </div>
 

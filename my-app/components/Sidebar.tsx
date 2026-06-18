@@ -6,8 +6,8 @@ import { usePathname } from 'next/navigation';
 import {
   Home, Calendar, CreditCard, CircleDollarSign, Book, LogOut, ChevronDown,
   PanelLeftClose, PanelLeftOpen, LayoutDashboard, WalletCards, Send,
-  Briefcase, ClipboardList, PieChart, FileText, User
-} from 'lucide-react';
+  Briefcase, ClipboardList, PieChart, FileText, User, Users
+  , Settings } from 'lucide-react';
 import { signOut, useSession } from "next-auth/react";
 import ActionModal from '@/components/ActionModal';
 
@@ -42,7 +42,7 @@ export default function Sidebar() {
       icon: CreditCard,
       roles: ['User', 'Officer/Admin', 'Superadmin', 'Treasurer', 'Auditor'],
       subItems: [
-        { label: 'Overview', href: '/membership', icon: User, roles: ['User', 'Officer/Admin', 'Superadmin', 'Treasurer', 'Auditor'] }
+        { label: 'Overview (External LAS)', href: '#', icon: FileText, roles: ['User', 'Officer/Admin', 'Superadmin', 'Treasurer', 'Auditor'] }
       ]
     },
     {
@@ -56,22 +56,26 @@ export default function Sidebar() {
     {
       label: 'Finance',
       icon: Book,
-      roles: ['User', 'Officer/Admin', 'Superadmin', 'Treasurer', 'Auditor'],
+      roles: ['User', 'Officer/Admin', 'Treasurer', 'Auditor'],
       subItems: [
-        // Member specific view
+        // MEMBER EXCLUSIVE
         { label: 'My Summary', href: '/member/dashboard', icon: PieChart, roles: ['User'] },
         
-        // Treasurer / Admin operational views
-        { label: 'Dashboard', href: '/treasurer/dashboard', icon: LayoutDashboard, roles: ['Superadmin', 'Officer/Admin', 'Treasurer'] },
-        { label: 'Collections', href: '/treasurer/collections', icon: WalletCards, roles: ['Superadmin', 'Officer/Admin', 'Treasurer'] },
-        { label: 'Disbursement', href: '/treasurer/disbursement', icon: Send, roles: ['Superadmin', 'Officer/Admin', 'Treasurer'] },
+        // ADMIN / SUPERADMIN EXCLUSIVE (Finance System User Management)
+        { label: 'User Management', href: '/admin/dashboard', icon: Users, roles: ['Officer/Admin'] },
+        { label: 'Settings', href: '/admin/settings', icon: Settings, roles: ['Officer/Admin'] },
+
+        // TREASURER & ADMIN EXCLUSIVE (Operational/Write Access)
+        { label: 'Dashboard', href: '/treasurer/dashboard', icon: LayoutDashboard, roles: ['Treasurer'] },
+        { label: 'Collections', href: '/treasurer/collections', icon: WalletCards, roles: ['Treasurer'] },
+        { label: 'Disbursement', href: '/treasurer/disbursement', icon: Send, roles: ['Treasurer'] },
+        { label: 'Loan Ledger', href: '/treasurer/loans', icon: CircleDollarSign, roles: ['Treasurer'] },
+        { label: 'Funds', href: '/treasurer/funds', icon: Briefcase, roles: ['Treasurer'] },
         
-        // Shared Oversight (Treasurer + Auditor + Admin)
-        { label: 'Loan Ledger', href: '/treasurer/loans', icon: CircleDollarSign, roles: ['Superadmin', 'Officer/Admin', 'Treasurer', 'Auditor'] },
-        { label: 'Fund', href: '/treasurer/funds', icon: Briefcase, roles: ['Superadmin', 'Officer/Admin', 'Treasurer', 'Auditor'] },
-        
-        // Auditor exclusive
-        { label: 'Audit Logs', href: '/auditor/dashboard', icon: ClipboardList, roles: ['Superadmin', 'Auditor'] },
+        // AUDITOR EXCLUSIVE (Strict Read-Only Access)
+        { label: 'Audit Dashboard', href: '/auditor/dashboard', icon: ClipboardList, roles: ['Auditor'] },
+        { label: 'Loan Ledger', href: '/auditor/loans', icon: CircleDollarSign, roles: ['Auditor'] },
+        { label: 'Funds', href: '/auditor/funds', icon: Briefcase, roles: ['Auditor'] },
       ]
     },
   ];
