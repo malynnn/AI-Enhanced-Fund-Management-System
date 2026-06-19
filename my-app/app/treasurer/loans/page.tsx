@@ -4,10 +4,9 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo } from 'react';
 import { 
-  FileText, RefreshCw, CheckCircle2, 
-  XCircle, Landmark, Search, Activity, 
-  CreditCard, Filter, ChevronLeft, ChevronRight, Eye, X, BookOpen, Clock,
-  Calendar, CircleDashed, CheckCircle, TrendingDown, Info, CircleDollarSign
+  FileText, RefreshCw, Landmark, Search, Activity, 
+  ChevronLeft, ChevronRight, Eye, X, BookOpen, Clock,
+  Calendar, CircleDashed, CheckCircle, CircleDollarSign, Filter, CreditCard, Tag
 } from 'lucide-react';
 import Header from '@/components/Header';
 import ActionModal from '@/components/ActionModal';
@@ -30,14 +29,19 @@ interface Repayment {
 export default function LoansDashboard() {
   const [funds, setFunds] = useState<any[]>([]);
   const [repayments, setRepayments] = useState<Repayment[]>([]);
+  
+  // Filters
   const [searchTerm, setSearchTerm] = useState('');
   const [filterMethod, setFilterMethod] = useState('ALL');
   const [filterMonth, setFilterMonth] = useState('');
+  
+  // Pagination
   const [repaymentPage, setRepaymentPage] = useState(1);
   const itemsPerPage = 10;
+  
   const [loading, setLoading] = useState(true);
 
-  // --- INDIVIDUAL LEDGER STATE ---
+  // Individual Ledger Modal State
   const [selectedLedger, setSelectedLedger] = useState<{ memberName: string; loanReference: string } | null>(null);
 
   const loadData = async () => {
@@ -53,7 +57,11 @@ export default function LoansDashboard() {
       if (repaymentsRes?.ok) {
         const repaymentsData = await repaymentsRes.json();
         setRepayments(repaymentsData.map((r: any) => ({
-          ...r, amount: Number(r.amount), principalAmount: Number(r.principalAmount), serviceFeeAmount: Number(r.serviceFeeAmount)
+          ...r, 
+          amount: Number(r.amount || 0), 
+          principalAmount: Number(r.principalAmount || 0), 
+          serviceFeeAmount: Number(r.serviceFeeAmount || 0),
+          overpaymentAmount: Number(r.overpaymentAmount || 0)
         })));
       }
     } catch (error) {
@@ -65,12 +73,16 @@ export default function LoansDashboard() {
 
   useEffect(() => { loadData(); }, []);
 
+  // AC8: Reset Pagination on Filter Change
+  useEffect(() => {
+    setRepaymentPage(1);
+  }, [searchTerm, filterMethod, filterMonth]);
+
+  // AC3 & AC4: Simultaneous Filters (Search, Method, Month)
   const filteredRepayments = useMemo(() => {
     return repayments.filter(r => {
       const matchesSearch = r.loanReference.toLowerCase().includes(searchTerm.toLowerCase()) || r.memberName.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesMethod = filterMethod === 'ALL' ? true : r.paymentMethod === filterMethod;
-      
-      // Check if processedAt matches the filterMonth (YYYY-MM)
       const matchesMonth = filterMonth === '' ? true : (r.processedAt && new Date(r.processedAt).toISOString().startsWith(filterMonth));
       
       return matchesSearch && matchesMethod && matchesMonth;
@@ -80,10 +92,8 @@ export default function LoansDashboard() {
   const totalRepaymentPages = Math.max(1, Math.ceil(filteredRepayments.length / itemsPerPage));
   const paginatedRepayments = filteredRepayments.slice((repaymentPage - 1) * itemsPerPage, repaymentPage * itemsPerPage);
 
-  // Global Metrics (Processed only)
+  // --- AC1: KPI SUMMARY CALCULATIONS ---
   const totalRepaymentsValue = repayments.filter(r => r.status === 'PROCESSED').reduce((acc, curr) => acc + curr.amount, 0);
-  
-  // Calculate Global Total Receivables (Mocked: Unique Loans * Assumed Capital - Global Processed Principal)
   const uniqueLoansCount = new Set(repayments.map(r => r.loanReference)).size;
   const globalProcessedPrincipal = repayments.filter(r => r.status === 'PROCESSED').reduce((acc, curr) => acc + curr.principalAmount, 0);
   const totalReceivables = uniqueLoansCount > 0 ? (uniqueLoansCount * 50000) - globalProcessedPrincipal : 0;
@@ -91,7 +101,6 @@ export default function LoansDashboard() {
   // --- DERIVED MEMBER LEDGER COMPUTATIONS & SCHEDULE MOCKING ---
   const memberHistory = selectedLedger ? repayments.filter(r => r.loanReference === selectedLedger.loanReference).sort((a, b) => new Date(a.processedAt).getTime() - new Date(b.processedAt).getTime()) : [];
   
-  // Note: Backend should eventually provide 'originalCapital' and 'loanTerm'. Using standard parameters for now.
   const assumedOriginalCapital = 50000.00; 
   const assumedLoanTerm = 12; // 12 Months
   const assumedMonthlyFee = 500.00; // 1% Interest
@@ -105,11 +114,8 @@ export default function LoansDashboard() {
   const remainingBalance = assumedOriginalCapital - processedPrincipal;
   const progressPercentage = Math.min((processedHistory.length / assumedLoanTerm) * 100, 100);
 
-  // Generate the full schedule (Paid + Unpaid months)
   const fullSchedule = Array.from({ length: Math.max(assumedLoanTerm, memberHistory.length) }, (_, index) => {
     const pastPayment = memberHistory[index];
-    
-    // Mocking future due dates based on the first payment (or just relative months)
     let displayDate = 'Upcoming';
     if (pastPayment) {
       displayDate = new Date(pastPayment.processedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -134,7 +140,7 @@ export default function LoansDashboard() {
   return (
     <div className="flex flex-col min-h-screen bg-transparent print:bg-white relative">
       
-      {/* INDIVIDUAL MEMBER LEDGER MODAL */}
+      {/* AC5: INDIVIDUAL MEMBER LEDGER MODAL */}
       {selectedLedger && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#04152d]/60 backdrop-blur-sm animate-fade-in p-4">
           <div className="bg-white w-full max-w-5xl rounded-[24px] shadow-2xl border border-white/80 overflow-hidden animate-pop flex flex-col max-h-[95vh]">
@@ -291,27 +297,34 @@ export default function LoansDashboard() {
           </div>
         </div>
 
-        {/* METRICS ROW - Fixed alignment with consistent heights */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 flex items-center gap-4 h-full">
-            <div className="w-12 h-12 rounded-full bg-blue-50 flex-shrink-0 flex items-center justify-center text-blue-600"><Landmark size={24} /></div>
-            <div className="min-w-0">
-              <p className="block text-[11px] font-black text-gray-500 uppercase tracking-widest mb-0.5 text-left">Global Processed Transactions</p>
-              <p className="text-2xl md:text-3xl font-black text-[#04152d] truncate text-left">{repayments.filter(r => r.status === 'PROCESSED').length} Payments</p>
-            </div>
-          </div>
+        {/* AC1: 4 KPI SUMMARY CARDS */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 flex items-center gap-4 h-full">
             <div className="w-12 h-12 rounded-full bg-emerald-50 flex-shrink-0 flex items-center justify-center text-emerald-600"><Activity size={24} /></div>
             <div className="min-w-0">
-              <p className="block text-[11px] font-black text-gray-500 uppercase tracking-widest mb-0.5 text-left">Total Global Repayments</p>
-              <p className="text-2xl md:text-3xl font-black text-[#04152d] truncate text-left">₱{totalRepaymentsValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+              <p className="block text-[11px] font-black text-gray-500 uppercase tracking-widest mb-0.5 text-left">Total Repayments Value</p>
+              <p className="text-2xl font-black text-[#04152d] truncate text-left">₱{totalRepaymentsValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+            </div>
+          </div>
+          <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 flex items-center gap-4 h-full">
+            <div className="w-12 h-12 rounded-full bg-blue-50 flex-shrink-0 flex items-center justify-center text-blue-600"><FileText size={24} /></div>
+            <div className="min-w-0">
+              <p className="block text-[11px] font-black text-gray-500 uppercase tracking-widest mb-0.5 text-left">Total Unique Active Loans</p>
+              <p className="text-2xl font-black text-[#04152d] truncate text-left">{uniqueLoansCount} Loans</p>
+            </div>
+          </div>
+          <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 flex items-center gap-4 h-full">
+            <div className="w-12 h-12 rounded-full bg-purple-50 flex-shrink-0 flex items-center justify-center text-purple-600"><Landmark size={24} /></div>
+            <div className="min-w-0">
+              <p className="block text-[11px] font-black text-gray-500 uppercase tracking-widest mb-0.5 text-left">Global Processed Principal</p>
+              <p className="text-2xl font-black text-[#04152d] truncate text-left">₱{globalProcessedPrincipal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
             </div>
           </div>
           <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 flex items-center gap-4 h-full">
             <div className="w-12 h-12 rounded-full bg-amber-50 flex-shrink-0 flex items-center justify-center text-amber-600"><CircleDollarSign size={24} /></div>
             <div className="min-w-0">
-              <p className="block text-[11px] font-black text-gray-500 uppercase tracking-widest mb-0.5 text-left">Total Active Receivables</p>
-              <p className="text-2xl md:text-3xl font-black text-[#04152d] truncate text-left">₱{Math.max(0, totalReceivables).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+              <p className="block text-[11px] font-black text-gray-500 uppercase tracking-widest mb-0.5 text-left">Estimated Total Receivables</p>
+              <p className="text-2xl font-black text-[#04152d] truncate text-left">₱{Math.max(0, totalReceivables).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
             </div>
           </div>
         </div>
@@ -319,14 +332,14 @@ export default function LoansDashboard() {
         <div className="flex-1 flex flex-col w-full">
           <div className="w-full flex flex-col gap-6">
             
-            {/* Search and Filter Row */}
+            {/* Search and Filters Row */}
             <div className="bg-white rounded-2xl p-6 shadow-md border border-white/80 flex flex-wrap gap-4 items-center">
               <div className="flex-1 min-w-[250px] relative">
                 <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input type="text" placeholder="Search by Loan Ref or Member..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full rounded-xl pl-11 pr-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] focus:border-[#04152d] outline-none font-bold text-[#04152d]"/>
+                <input type="text" placeholder="Search by Loan Ref or Member Name..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full rounded-xl pl-11 pr-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] focus:border-[#04152d] outline-none font-bold text-[#04152d]"/>
               </div>
 
-              {/* Calendar / Month Picker Filter */}
+              {/* Month Picker Filter */}
               <div className="relative inline-flex items-center w-full sm:w-auto min-w-[160px] bg-white border-[1.5px] border-[#dde3ee] rounded-xl overflow-hidden focus-within:border-[#04152d] transition-colors">
                 <div className="pl-4 pr-2 flex items-center pointer-events-none">
                   <Calendar size={14} className="text-gray-400" />
@@ -343,10 +356,7 @@ export default function LoansDashboard() {
                   </div>
                 </div>
                 {filterMonth ? (
-                  <button 
-                    onClick={() => setFilterMonth('')} 
-                    className="pr-4 pl-2 text-gray-400 hover:text-red-500 z-20 transition-colors"
-                  >
+                  <button onClick={() => setFilterMonth('')} className="pr-4 pl-2 text-gray-400 hover:text-red-500 z-20 transition-colors">
                     <X size={14} />
                   </button>
                 ) : (
@@ -355,49 +365,88 @@ export default function LoansDashboard() {
                   </div>
                 )}
               </div>
+
+              {/* Payment Method Filter */}
+              <div className="relative inline-block w-full sm:w-auto min-w-[180px]">
+                <Filter size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                <select value={filterMethod} onChange={(e) => setFilterMethod(e.target.value)} className="w-full rounded-xl pl-10 pr-8 py-3 text-sm bg-white border-[1.5px] border-[#dde3ee] focus:border-[#04152d] outline-none transition-colors appearance-none font-bold text-[#04152d] cursor-pointer">
+                  <option value="ALL">All Methods</option>
+                  <option value="BANK_TRANSFER">Bank Transfer</option>
+                  <option value="SALARY_DEDUCTION">Salary Deduction</option>
+                  <option value="CASH">Cash</option>
+                  <option value="CHECK">Check</option>
+                </select>
+              </div>
             </div>
 
+            {/* AC2: Display Repayment Table (Fully Expanded Columns) */}
             <div className="w-full bg-white rounded-2xl shadow-lg border border-white/80 overflow-hidden flex flex-col min-h-[500px]">
               <div className="overflow-x-auto w-full">
-                <table className="w-full whitespace-nowrap min-w-[900px]">
+                <table className="w-full whitespace-nowrap min-w-[1500px]">
                   <thead className="bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)]">
                     <tr>
-                      <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wide text-left">Transaction Date</th>
-                      <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wide text-left">Loan Reference</th>
-                      <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wide text-left">Member Name</th>
-                      <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wide text-left">Amount Remitted</th>
-                      <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wide text-left">Ledger Split (Principal / Fee)</th>
-                      <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wide text-left">Action</th>
+                      <th className="px-5 py-4 text-[10px] font-black text-gray-500 uppercase tracking-wide text-left">Processed Date</th>
+                      <th className="px-5 py-4 text-[10px] font-black text-gray-500 uppercase tracking-wide text-left">Loan Ref</th>
+                      <th className="px-5 py-4 text-[10px] font-black text-gray-500 uppercase tracking-wide text-left">Member ID</th>
+                      <th className="px-5 py-4 text-[10px] font-black text-gray-500 uppercase tracking-wide text-left">Member Name</th>
+                      <th className="px-5 py-4 text-[10px] font-black text-[#04152d] uppercase tracking-wide text-right">Amount Paid</th>
+                      <th className="px-5 py-4 text-[10px] font-black text-emerald-600 uppercase tracking-wide text-right">Principal</th>
+                      <th className="px-5 py-4 text-[10px] font-black text-blue-600 uppercase tracking-wide text-right">Service Fee</th>
+                      <th className="px-5 py-4 text-[10px] font-black text-purple-600 uppercase tracking-wide text-right">Overpayment</th>
+                      <th className="px-5 py-4 text-[10px] font-black text-gray-500 uppercase tracking-wide text-left">Method</th>
+                      <th className="px-5 py-4 text-[10px] font-black text-gray-500 uppercase tracking-wide text-left">Ref Number</th>
+                      <th className="px-5 py-4 text-[10px] font-black text-gray-500 uppercase tracking-wide text-center">Status</th>
+                      <th className="px-5 py-4 text-[10px] font-black text-gray-500 uppercase tracking-wide text-center">Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50">
                     {paginatedRepayments.map((rep) => (
                       <tr key={rep.id} className="hover:bg-[#e8edf8]/60 transition-colors">
-                        <td className="px-6 py-5 text-sm text-gray-500 font-medium text-left">{new Date(rep.processedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
-                        <td className="px-6 py-5 text-sm font-bold text-blue-600 font-mono text-left">{rep.loanReference}</td>
-                        <td className="px-6 py-5 text-sm text-left">
-                          <span className="font-bold text-[#04152d] block">{rep.memberName}</span>
-                          <span className="text-[10px] font-mono text-gray-400 mt-1 block uppercase tracking-widest">{rep.paymentMethod}</span>
+                        <td className="px-5 py-4 text-sm text-gray-500 font-medium text-left">
+                          {new Date(rep.processedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                         </td>
-                        <td className="px-6 py-5 text-sm font-black text-[#04152d] text-lg text-left">₱{rep.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                        <td className="px-6 py-5 text-sm text-left text-xs">
-                          <span className="text-[#04152d] font-bold">₱{rep.principalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                          <span className="text-gray-300 mx-2 font-black">/</span>
-                          <span className="text-emerald-600 font-bold">₱{rep.serviceFeeAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                        <td className="px-5 py-4 text-sm font-bold text-blue-600 font-mono text-left">{rep.loanReference}</td>
+                        <td className="px-5 py-4 text-sm text-gray-500 font-mono font-medium text-left">{rep.memberId}</td>
+                        <td className="px-5 py-4 text-sm font-bold text-[#04152d] text-left">{rep.memberName}</td>
+                        <td className="px-5 py-4 text-sm font-black text-[#04152d] text-right">₱{rep.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                        <td className="px-5 py-4 text-sm font-bold text-emerald-600 text-right">₱{rep.principalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                        <td className="px-5 py-4 text-sm font-bold text-blue-600 text-right">₱{rep.serviceFeeAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                        <td className="px-5 py-4 text-sm font-bold text-purple-600 text-right">₱{rep.overpaymentAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                        <td className="px-5 py-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest text-left">{rep.paymentMethod.replace('_', ' ')}</td>
+                        <td className="px-5 py-4 text-[11px] font-mono font-medium text-gray-500 text-left">{rep.referenceNumber || 'N/A'}</td>
+                        <td className="px-5 py-4 text-center">
+                          {rep.status === 'PROCESSED' ? (
+                            <span className="inline-flex items-center px-2 py-1 rounded text-[9px] font-bold uppercase tracking-widest bg-emerald-50 text-emerald-700 border border-emerald-200">Processed</span>
+                          ) : (
+                            <span className="inline-flex items-center px-2 py-1 rounded text-[9px] font-bold uppercase tracking-widest bg-amber-50 text-amber-700 border border-amber-200">Pending</span>
+                          )}
                         </td>
-                        <td className="px-6 py-5 text-sm text-left">
-                          <button onClick={() => setSelectedLedger({ memberName: rep.memberName, loanReference: rep.loanReference })} className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white font-bold py-2 px-4 rounded-lg text-xs transition-all shadow-sm active:translate-y-[2px]">
+                        <td className="px-5 py-4 text-center">
+                          <button onClick={() => setSelectedLedger({ memberName: rep.memberName, loanReference: rep.loanReference })} className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white font-bold py-1.5 px-3 rounded-lg text-xs transition-all shadow-sm active:translate-y-[2px]">
                             <Eye size={14} /> View
                           </button>
                         </td>
                       </tr>
                     ))}
                     {paginatedRepayments.length === 0 && (
-                      <tr><td colSpan={6} className="px-6 py-16 text-center text-gray-400 font-medium text-left">No repayment records found.</td></tr>
+                      <tr><td colSpan={12} className="px-6 py-16 text-center text-gray-400 font-medium">No repayment records found matching criteria.</td></tr>
                     )}
                   </tbody>
                 </table>
               </div>
+              
+              {/* Pagination Controls */}
+              {totalRepaymentPages > 1 && !loading && (
+                <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-gray-50/50 mt-auto">
+                  <button onClick={() => setRepaymentPage(p => Math.max(1, p - 1))} disabled={repaymentPage === 1} className="inline-flex items-center justify-center gap-2 bg-white border border-gray-200 text-[#04152d] hover:bg-gray-50 font-bold py-2.5 px-4 rounded-xl text-xs transition-all disabled:opacity-50 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+                    <ChevronLeft size={16} /> Previous
+                  </button>
+                  <span className="text-[11px] font-black text-gray-500 uppercase tracking-widest">Page {repaymentPage} of {totalRepaymentPages}</span>
+                  <button onClick={() => setRepaymentPage(p => Math.min(totalRepaymentPages, p + 1))} disabled={repaymentPage === totalRepaymentPages} className="inline-flex items-center justify-center gap-2 bg-white border border-gray-200 text-[#04152d] hover:bg-gray-50 font-bold py-2.5 px-4 rounded-xl text-xs transition-all disabled:opacity-50 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+                    Next <ChevronRight size={16} />
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

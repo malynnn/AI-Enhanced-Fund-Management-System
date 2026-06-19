@@ -35,8 +35,10 @@ export default function DisbursementPage() {
   const [disbursements, setDisbursements] = useState<Disbursement[]>([]);
   const [selectedVoucher, setSelectedVoucher] = useState<Disbursement | null>(null);
   const [selectedForAction, setSelectedForAction] = useState<Disbursement | null>(null);
+  
   const [isLoading, setIsLoading] = useState(true);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [isPrinting, setIsPrinting] = useState(false);
   const voucherRef = useRef<HTMLDivElement>(null);
 
   // Global Action Modal
@@ -81,7 +83,6 @@ export default function DisbursementPage() {
           disbursementType: d.disbursementType || 'LOAN_RELEASE',
           fundSource: d.fundSource || 'PENDING'
         }));
-        // Sort by newest first
         formatted.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         setDisbursements(formatted);
       }
@@ -110,7 +111,6 @@ export default function DisbursementPage() {
   const totalPages = Math.max(1, Math.ceil(filteredDisbursements.length / itemsPerPage));
   const paginatedDisbursements = filteredDisbursements.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-  // --- EXISTING HANDLERS ---
   const triggerAccept = (disb: Disbursement) => {
     setSelectedForAction(disb);
     let autoFund = 'GENERAL_FUND';
@@ -184,6 +184,115 @@ export default function DisbursementPage() {
     }
   };
 
+  // --- VOUCHER HTML ENGINE (FOR PRINTING AND PDF) ---
+  const getVoucherHTML = async (voucher: Disbursement) => {
+    let logoBase64 = '';
+    try {
+      const logoRes = await fetch('/bdoea-logo-blue.png');
+      if (logoRes.ok) {
+        const blob = await logoRes.blob();
+        logoBase64 = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+      }
+    } catch (err) { console.error('Failed to load logo in Base64:', err); }
+
+    const postingDate = new Date(voucher.createdAt).toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    const amount = Number(voucher.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 });
+    
+    const authorizedByRaw = voucher.authorizedBy || 'PENDING';
+    const cleanAuthorizedBy = authorizedByRaw.replace(/Treasurer\s+/i, '');
+    const typeDisplay = voucher.disbursementType?.replace('_', ' ') || 'LOAN RELEASE';
+    const fundDisplay = voucher.fundSource?.replace('_', ' ') || 'GENERAL FUND';
+
+    return `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8" />
+        <title>Disbursement Voucher - ${voucher.loanReference}</title>
+        <style>
+          @media print {
+            @page { size: portrait; margin: 15mm; }
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; margin: 0; }
+          }
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body { font-family: 'Segoe UI', Arial, sans-serif; color: #1a202c; padding: 30px; font-size: 13px; background: #ffffff; }
+          .voucher-container { border: 1px solid #cbd5e1; padding: 40px; border-radius: 12px; position: relative; max-width: 800px; margin: 0 auto; page-break-inside: avoid; }
+          .voucher-container::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, #021124 0%, #005a9c 50%, #e6b012 100%); border-top-left-radius: 12px; border-top-right-radius: 12px; }
+          .header { text-align: center; border-bottom: 2px dashed #e2e8f0; padding-bottom: 22px; margin-bottom: 28px; }
+          .logo-container { display: flex; justify-content: center; margin-bottom: 12px; }
+          .logo { height: 55px; object-fit: contain; }
+          .org-name { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: #021124; }
+          .title-badge { display: inline-block; margin-top: 16px; background: #021124; color: #ffffff; font-size: 11px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; padding: 6px 28px; border-radius: 30px; border: 2px solid #e6b012; }
+          .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 40px; margin-bottom: 28px; background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; }
+          .label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 4px; }
+          .value { font-weight: 700; font-size: 13px; color: #021124; }
+          .payee-block { grid-column: 1 / -1; border-top: 1px solid #e2e8f0; padding-top: 12px; margin-top: 4px; }
+          table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+          thead th { background: #021124; padding: 12px 16px; text-align: left; font-size: 10px; font-weight: 800; text-transform: uppercase; color: #ffffff; }
+          tbody td { padding: 18px 16px; border-bottom: 1px solid #cbd5e1; text-align: left; }
+          .amount-cell { font-size: 22px; font-weight: 900; color: #15803d; text-align: right; }
+          .signatures { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 30px; margin-top: 40px; }
+          .sig-block { text-align: center; }
+          .sig-label { font-size: 11px; font-weight: 800; text-transform: uppercase; color: #04152d; margin-bottom: 50px; letter-spacing: 1px; text-align: center; }
+          .sig-line { border-top: 1px solid #04152d; padding-top: 8px; width: 100%; }
+          .name { font-size: 11px; font-weight: 800; color: #04152d; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; }
+          .title { font-size: 10px; font-weight: 700; color: #04152d; text-transform: uppercase; margin-top: 4px; text-align: center; }
+        </style>
+      </head>
+      <body>
+        <div class="voucher-container">
+          <div class="header">
+            ${logoBase64 ? `<div class="logo-container"><img src="${logoBase64}" alt="Logo" class="logo" /></div>` : ''}
+            <div class="org-name">Banco de Oro Employees Association (BDOEA)</div>
+            <div class="title-badge">Disbursement Voucher</div>
+          </div>
+          <div class="details-grid">
+            <div><div class="label">Voucher Reference</div><div class="value">${voucher.id}</div></div>
+            <div><div class="label">Posting Date</div><div class="value">${postingDate}</div></div>
+            <div><div class="label">Disbursement Category</div><div class="value" style="color: #0369a1;">${typeDisplay}</div></div>
+            <div><div class="label">Deducted From Fund</div><div class="value" style="color: #b45309;">${fundDisplay}</div></div>
+            <div class="payee-block"><div class="label">Payee</div><div class="value">${voucher.memberName} (ID: ${voucher.memberId})</div></div>
+          </div>
+          <table>
+            <thead><tr><th style="text-align: left;">Particulars / Narrative</th><th style="text-align: right;">Debit Amount (PHP)</th></tr></thead>
+            <tbody>
+              <tr><td style="text-align: left;">Disbursement release for reference: ${voucher.loanReference}. <br><span style="font-size: 10px; color: #64748b; font-weight: 500;">Method: ${voucher.paymentMethod} ${voucher.bankAccount && voucher.bankAccount !== 'N/A' ? `(${voucher.bankAccount})` : ''}</span></td><td class="amount-cell">₱${amount}</td></tr>
+            </tbody>
+          </table>
+          
+          <div class="signatures">
+            <div class="sig-block">
+              <div class="sig-label">Prepared By</div>
+              <div class="sig-line">
+                <div class="name">System Admin</div>
+                <div class="title">BDOEA Officer</div>
+              </div>
+            </div>
+            <div class="sig-block">
+              <div class="sig-label">Confirmed By</div>
+              <div class="sig-line">
+                <div class="name">${cleanAuthorizedBy}</div>
+                <div class="title">Treasurer</div>
+              </div>
+            </div>
+            <div class="sig-block">
+              <div class="sig-label">Received By Payee</div>
+              <div class="sig-line">
+                <div class="name">${voucher.memberName}</div>
+                <div class="title">Member</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </body>
+      </html>`;
+  };
+
   const downloadVoucherPDF = async () => {
     if (!selectedVoucher) return;
     setIsGeneratingPDF(true);
@@ -200,108 +309,7 @@ export default function DisbursementPage() {
     document.body.appendChild(iframe);
 
     try {
-      let logoBase64 = '';
-      try {
-        const logoRes = await fetch('/bdoea-logo-blue.png');
-        if (logoRes.ok) {
-          const blob = await logoRes.blob();
-          logoBase64 = await new Promise<string>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result as string);
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-          });
-        }
-      } catch (err) { console.error('Failed to load logo in Base64:', err); }
-
-      const postingDate = new Date(selectedVoucher.createdAt).toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-      const amount = Number(selectedVoucher.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 });
-      
-      const authorizedByRaw = selectedVoucher.authorizedBy || 'PENDING';
-      const cleanAuthorizedBy = authorizedByRaw.replace(/Treasurer\s+/i, '');
-      const typeDisplay = selectedVoucher.disbursementType?.replace('_', ' ') || 'LOAN RELEASE';
-      const fundDisplay = selectedVoucher.fundSource?.replace('_', ' ') || 'GENERAL FUND';
-      
-      const voucherHTML = `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-          <meta charset="UTF-8" />
-          <title>Disbursement Voucher</title>
-          <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body { font-family: 'Segoe UI', Arial, sans-serif; color: #1a202c; padding: 30px; font-size: 13px; }
-            .voucher-container { border: 1px solid #cbd5e1; padding: 40px; border-radius: 12px; position: relative; }
-            .voucher-container::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, #021124 0%, #005a9c 50%, #e6b012 100%); border-top-left-radius: 12px; border-top-right-radius: 12px; }
-            .header { text-align: center; border-bottom: 2px dashed #e2e8f0; padding-bottom: 22px; margin-bottom: 28px; }
-            .logo-container { display: flex; justify-content: center; margin-bottom: 12px; }
-            .logo { height: 55px; object-fit: contain; }
-            .org-name { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: #021124; }
-            .title-badge { display: inline-block; margin-top: 16px; background: #021124; color: #ffffff; font-size: 11px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; padding: 6px 28px; border-radius: 30px; border: 2px solid #e6b012; }
-            .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 40px; margin-bottom: 28px; background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; }
-            .label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 4px; }
-            .value { font-weight: 700; font-size: 13px; color: #021124; }
-            .payee-block { grid-column: 1 / -1; border-top: 1px solid #e2e8f0; padding-top: 12px; margin-top: 4px; }
-            table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-            thead th { background: #021124; padding: 12px 16px; text-align: left; font-size: 10px; font-weight: 800; text-transform: uppercase; color: #ffffff; }
-            tbody td { padding: 18px 16px; border-bottom: 1px solid #cbd5e1; text-align: left; }
-            .amount-cell { font-size: 22px; font-weight: 900; color: #15803d; text-align: left; }
-            .signatures { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 30px; margin-top: 40px; }
-            .sig-block { text-align: center; }
-            .sig-label { font-size: 11px; font-weight: 800; text-transform: uppercase; color: #04152d; margin-bottom: 50px; letter-spacing: 1px; }
-            .sig-line { border-top: 1px solid #04152d; padding-top: 8px; width: 100%; }
-            .name { font-size: 11px; font-weight: 800; color: #04152d; text-transform: uppercase; letter-spacing: 0.5px; }
-            .title { font-size: 10px; font-weight: 700; color: #04152d; text-transform: uppercase; margin-top: 4px; }
-          </style>
-        </head>
-        <body>
-          <div class="voucher-container">
-            <div class="header">
-              ${logoBase64 ? `<div class="logo-container"><img src="${logoBase64}" alt="Logo" class="logo" /></div>` : ''}
-              <div class="org-name">Banco de Oro Employees Association (BDOEA)</div>
-              <div class="title-badge">Disbursement Voucher</div>
-            </div>
-            <div class="details-grid">
-              <div><div class="label">Voucher Reference</div><div class="value">${selectedVoucher.id}</div></div>
-              <div><div class="label">Posting Date</div><div class="value">${postingDate}</div></div>
-              <div><div class="label">Disbursement Category</div><div class="value" style="color: #0369a1;">${typeDisplay}</div></div>
-              <div><div class="label">Deducted From Fund</div><div class="value" style="color: #b45309;">${fundDisplay}</div></div>
-              <div class="payee-block"><div class="label">Payee</div><div class="value">${selectedVoucher.memberName} (ID: ${selectedVoucher.memberId})</div></div>
-            </div>
-            <table>
-              <thead><tr><th style="text-align: left;">Particulars</th><th style="text-align: left;">Amount (PHP)</th></tr></thead>
-              <tbody>
-                <tr><td style="text-align: left;">Disbursement release for reference: ${selectedVoucher.loanReference}. <br><span style="font-size: 10px; color: #64748b; font-weight: 500;">Method: ${selectedVoucher.paymentMethod} (${selectedVoucher.bankAccount})</span></td><td class="amount-cell">₱${amount}</td></tr>
-              </tbody>
-            </table>
-            
-            <div class="signatures">
-              <div class="sig-block">
-                <div class="sig-label">Prepared By</div>
-                <div class="sig-line">
-                  <div class="name">System Admin</div>
-                  <div class="title">BDOEA Officer</div>
-                </div>
-              </div>
-              <div class="sig-block">
-                <div class="sig-label">Confirmed By</div>
-                <div class="sig-line">
-                  <div class="name">${cleanAuthorizedBy}</div>
-                  <div class="title">Treasurer</div>
-                </div>
-              </div>
-              <div class="sig-block">
-                <div class="sig-label">Received By Payee</div>
-                <div class="sig-line">
-                  <div class="name">${selectedVoucher.memberName}</div>
-                  <div class="title">Member</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </body>
-        </html>`;
-
+      const voucherHTML = await getVoucherHTML(selectedVoucher);
       const doc = iframe.contentWindow?.document || iframe.contentDocument;
       if (!doc) throw new Error('Cannot access iframe document');
       
@@ -329,11 +337,53 @@ export default function DisbursementPage() {
     }
   };
 
-  const printVoucher = () => window.print();
+  const printVoucher = async () => {
+    if (!selectedVoucher) return;
+    setIsPrinting(true);
+
+    try {
+      const voucherHTML = await getVoucherHTML(selectedVoucher);
+      
+      const iframe = document.createElement('iframe');
+      iframe.style.position = 'fixed';
+      iframe.style.right = '0';
+      iframe.style.bottom = '0';
+      iframe.style.width = '0';
+      iframe.style.height = '0';
+      iframe.style.border = '0';
+      document.body.appendChild(iframe);
+
+      const doc = iframe.contentWindow?.document || iframe.contentDocument;
+      if (!doc) throw new Error('Cannot access iframe document');
+      
+      doc.open();
+      doc.write(voucherHTML);
+      doc.close();
+
+      // Wait briefly for images and styles to load before triggering print
+      setTimeout(() => {
+        if (iframe.contentWindow) {
+          iframe.contentWindow.focus();
+          iframe.contentWindow.print();
+        }
+        // Cleanup after print dialog opens
+        setTimeout(() => {
+          if (document.body.contains(iframe)) document.body.removeChild(iframe);
+        }, 1000);
+      }, 500);
+
+    } catch (err) {
+      console.error('Print failed:', err);
+      alert('Failed to print voucher. Please try again.');
+    } finally {
+      setIsPrinting(false);
+    }
+  };
 
   const pendingCount = disbursements.filter(d => d.status === 'PENDING').length;
   const completedCount = disbursements.filter(d => d.status === 'COMPLETED').length;
   const rejectedCount = disbursements.filter(d => d.status === 'REJECTED').length;
+  
   const chartData = [
     { name: 'Pending Review', value: pendingCount, fill: '#facc15' }, 
     { name: 'Completed', value: completedCount, fill: '#10b981' },
@@ -341,7 +391,7 @@ export default function DisbursementPage() {
   ].filter(d => d.value > 0);
 
   return (
-    <div className="flex flex-col min-h-screen relative">
+    <div className="flex flex-col min-h-screen relative print:block print:h-auto print:min-h-0 print:overflow-visible">
       
       <div className={selectedVoucher ? "print:hidden" : ""}>
         <ActionModal 
@@ -499,7 +549,6 @@ export default function DisbursementPage() {
                     <input type="text" placeholder="Search Reference or Member..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full rounded-xl pl-10 pr-4 py-2.5 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] focus:border-[#04152d] outline-none transition-colors font-bold text-[#04152d]" />
                   </div>
                   
-                  {/* Calendar / Month Picker Filter */}
                   <div className="relative inline-flex items-center w-full sm:w-auto min-w-[160px] bg-white border-[1.5px] border-[#dde3ee] rounded-xl overflow-hidden focus-within:border-[#04152d] transition-colors">
                     <div className="pl-4 pr-2 flex items-center pointer-events-none">
                       <Calendar size={14} className="text-gray-400" />
@@ -566,51 +615,44 @@ export default function DisbursementPage() {
                     <p className="font-black text-[#04152d] text-lg text-left">No requests found matching filters.</p>
                   </div>
                 ) : (
-                  <table className="w-full text-left whitespace-nowrap min-w-[1000px]">
+                  <table className="w-full text-left whitespace-nowrap min-w-[1100px]">
                     <thead>
                       <tr>
-                        <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] text-left">Reference</th>
-                        <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] text-left">Payee (Member)</th>
-                        <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] text-left">Category</th>
-                        <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] text-left">Method & Bank</th>
-                        <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] text-right">Amount</th>
-                        <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] text-left">Status</th>
-                        <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] text-left">Actions</th>
+                        <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] text-left">Date Created</th>
+                        <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] text-left">Loan Reference</th>
+                        <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] text-left">Member ID</th>
+                        <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] text-left">Member Name</th>
+                        <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] text-left">Payment Method</th>
+                        <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] text-left">Bank Account</th>
+                        <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] text-right">Amount</th>
+                        <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] text-left">Status</th>
+                        <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-wide bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] text-left">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
                       {paginatedDisbursements.map((disb) => (
                         <tr key={disb.id} className="hover:bg-[#e8edf8]/60 transition-colors duration-100">
-                          <td className="px-6 py-5 text-sm text-gray-700 text-left">
-                            <div className="font-mono font-medium text-[#04152d]">{disb.loanReference}</div>
-                            <span className="text-[10px] text-gray-400 font-mono block mt-0.5">{new Date(disb.createdAt).toLocaleDateString()}</span>
+                          <td className="px-6 py-5 text-sm font-medium text-gray-500 text-left">
+                            {new Date(disb.createdAt).toLocaleDateString()}
                           </td>
-                          
-                          <td className="px-6 py-5 text-sm text-gray-700 text-left">
-                            <div className="font-medium text-[#04152d]">{disb.memberName}</div>
-                            <span className="text-[10px] text-gray-500 font-mono mt-0.5 block">ID: {disb.memberId}</span>
+                          <td className="px-6 py-5 text-sm font-mono font-bold text-blue-600 text-left">
+                            {disb.loanReference}
                           </td>
-
-                          <td className="px-6 py-5 text-sm text-gray-700 text-left">
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest ${
-                              disb.disbursementType === 'LOAN_RELEASE' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'
-                            }`}>
-                              {disb.disbursementType?.replace('_', ' ')}
-                            </span>
-                            {disb.fundSource && disb.fundSource !== 'PENDING' && (
-                               <span className="text-[9px] text-gray-400 font-bold uppercase tracking-widest block mt-1 text-left">From: {disb.fundSource.replace('_', ' ')}</span>
-                            )}
+                          <td className="px-6 py-5 text-sm font-mono font-bold text-gray-500 text-left">
+                            {disb.memberId}
                           </td>
-                          
-                          <td className="px-6 py-5 text-sm text-gray-700 text-left">
-                            <div className="font-mono text-xs font-medium text-[#04152d] text-left">{disb.bankAccount}</div>
-                            <span className="text-[10px] text-gray-500 uppercase tracking-widest mt-1 block text-left">{disb.paymentMethod}</span>
+                          <td className="px-6 py-5 text-sm font-bold text-[#04152d] text-left">
+                            {disb.memberName}
                           </td>
-                          
+                          <td className="px-6 py-5 text-[11px] font-black text-gray-500 uppercase tracking-widest text-left">
+                            {disb.paymentMethod}
+                          </td>
+                          <td className="px-6 py-5 text-sm font-mono font-medium text-[#04152d] text-left">
+                            {disb.bankAccount || 'N/A'}
+                          </td>
                           <td className="px-6 py-5 text-right font-black text-emerald-700 text-base">
                             ₱{Number(disb.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                           </td>
-                          
                           <td className="px-6 py-5 text-left text-sm">
                             <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest ${
                               disb.status === 'PENDING' ? 'bg-amber-50 text-amber-700 border border-amber-200/50' : 
@@ -620,7 +662,6 @@ export default function DisbursementPage() {
                               {disb.status}
                             </span>
                           </td>
-                          
                           <td className="px-6 py-5 text-left">
                             <div className="flex items-center justify-start gap-1.5">
                               <button onClick={() => setSelectedVoucher(disb)} className="text-gray-400 hover:text-[#04152d] hover:bg-gray-100 p-2 rounded-xl transition-all duration-150" title="View Details"><Eye size={18} /></button>
@@ -656,15 +697,17 @@ export default function DisbursementPage() {
       </div>
 
       {selectedVoucher && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-[#04152d]/60 backdrop-blur-sm print:bg-transparent print:static print:block print:inset-auto animate-fade-in p-4 print:p-0">
-          <div className="bg-white w-full max-w-3xl rounded-[24px] shadow-2xl flex flex-col max-h-[95vh] print:max-h-none print:shadow-none print:border-none print:rounded-none print:mx-auto animate-pop overflow-hidden print:overflow-visible">
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-[#04152d]/60 backdrop-blur-sm print:absolute print:inset-0 print:bg-transparent print:items-start print:justify-start print:p-0 animate-fade-in p-4">
+          <div className="bg-white w-full max-w-3xl rounded-[24px] shadow-2xl flex flex-col max-h-[95vh] print:max-h-none print:h-auto print:shadow-none print:border-none print:rounded-none print:m-0 print:w-full animate-pop overflow-hidden print:overflow-visible">
             
             <div className="flex items-center justify-between p-5 border-b border-gray-100 print:hidden bg-gray-50/80">
               <h2 className="font-black text-xl text-[#04152d] text-left">Disbursement Details</h2>
               <div className="flex gap-3">
                 {selectedVoucher.status === 'COMPLETED' && (
                   <>
-                    <button onClick={printVoucher} className="inline-flex items-center justify-center gap-2 border-2 border-[#04152d] text-[#04152d] hover:bg-[#04152d] hover:text-white font-bold py-2.5 px-5 rounded-xl text-sm shadow-[0_4px_0_rgba(2,6,15,0.55)] active:translate-y-[2px] active:shadow-[0_2px_0_rgba(2,6,15,0.55)] transition-all duration-150"><Printer size={16} /> Print</button>
+                    <button onClick={printVoucher} disabled={isPrinting} className="inline-flex items-center justify-center gap-2 border-2 border-[#04152d] text-[#04152d] hover:bg-[#04152d] hover:text-white font-bold py-2.5 px-5 rounded-xl text-sm shadow-[0_4px_0_rgba(2,6,15,0.55)] active:translate-y-[2px] active:shadow-[0_2px_0_rgba(2,6,15,0.55)] transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed">
+                      {isPrinting ? <><Loader size={16} className="animate-spin" /> Printing...</> : <><Printer size={16} /> Print</>}
+                    </button>
                     <button onClick={downloadVoucherPDF} disabled={isGeneratingPDF} className="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-5 rounded-xl text-sm shadow-[0_6px_0_rgba(5,70,40,0.45)] active:translate-y-[4px] active:shadow-[0_2px_0_rgba(5,70,40,0.45)] transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                       {isGeneratingPDF ? <><Loader size={16} className="animate-spin" /> Generating...</> : <><Download size={16} /> PDF</>}
                     </button>
@@ -674,7 +717,7 @@ export default function DisbursementPage() {
               </div>
             </div>
 
-            <div ref={voucherRef} className="p-8 md:p-12 overflow-y-auto print:p-0 bg-white print:overflow-visible">
+            <div ref={voucherRef} className="p-8 md:p-12 overflow-y-auto print:p-0 bg-white print:overflow-visible print:h-auto print:block">
               
               <div className="hidden print:flex w-full justify-end pb-8">
                 <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest text-left">BDOEA Financial System</span>
@@ -690,10 +733,10 @@ export default function DisbursementPage() {
                 </div>
               )}
 
-              <div className="text-center mb-10 border-b-2 border-[#04152d] pb-8 flex flex-col items-center">
-                <img src="/bdoea-logo-blue.png" alt="BDOEA Logo" className="h-16 object-contain mb-4" />
-                <p className="text-xs text-gray-500 font-black uppercase tracking-widest text-left">Banco de Oro Employees Association</p>
-                <h2 className="mt-6 text-lg font-black bg-[#04152d] text-white inline-block px-8 py-2 rounded-full uppercase tracking-widest text-xs shadow-md print:bg-white print:text-[#04152d] print:border-2 print:border-[#04152d] print:shadow-none text-left">
+              <div className="text-center mb-10 border-b-2 border-[#04152d] pb-8 flex flex-col items-center print:border-b print:pb-6 print:mb-6 print:block">
+                <img src="/bdoea-logo-blue.png" alt="BDOEA Logo" className="h-16 object-contain mb-4 print:mx-auto" />
+                <p className="text-xs text-gray-500 font-black uppercase tracking-widest text-center">Banco de Oro Employees Association</p>
+                <h2 className="mt-6 text-lg font-black bg-[#04152d] text-white inline-block px-8 py-2 rounded-full uppercase tracking-widest text-xs shadow-md print:bg-white print:text-[#04152d] print:border-2 print:border-[#04152d] print:shadow-none text-center">
                   Disbursement Voucher
                 </h2>
               </div>
@@ -719,7 +762,7 @@ export default function DisbursementPage() {
                   <tr className="border-b border-gray-200 bg-white">
                     <td className="py-6 px-5 font-medium text-gray-800 leading-relaxed text-left">
                       Disbursement release for reference: <span className="font-black text-[#04152d]">{selectedVoucher.loanReference}</span>. <br/>
-                      <span className="text-xs text-gray-500 font-medium italic mt-2 block text-left">Method: {selectedVoucher.paymentMethod} ({selectedVoucher.bankAccount})</span>
+                      <span className="text-xs text-gray-500 font-medium italic mt-2 block text-left">Method: {selectedVoucher.paymentMethod} {selectedVoucher.bankAccount && selectedVoucher.bankAccount !== 'N/A' ? `(${selectedVoucher.bankAccount})` : ''}</span>
                     </td>
                     <td className="py-6 px-5 text-right font-black text-2xl text-emerald-700 align-top print:text-[#04152d]">₱{Number(selectedVoucher.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                   </tr>
@@ -728,26 +771,26 @@ export default function DisbursementPage() {
               
               <div className="grid grid-cols-3 gap-8 pt-12 print:pt-16">
                 <div className="flex flex-col items-center text-center">
-                  <p className="block text-[11px] font-black text-[#04152d] uppercase tracking-[0.1em] mb-12 text-left">Prepared By</p>
+                  <p className="block text-[11px] font-black text-[#04152d] uppercase tracking-[0.1em] mb-12 text-center">Prepared By</p>
                   <div className="w-full border-t border-[#04152d] pt-3">
-                    <p className="font-black text-xs text-[#04152d] uppercase tracking-wide text-left">System Admin</p>
-                    <p className="text-[10px] text-[#04152d] font-bold uppercase mt-1 text-left">BDOEA Officer</p>
+                    <p className="font-black text-xs text-[#04152d] uppercase tracking-wide text-center">System Admin</p>
+                    <p className="text-[10px] text-[#04152d] font-bold uppercase mt-1 text-center">BDOEA Officer</p>
                   </div>
                 </div>
                 <div className="flex flex-col items-center text-center">
-                  <p className="block text-[11px] font-black text-[#04152d] uppercase tracking-[0.1em] mb-12 text-left">Confirmed By</p>
+                  <p className="block text-[11px] font-black text-[#04152d] uppercase tracking-[0.1em] mb-12 text-center">Confirmed By</p>
                   <div className="w-full border-t border-[#04152d] pt-3">
-                    <p className="font-black text-xs text-[#04152d] uppercase tracking-wide text-left">
+                    <p className="font-black text-xs text-[#04152d] uppercase tracking-wide text-center">
                       {selectedVoucher.authorizedBy ? selectedVoucher.authorizedBy.replace(/Treasurer\s+/i, '') : 'PENDING'}
                     </p>
-                    <p className="text-[10px] text-[#04152d] font-bold uppercase mt-1 text-left">Treasurer</p>
+                    <p className="text-[10px] text-[#04152d] font-bold uppercase mt-1 text-center">Treasurer</p>
                   </div>
                 </div>
                 <div className="flex flex-col items-center text-center">
-                  <p className="block text-[11px] font-black text-[#04152d] uppercase tracking-[0.1em] mb-12 text-left">Received By Payee</p>
+                  <p className="block text-[11px] font-black text-[#04152d] uppercase tracking-[0.1em] mb-12 text-center">Received By Payee</p>
                   <div className="w-full border-t border-[#04152d] pt-3">
-                    <p className="font-black text-xs text-[#04152d] uppercase tracking-wide text-left">{selectedVoucher.memberName}</p>
-                    <p className="text-[10px] text-[#04152d] font-bold uppercase mt-1 text-left">Member</p>
+                    <p className="font-black text-xs text-[#04152d] uppercase tracking-wide text-center">{selectedVoucher.memberName}</p>
+                    <p className="text-[10px] text-[#04152d] font-bold uppercase mt-1 text-center">Member</p>
                   </div>
                 </div>
               </div>
