@@ -73,12 +73,12 @@ export default function AuditorLoansDashboard() {
 
   useEffect(() => { loadData(); }, []);
 
-  // AC8: Reset Pagination on Filter Change
+  // Reset Pagination on Filter Change
   useEffect(() => {
     setRepaymentPage(1);
   }, [searchTerm, filterMethod, filterMonth]);
 
-  // AC3 & AC4: Simultaneous Filters (Search, Method, Month)
+  // Simultaneous Filters (Search, Method, Month)
   const filteredRepayments = useMemo(() => {
     return repayments.filter(r => {
       const matchesSearch = r.loanReference.toLowerCase().includes(searchTerm.toLowerCase()) || r.memberName.toLowerCase().includes(searchTerm.toLowerCase());
@@ -92,7 +92,7 @@ export default function AuditorLoansDashboard() {
   const totalRepaymentPages = Math.max(1, Math.ceil(filteredRepayments.length / itemsPerPage));
   const paginatedRepayments = filteredRepayments.slice((repaymentPage - 1) * itemsPerPage, repaymentPage * itemsPerPage);
 
-  // --- AC1: KPI SUMMARY CALCULATIONS ---
+  // --- KPI SUMMARY CALCULATIONS ---
   const totalRepaymentsValue = repayments.filter(r => r.status === 'PROCESSED').reduce((acc, curr) => acc + curr.amount, 0);
   const uniqueLoansCount = new Set(repayments.map(r => r.loanReference)).size;
   const globalProcessedPrincipal = repayments.filter(r => r.status === 'PROCESSED').reduce((acc, curr) => acc + curr.principalAmount, 0);
@@ -140,7 +140,7 @@ export default function AuditorLoansDashboard() {
   return (
     <div className="flex flex-col min-h-screen bg-transparent print:bg-white relative">
       
-      {/* AC5: INDIVIDUAL MEMBER LEDGER MODAL (READ-ONLY) */}
+      {/* INDIVIDUAL MEMBER LEDGER MODAL (READ-ONLY) */}
       {selectedLedger && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#04152d]/60 backdrop-blur-sm animate-fade-in p-4">
           <div className="bg-white w-full max-w-5xl rounded-[24px] shadow-2xl border border-white/80 overflow-hidden animate-pop flex flex-col max-h-[95vh]">
@@ -379,7 +379,7 @@ export default function AuditorLoansDashboard() {
               </div>
             </div>
 
-            {/* AC2: Display Repayment Table (Fully Expanded Columns) */}
+            {/* Display Repayment Table (Fully Expanded Columns) */}
             <div className="w-full bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col min-h-[500px]">
               <div className="overflow-x-auto w-full">
                 <table className="w-full whitespace-nowrap min-w-[1500px]">

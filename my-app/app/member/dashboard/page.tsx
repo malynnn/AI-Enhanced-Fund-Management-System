@@ -55,14 +55,12 @@ export default function MemberDashboard() {
   }, [currentUser]);
 
   // --- LOAN COMPUTATIONS ---
-  // Note: Original capital would ideally come from the external loan system API.
   const assumedOriginalCapital = 50000.00; 
   const processedLoans = repayments.filter(r => r.status === 'PROCESSED');
   const totalPrincipalPaid = processedLoans.reduce((acc, curr) => acc + Number(curr.principalAmount || 0), 0);
   const remainingBalance = Math.max(0, assumedOriginalCapital - totalPrincipalPaid);
 
   // --- DUES COMPUTATIONS ---
-  // Assuming a standard 12-month tracking year for the pie chart
   const monthsPaid = collections.filter(c => c.status === 'CONFIRMED').length;
   const monthsPending = collections.filter(c => c.status === 'PENDING').length;
   const monthsUnpaid = Math.max(0, 12 - (monthsPaid + monthsPending));

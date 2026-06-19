@@ -58,21 +58,21 @@ export default function Sidebar() {
       icon: Book,
       roles: ['User', 'Officer/Admin', 'Treasurer', 'Auditor'],
       subItems: [
-        // MEMBER EXCLUSIVE
+        // MEMBER 
         { label: 'My Summary', href: '/member/dashboard', icon: PieChart, roles: ['User'] },
         
-        // ADMIN / SUPERADMIN EXCLUSIVE (Finance System User Management)
+        // ADMIN 
         { label: 'User Management', href: '/admin/dashboard', icon: Users, roles: ['Officer/Admin'] },
         { label: 'Settings', href: '/admin/settings', icon: Settings, roles: ['Officer/Admin'] },
 
-        // TREASURER & ADMIN EXCLUSIVE (Operational/Write Access)
+        // TREASURER 
         { label: 'Dashboard', href: '/treasurer/dashboard', icon: LayoutDashboard, roles: ['Treasurer'] },
         { label: 'Collections', href: '/treasurer/collections', icon: WalletCards, roles: ['Treasurer'] },
         { label: 'Disbursement', href: '/treasurer/disbursement', icon: Send, roles: ['Treasurer'] },
         { label: 'Loan Ledger', href: '/treasurer/loans', icon: CircleDollarSign, roles: ['Treasurer'] },
         { label: 'Funds', href: '/treasurer/funds', icon: Briefcase, roles: ['Treasurer'] },
         
-        // AUDITOR EXCLUSIVE (Strict Read-Only Access)
+        // AUDITOR
         { label: 'Audit Dashboard', href: '/auditor/dashboard', icon: ClipboardList, roles: ['Auditor'] },
         { label: 'Loan Ledger', href: '/auditor/loans', icon: CircleDollarSign, roles: ['Auditor'] },
         { label: 'Funds', href: '/auditor/funds', icon: Briefcase, roles: ['Auditor'] },

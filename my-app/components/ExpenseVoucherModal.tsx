@@ -1,4 +1,3 @@
-// components/ExpenseVoucherModal.tsx
 "use client";
 
 import { useState, useEffect } from 'react';

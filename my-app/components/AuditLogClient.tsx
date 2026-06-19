@@ -1,4 +1,3 @@
-// components/AuditLogClient.tsx
 "use client";
 
 import { useState, useMemo } from 'react';
@@ -11,7 +10,6 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import Header from '@/components/Header';
 import ActionModal from '@/components/ActionModal';
 
-// 1. Define the TypeScript shape for incoming database logs
 interface AuditLogProp {
   id: string;
   timestamp: string;
@@ -42,9 +40,6 @@ export default function AuditLogClient({ initialLogs }: { initialLogs: AuditLogP
     resultMsg?: string;
   }>({ isOpen: false, title: '', message: '', actionType: null, status: 'idle' });
 
-  // ==========================================
-  // 1. STRICT ROLE GATEKEEPER
-  // ==========================================
   if (role !== 'Superadmin') {
     return (
       <div className="flex flex-col min-h-screen bg-transparent">
@@ -64,9 +59,6 @@ export default function AuditLogClient({ initialLogs }: { initialLogs: AuditLogP
     );
   }
 
-  // ==========================================
-  // 2. DATA AGGREGATION & FILTERING
-  // ==========================================
   const filteredLogs = useMemo(() => {
     return initialLogs.filter(log => {
       const matchesSearch = log.user.toLowerCase().includes(searchUser.toLowerCase()) || 
@@ -90,7 +82,7 @@ export default function AuditLogClient({ initialLogs }: { initialLogs: AuditLogP
 
   const CHART_COLORS = ['#8b5cf6', '#10b981', '#ef4444', '#facc15', '#3b82f6', '#04152d'];
 
-  // --- HELPER: Format Date for UI ---
+  // --- Format Date for UI ---
   const formatDateTime = (isoString: string) => {
     const date = new Date(isoString);
     return new Intl.DateTimeFormat('en-PH', {
@@ -99,9 +91,6 @@ export default function AuditLogClient({ initialLogs }: { initialLogs: AuditLogP
     }).format(date);
   };
 
-  // ==========================================
-  // 3. HANDLERS & MODALS
-  // ==========================================
   const triggerViewLog = (log: AuditLogProp) => {
     setModal({
       isOpen: true,
@@ -153,9 +142,7 @@ export default function AuditLogClient({ initialLogs }: { initialLogs: AuditLogP
     }, 800);
   };
 
-  // ==========================================
-  // 4. UI RENDER
-  // ==========================================
+
   return (
     <div className="flex flex-col min-h-screen bg-transparent relative">
       

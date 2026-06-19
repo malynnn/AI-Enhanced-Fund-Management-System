@@ -73,12 +73,12 @@ export default function LoansDashboard() {
 
   useEffect(() => { loadData(); }, []);
 
-  // AC8: Reset Pagination on Filter Change
+  // Reset Pagination on Filter Change
   useEffect(() => {
     setRepaymentPage(1);
   }, [searchTerm, filterMethod, filterMonth]);
 
-  // AC3 & AC4: Simultaneous Filters (Search, Method, Month)
+  // Simultaneous Filters (Search, Method, Month)
   const filteredRepayments = useMemo(() => {
     return repayments.filter(r => {
       const matchesSearch = r.loanReference.toLowerCase().includes(searchTerm.toLowerCase()) || r.memberName.toLowerCase().includes(searchTerm.toLowerCase());
@@ -92,7 +92,7 @@ export default function LoansDashboard() {
   const totalRepaymentPages = Math.max(1, Math.ceil(filteredRepayments.length / itemsPerPage));
   const paginatedRepayments = filteredRepayments.slice((repaymentPage - 1) * itemsPerPage, repaymentPage * itemsPerPage);
 
-  // --- AC1: KPI SUMMARY CALCULATIONS ---
+  // --- KPI SUMMARY CALCULATIONS ---
   const totalRepaymentsValue = repayments.filter(r => r.status === 'PROCESSED').reduce((acc, curr) => acc + curr.amount, 0);
   const uniqueLoansCount = new Set(repayments.map(r => r.loanReference)).size;
   const globalProcessedPrincipal = repayments.filter(r => r.status === 'PROCESSED').reduce((acc, curr) => acc + curr.principalAmount, 0);
@@ -140,7 +140,7 @@ export default function LoansDashboard() {
   return (
     <div className="flex flex-col min-h-screen bg-transparent print:bg-white relative">
       
-      {/* AC5: INDIVIDUAL MEMBER LEDGER MODAL */}
+      {/* INDIVIDUAL MEMBER LEDGER MODAL */}
       {selectedLedger && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#04152d]/60 backdrop-blur-sm animate-fade-in p-4">
           <div className="bg-white w-full max-w-5xl rounded-[24px] shadow-2xl border border-white/80 overflow-hidden animate-pop flex flex-col max-h-[95vh]">
@@ -214,7 +214,7 @@ export default function LoansDashboard() {
                 </div>
               </div>
 
-              {/* Full Amortization Schedule Table */}
+              {/* Amortization Schedule Table */}
               <div className="flex items-center gap-2 mb-4 mt-8">
                 <Calendar size={18} className="text-[#04152d]"/>
                 <h4 className="text-sm font-black text-[#04152d] uppercase tracking-widest text-left">Complete Payment Schedule</h4>
@@ -279,7 +279,6 @@ export default function LoansDashboard() {
         </div>
       )}
 
-      {/* --- MAIN PAGE BACKGROUND --- */}
       <Header />
 
       <main className="p-4 md:p-8 max-w-[1600px] w-full mx-auto space-y-8 flex-1 print:p-0 print:m-0 print:max-w-none">
@@ -297,7 +296,7 @@ export default function LoansDashboard() {
           </div>
         </div>
 
-        {/* AC1: 4 KPI SUMMARY CARDS */}
+        {/* 4 KPI SUMMARY CARDS */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 flex items-center gap-4 h-full">
             <div className="w-12 h-12 rounded-full bg-emerald-50 flex-shrink-0 flex items-center justify-center text-emerald-600"><Activity size={24} /></div>
@@ -379,7 +378,7 @@ export default function LoansDashboard() {
               </div>
             </div>
 
-            {/* AC2: Display Repayment Table (Fully Expanded Columns) */}
+            {/* Display Repayment Table (Fully Expanded Columns) */}
             <div className="w-full bg-white rounded-2xl shadow-lg border border-white/80 overflow-hidden flex flex-col min-h-[500px]">
               <div className="overflow-x-auto w-full">
                 <table className="w-full whitespace-nowrap min-w-[1500px]">

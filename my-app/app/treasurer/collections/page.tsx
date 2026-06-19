@@ -276,7 +276,7 @@ export default function CollectionsPage() {
           onConfirm={() => setModal({ ...modal, isOpen: false })} onClose={() => setModal({ ...modal, isOpen: false })} confirmText="Close"
         />
 
-        {/* DETAILED REVIEW & VERIFY MODAL */}
+        {/* REVIEW & VERIFY MODAL */}
         {reviewModal.isOpen && (
           <div className="fixed inset-0 z-[110] flex items-center justify-center bg-[#04152d]/60 backdrop-blur-sm animate-fade-in p-4 print:hidden">
             <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl animate-pop overflow-hidden flex flex-col">
@@ -320,7 +320,7 @@ export default function CollectionsPage() {
           </div>
         )}
 
-        {/* ADD COLLECTION FORM MODAL */}
+        {/* COLLECTION FORM MODAL */}
         {isAddModalOpen && !reviewModal.isOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#04152d]/60 backdrop-blur-sm animate-fade-in p-4 print:hidden">
             <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-white/80 overflow-hidden animate-pop flex flex-col max-h-[90vh]">
@@ -394,7 +394,6 @@ export default function CollectionsPage() {
           <Header />
         </div>
 
-        {/* PRINT SAFE MAIN WRAPPER */}
         <main className="p-4 md:p-8 max-w-[1600px] w-full mx-auto space-y-8 flex-1 print:p-0 print:m-0 print:max-w-none print:block print:h-auto print:overflow-visible print:space-y-4">
           
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6 print:hidden mt-2">
@@ -421,7 +420,7 @@ export default function CollectionsPage() {
             </div>
           </div>
 
-          {/* Global Filters with FIX for Autocomplete MouseDown */}
+          {/* Global Filters with for Autocomplete MouseDown */}
           <div className="bg-white rounded-2xl p-6 shadow-md border border-white/80 flex flex-col md:flex-row gap-4 items-center print:hidden">
             <div className="flex-1 w-full relative">
               <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 z-10" />
@@ -561,7 +560,7 @@ export default function CollectionsPage() {
             </div>
           )}
 
-          {/* PRINT-OPTIMIZED SUMMARY REPORT */}
+          {/* Summary Report Print*/}
           {activeTab === 'report' && (
             <div className="bg-white p-10 rounded-2xl shadow-xl border border-white/80 w-full max-w-5xl mx-auto print:shadow-none print:border-none print:p-0 print:max-w-full print:block print:h-auto print:overflow-visible">
                <div className="text-center mb-10 border-b-2 border-[#04152d] pb-8 print:border-b print:pb-4 print:mb-6 print:block">

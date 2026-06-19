@@ -62,7 +62,7 @@ export default function FundPage() {
     });
   }, [funds, searchTerm]);
   
-  // --- ANALYTICS MATH ---
+  // --- MATH ---
   const totalAssets = funds.filter(f => f.status === 'Active').reduce((sum, f) => sum + f.balance, 0);
   const totalCashIn = funds.filter(f => f.status === 'Active').reduce((sum, f) => sum + f.totalIn, 0);
   const totalCashOut = funds.filter(f => f.status === 'Active').reduce((sum, f) => sum + f.totalOut, 0);

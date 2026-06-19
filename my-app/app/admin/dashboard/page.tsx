@@ -13,7 +13,7 @@ import {
 import Header from '@/components/Header';
 import ActionModal from '@/components/ActionModal';
 
-// --- INTERFACES FOR BACKEND DATA ---
+// interfaces for backend data
 interface User {
   id: string;
   name: string;
@@ -37,7 +37,7 @@ function AdminDashboardContent() {
   const currentTab = searchParams.get('tab') || 'users';
   const { data: session } = useSession();
 
-  // --- STATE MANAGEMENT ---
+  // state management
   const [users, setUsers] = useState<User[]>([]);
   const [pendingRequests, setPendingRequests] = useState<PendingRequest[]>([]);
   
@@ -45,11 +45,11 @@ function AdminDashboardContent() {
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('ALL');
 
-  // Pagination State
+  // pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  // Modal States
+  // modal states
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [newUserForm, setNewUserForm] = useState({ name: '', email: '', role: 'Member', password: '' });
@@ -58,7 +58,7 @@ function AdminDashboardContent() {
     isOpen: boolean; title: string; message: string; status: 'idle' | 'loading' | 'success' | 'error'; resultMsg?: string; onConfirm?: () => void; confirmText?: string;
   }>({ isOpen: false, title: '', message: '', status: 'idle' });
 
-  // --- DATA FETCHING ---
+  // data fetching
   const fetchData = async () => {
     setIsLoading(true);
     try {
@@ -82,14 +82,13 @@ function AdminDashboardContent() {
     fetchData();
   }, []);
 
-  // --- FILTERING & PAGINATION ---
+  // filtering and pagination
   useEffect(() => {
     setCurrentPage(1); // Reset to page 1 when filters change
   }, [searchTerm, roleFilter]);
 
   const filteredUsers = useMemo(() => {
     return users.filter(u => {
-      // Don't show the logged-in user themselves
       if (session?.user?.email && u.email === session.user.email) return false;
 
       const matchesSearch = u.name.toLowerCase().includes(searchTerm.toLowerCase()) || u.email.toLowerCase().includes(searchTerm.toLowerCase());
@@ -113,7 +112,6 @@ function AdminDashboardContent() {
     'Member': 'bg-gray-100 text-gray-700 border-gray-200',
   };
 
-  // --- HANDLERS ---
   const handleTabChange = (tab: string) => {
     router.push(`/admin/dashboard?tab=${tab}`);
   };
@@ -143,7 +141,7 @@ function AdminDashboardContent() {
   };
 
   const toggleUserStatus = (user: User) => {
-    if (user.role === 'Admin') return; // Extra protection guard
+    if (user.role === 'Admin') return; 
     
     const isSuspending = user.status === 'ACTIVE';
     setActionModal({
@@ -206,7 +204,6 @@ function AdminDashboardContent() {
         onClose={() => setActionModal({ ...actionModal, isOpen: false })} 
       />
 
-      {/* ADD USER MODAL */}
       {isAddUserModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#04152d]/60 backdrop-blur-sm p-4">
           <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-pop">

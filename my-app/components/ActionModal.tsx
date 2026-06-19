@@ -1,4 +1,3 @@
-// components/ActionModal.tsx
 "use client";
 
 import { CheckCircle2, AlertTriangle, X, Loader } from 'lucide-react';

@@ -22,7 +22,6 @@ const ADMIN_TAB_TITLES: Record<string, string> = {
   users:                 'User Management',
 };
 
-// UPDATED: Mapping based on new role-based folder structure
 const PAGE_TITLES: Record<string, string> = {
   '/member/dashboard':        'My Dashboard',
   '/treasurer/dashboard':     'Dashboard',
@@ -71,7 +70,7 @@ function HeaderContent({ unreadCount = 0 }: Props) {
 
   const userName = session?.user?.name || session?.user?.email?.split('@')[0] || 'Member';
   
-  // Logic: Show Greeting for dashboards, otherwise show page title
+  // Show Greeting for dashboards, otherwise show page title
   let title = PAGE_TITLES[pathname] ?? 'BDOEA';
 
   if (pathname === '/admin') {

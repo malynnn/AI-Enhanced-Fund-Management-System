@@ -41,7 +41,7 @@ function LoginForm() {
       setDetectedRole(userRole);
 
       setTimeout(() => {
-        // EXACT ROLE-BASED ROUTING TO NEW FOLDERS
+        // based on separated folders
         if (userRole === "Member" || userRole === "User") {
           router.push("/member/dashboard");
         } else if (userRole === "Auditor") {
@@ -59,7 +59,7 @@ function LoginForm() {
   return (
     <div className="min-h-screen w-full flex font-sans">
       
-      {/* LEFT COLUMN: Logo */}
+      {/* Logo */}
       <div className="hidden lg:flex w-1/2 bg-[#f8f9fa] items-center justify-center p-12">
         <Image 
           src="/bdoea-logo-blue.png" 
@@ -71,7 +71,7 @@ function LoginForm() {
         />
       </div>
 
-      {/* RIGHT COLUMN: Login Form Area */}
+      {/* Login Form Area */}
       <div className="w-full lg:w-1/2 bg-[#021124] flex items-center justify-center p-8">
         <div className="bg-[#f8f9fa] w-full max-w-md rounded-md p-10 lg:p-12 shadow-xl">
           

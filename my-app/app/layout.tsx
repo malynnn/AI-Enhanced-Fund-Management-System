@@ -17,9 +17,6 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.className} flex h-screen overflow-hidden bg-bdoea-bg`}>
         <Providers>
-          {/* The <aside> wrapper was moved inside the Sidebar component
-            so it can completely delete its own width on the login page 
-          */}
           <Sidebar />
           
           <main className="flex-1 h-full overflow-y-auto">
