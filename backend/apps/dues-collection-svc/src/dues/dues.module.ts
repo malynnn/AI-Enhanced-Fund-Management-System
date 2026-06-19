@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma.service';
 import { DuesController } from './dues.controller';
 import { DuesService } from './dues.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { QUEUE_LEDGER } from '@backend/events';
+import { QUEUE_LEDGER, QUEUE_REPAYMENTS } from '@backend/events';
 
 @Module({
   imports: [
@@ -19,6 +19,21 @@ import { QUEUE_LEDGER } from '@backend/events';
             arguments: {
               'x-dead-letter-exchange': '',
               'x-dead-letter-routing-key': `dlq.${QUEUE_LEDGER}`,
+            },
+          },
+        },
+      },
+      {
+        name: 'REPAYMENTS_CLIENT',
+        transport: Transport.RMQ,
+        options: {
+          urls: [process.env.RABBITMQ_URL || 'amqp://guest:guest@localhost:5672'],
+          queue: QUEUE_REPAYMENTS,
+          queueOptions: {
+            durable: true,
+            arguments: {
+              'x-dead-letter-exchange': '',
+              'x-dead-letter-routing-key': `dlq.${QUEUE_REPAYMENTS}`,
             },
           },
         },

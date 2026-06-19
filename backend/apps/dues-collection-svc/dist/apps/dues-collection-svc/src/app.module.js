@@ -30,6 +30,21 @@ const rabbitMqClients = microservices_1.ClientsModule.register([
             },
         },
     },
+    {
+        name: 'REPAYMENTS_CLIENT',
+        transport: microservices_1.Transport.RMQ,
+        options: {
+            urls: [process.env.RABBITMQ_URL || 'amqp://guest:guest@localhost:5672'],
+            queue: events_1.QUEUE_REPAYMENTS,
+            queueOptions: {
+                durable: true,
+                arguments: {
+                    'x-dead-letter-exchange': '',
+                    'x-dead-letter-routing-key': `dlq.${events_1.QUEUE_REPAYMENTS}`,
+                },
+            },
+        },
+    },
 ]);
 let AppModule = class AppModule {
 };

@@ -203,7 +203,7 @@ async function main() {
       amountPaid: 500,
       method: 'CASH',
       referenceNumber: 'CS-0615-0902',
-      fundToCredit: 'GF',
+      fundToCredit: 'LN',
       status: 'PENDING',
       collectionType: 'LOAN_PAYMENT'
     },
@@ -215,7 +215,7 @@ async function main() {
       amountPaid: 450,
       method: 'SALARY_DEDUCTION',
       referenceNumber: 'SD-0615-0903',
-      fundToCredit: 'GF',
+      fundToCredit: 'UF',
       status: 'PENDING',
       collectionType: 'CONTRIBUTION'
     },

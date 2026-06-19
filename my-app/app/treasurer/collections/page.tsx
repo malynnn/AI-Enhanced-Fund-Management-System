@@ -106,7 +106,7 @@ export default function CollectionsPage() {
       autoName = 'Member Not Found';
     }
     
-    setFormData(prev => ({ ...prev, memberId: e.target.value, memberName: autoName }));
+    setFormData(prev => ({ ...prev, memberId: id, memberName: autoName }));
   };
 
   const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -165,7 +165,6 @@ export default function CollectionsPage() {
   };
 
   const processReviewSubmit = async () => {
-    setReviewModal(prev => ({...prev, isOpen: false}));
     setIsSubmitting(true);
     
     const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
@@ -182,6 +181,7 @@ export default function CollectionsPage() {
         if (!res?.ok) res = await fetch(`${gatewayUrl}/api/finance/dues`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).catch(() => null);
 
         if (res?.ok) {
+          setReviewModal(prev => ({...prev, isOpen: false}));
           closeAddModal(); // Close and reset form
           await fetchCollections();
           setModal({ isOpen: true, title: 'Transaction Confirmed', message: '', status: 'success', resultMsg: 'Collection has been successfully mapped to the ledger.' });
@@ -193,11 +193,13 @@ export default function CollectionsPage() {
         if (!res?.ok) res = await fetch(`${gatewayUrl}/api/finance/dues/${recordId}/confirm`, { method: 'PATCH' }).catch(() => null);
 
         if (res?.ok) {
+          setReviewModal(prev => ({...prev, isOpen: false}));
           await fetchCollections();
           setModal({ isOpen: true, title: 'Ledger Updated', message: '', status: 'success', resultMsg: 'Collection confirmed and posted successfully!' });
         } else throw new Error('Error confirming record.');
       }
     } catch (err: any) {
+      setReviewModal(prev => ({...prev, isOpen: false}));
       setModal({ isOpen: true, title: 'Error', message: '', status: 'error', resultMsg: err.message });
     } finally {
       setIsSubmitting(false);

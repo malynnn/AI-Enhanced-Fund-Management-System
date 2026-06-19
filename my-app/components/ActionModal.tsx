@@ -21,7 +21,7 @@ export default function ActionModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#04152d]/60 backdrop-blur-sm animate-fade-in p-4">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-[#04152d]/60 backdrop-blur-sm animate-fade-in p-4">
       <div className="bg-white w-full max-w-md rounded-2xl shadow-[0_20px_60px_-12px_rgba(0,0,0,0.3),0_4px_16px_rgba(0,0,0,0.12)] border border-white/80 overflow-hidden animate-pop">
         
         {/* Header */}

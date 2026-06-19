@@ -16,11 +16,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.DuesService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma.service");
+const events_1 = require("@backend/events");
 const microservices_1 = require("@nestjs/microservices");
 let DuesService = DuesService_1 = class DuesService {
-    constructor(prisma, ledgerClient) {
+    constructor(prisma, ledgerClient, repaymentsClient) {
         this.prisma = prisma;
         this.ledgerClient = ledgerClient;
+        this.repaymentsClient = repaymentsClient;
         this.logger = new common_1.Logger(DuesService_1.name);
     }
     async processDuesEvent(data) {
@@ -88,6 +90,39 @@ let DuesService = DuesService_1 = class DuesService {
         catch (error) {
             this.logger.error(`Failed to emit fund.dues.posted event for ${id}: ${error.message}`);
         }
+        if (updated.collectionType === 'LOAN_PAYMENT') {
+            try {
+                const activeLoan = await this.prisma.disbursementRequest.findFirst({
+                    where: {
+                        memberId: updated.memberId,
+                        status: 'COMPLETED',
+                    },
+                    orderBy: {
+                        createdAt: 'desc',
+                    },
+                });
+                if (activeLoan) {
+                    const repaymentEvent = {
+                        loanReference: activeLoan.loanReference,
+                        memberId: updated.memberId,
+                        memberName: updated.name,
+                        amount: Number(updated.amountPaid),
+                        principalAmount: Number(updated.amountPaid),
+                        serviceFeeAmount: 0,
+                        paymentMethod: updated.method,
+                        referenceNumber: updated.referenceNumber || undefined,
+                    };
+                    this.repaymentsClient.emit(events_1.QUEUE_REPAYMENTS, repaymentEvent);
+                    this.logger.log(`Emitted ${events_1.QUEUE_REPAYMENTS} event for loan ${activeLoan.loanReference} from collection confirmation`);
+                }
+                else {
+                    this.logger.warn(`No active completed loan found for member ${updated.memberId} when confirming collection.`);
+                }
+            }
+            catch (error) {
+                this.logger.error(`Failed to emit ${events_1.QUEUE_REPAYMENTS} event: ${error.message}`);
+            }
+        }
         return updated;
     }
     async createCollection(payload) {
@@ -95,6 +130,7 @@ let DuesService = DuesService_1 = class DuesService {
         if (!memberId || !memberName || !collectionType || amount === undefined || !method) {
             throw new common_1.BadRequestException('Missing required fields: memberId, memberName, collectionType, amount, method');
         }
+        const sanitizedMemberId = memberId.toUpperCase().trim();
         const numericAmount = Number(amount);
         if (isNaN(numericAmount) || numericAmount <= 0) {
             throw new common_1.BadRequestException('Amount must be a positive number');
@@ -125,7 +161,7 @@ let DuesService = DuesService_1 = class DuesService {
             if (collectionType === 'LOAN_PAYMENT') {
                 const activeLoan = await tx.disbursementRequest.findFirst({
                     where: {
-                        memberId: memberId,
+                        memberId: sanitizedMemberId,
                         status: 'COMPLETED',
                     },
                     orderBy: {
@@ -133,7 +169,7 @@ let DuesService = DuesService_1 = class DuesService {
                     },
                 });
                 if (!activeLoan) {
-                    throw new common_1.BadRequestException(`No active completed loan found for member ${memberId}`);
+                    throw new common_1.BadRequestException(`No active completed loan found for member ${sanitizedMemberId}`);
                 }
                 const currentLoanBalance = Number(activeLoan.amount);
                 const newLoanBalance = Math.max(0, currentLoanBalance - numericAmount);
@@ -141,12 +177,12 @@ let DuesService = DuesService_1 = class DuesService {
                     where: { id: activeLoan.id },
                     data: { amount: newLoanBalance },
                 });
-                this.logger.log(`Subtracted ${numericAmount} from outstanding loan balance of member ${memberId} (ref: ${activeLoan.loanReference}). New balance: ${newLoanBalance}`);
+                this.logger.log(`Subtracted ${numericAmount} from outstanding loan balance of member ${sanitizedMemberId} (ref: ${activeLoan.loanReference}). New balance: ${newLoanBalance}`);
             }
             const record = await tx.duesRecord.create({
                 data: {
                     transactionId: txId,
-                    memberId: memberId,
+                    memberId: sanitizedMemberId,
                     name: memberName,
                     month: currentMonth,
                     amountPaid: numericAmount,
@@ -166,7 +202,9 @@ exports.DuesService = DuesService;
 exports.DuesService = DuesService = DuesService_1 = __decorate([
     (0, common_1.Injectable)(),
     __param(1, (0, common_1.Inject)('LEDGER_CLIENT')),
+    __param(2, (0, common_1.Inject)('REPAYMENTS_CLIENT')),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        microservices_1.ClientProxy,
         microservices_1.ClientProxy])
 ], DuesService);
 //# sourceMappingURL=dues.service.js.map

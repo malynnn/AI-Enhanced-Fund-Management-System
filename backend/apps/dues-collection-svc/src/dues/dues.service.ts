@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException, ConflictException, Inject, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { DuesPayrollConfirmedEvent } from '@backend/events';
+import { DuesPayrollConfirmedEvent, QUEUE_REPAYMENTS } from '@backend/events';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 import { DuesStatus, PaymentMethod, CollectionType } from '@prisma/client';
@@ -12,6 +12,7 @@ export class DuesService {
   constructor(
     private readonly prisma: PrismaService,
     @Inject('LEDGER_CLIENT') private readonly ledgerClient: ClientProxy,
+    @Inject('REPAYMENTS_CLIENT') private readonly repaymentsClient: ClientProxy,
   ) {}
 
   async processDuesEvent(data: DuesPayrollConfirmedEvent) {
@@ -92,6 +93,41 @@ export class DuesService {
       this.logger.error(`Failed to emit fund.dues.posted event for ${id}: ${error.message}`);
     }
 
+    // Publish repayment event to disbursement-svc if it is a loan repayment
+    if (updated.collectionType === 'LOAN_PAYMENT') {
+      try {
+        const activeLoan = await this.prisma.disbursementRequest.findFirst({
+          where: {
+            memberId: updated.memberId,
+            status: 'COMPLETED',
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+        });
+
+        if (activeLoan) {
+          const repaymentEvent = {
+            loanReference: activeLoan.loanReference,
+            memberId: updated.memberId,
+            memberName: updated.name,
+            amount: Number(updated.amountPaid),
+            principalAmount: Number(updated.amountPaid),
+            serviceFeeAmount: 0,
+            paymentMethod: updated.method,
+            referenceNumber: updated.referenceNumber || undefined,
+          };
+
+          this.repaymentsClient.emit(QUEUE_REPAYMENTS, repaymentEvent);
+          this.logger.log(`Emitted ${QUEUE_REPAYMENTS} event for loan ${activeLoan.loanReference} from collection confirmation`);
+        } else {
+          this.logger.warn(`No active completed loan found for member ${updated.memberId} when confirming collection.`);
+        }
+      } catch (error) {
+        this.logger.error(`Failed to emit ${QUEUE_REPAYMENTS} event: ${error.message}`);
+      }
+    }
+
     return updated;
   }
 
@@ -110,6 +146,8 @@ export class DuesService {
     if (!memberId || !memberName || !collectionType || amount === undefined || !method) {
       throw new BadRequestException('Missing required fields: memberId, memberName, collectionType, amount, method');
     }
+
+    const sanitizedMemberId = memberId.toUpperCase().trim();
 
     const numericAmount = Number(amount);
     if (isNaN(numericAmount) || numericAmount <= 0) {
@@ -150,7 +188,7 @@ export class DuesService {
         // Find latest completed disbursement request (active loan) for this member
         const activeLoan = await tx.disbursementRequest.findFirst({
           where: {
-            memberId: memberId,
+            memberId: sanitizedMemberId,
             status: 'COMPLETED',
           },
           orderBy: {
@@ -159,7 +197,7 @@ export class DuesService {
         });
 
         if (!activeLoan) {
-          throw new BadRequestException(`No active completed loan found for member ${memberId}`);
+          throw new BadRequestException(`No active completed loan found for member ${sanitizedMemberId}`);
         }
 
         // Subtract the amount from outstanding balance (amount field)
@@ -171,14 +209,14 @@ export class DuesService {
           data: { amount: newLoanBalance },
         });
 
-        this.logger.log(`Subtracted ${numericAmount} from outstanding loan balance of member ${memberId} (ref: ${activeLoan.loanReference}). New balance: ${newLoanBalance}`);
+        this.logger.log(`Subtracted ${numericAmount} from outstanding loan balance of member ${sanitizedMemberId} (ref: ${activeLoan.loanReference}). New balance: ${newLoanBalance}`);
       }
 
       // Create DuesRecord
       const record = await tx.duesRecord.create({
         data: {
           transactionId: txId,
-          memberId: memberId,
+          memberId: sanitizedMemberId,
           name: memberName,
           month: currentMonth,
           amountPaid: numericAmount,

@@ -4,8 +4,9 @@ import { ClientProxy } from '@nestjs/microservices';
 export declare class DuesService {
     private readonly prisma;
     private readonly ledgerClient;
+    private readonly repaymentsClient;
     private readonly logger;
-    constructor(prisma: PrismaService, ledgerClient: ClientProxy);
+    constructor(prisma: PrismaService, ledgerClient: ClientProxy, repaymentsClient: ClientProxy);
     processDuesEvent(data: DuesPayrollConfirmedEvent): Promise<void>;
     findAll(status?: string): Promise<{
         id: string;
