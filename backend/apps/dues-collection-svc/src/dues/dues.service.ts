@@ -37,6 +37,15 @@ export class DuesService {
       throw new Error(`Fund with code ${data.fundCredited} does not exist`);
     }
 
+    const fundCodeToDepositMap: Record<string, string> = {
+      GF: 'GENERAL_FUND',
+      UF: 'UNION_FUND',
+      LN: 'LOAN_FUND',
+      FA: 'FOREIGN_FUND',
+      DA: 'DEATH_ASSISTANCE_FUND',
+    };
+    const depositFund = fundCodeToDepositMap[fund.code] || 'GENERAL_FUND';
+
     await this.prisma.duesRecord.create({
       data: {
         transactionId: data.transactionId,
@@ -47,6 +56,7 @@ export class DuesService {
         method: (data.paymentMethod || 'SALARY_DEDUCTION') as PaymentMethod,
         referenceNumber: data.referenceNumber,
         fundToCredit: fund.code,
+        depositFund,
         status: 'PENDING',
       },
     });
@@ -56,10 +66,23 @@ export class DuesService {
 
   async findAll(status?: string) {
     const whereClause = status ? { status: status as DuesStatus } : {};
-    return this.prisma.duesRecord.findMany({
+    const records = await this.prisma.duesRecord.findMany({
       where: whereClause,
       orderBy: { createdAt: 'desc' },
     });
+
+    const fundCodeToDepositMap: Record<string, string> = {
+      GF: 'GENERAL_FUND',
+      UF: 'UNION_FUND',
+      LN: 'LOAN_FUND',
+      FA: 'FOREIGN_FUND',
+      DA: 'DEATH_ASSISTANCE_FUND',
+    };
+
+    return records.map(rec => ({
+      ...rec,
+      depositFund: rec.depositFund || fundCodeToDepositMap[rec.fundToCredit] || 'GENERAL_FUND',
+    }));
   }
 
   async confirmDues(id: string) {
@@ -223,6 +246,7 @@ export class DuesService {
           method: method as PaymentMethod,
           referenceNumber: refNo,
           fundToCredit: targetFundCode,
+          depositFund: depositFund || 'GENERAL_FUND',
           status: 'PENDING',
           collectionType: collectionType as CollectionType,
         },

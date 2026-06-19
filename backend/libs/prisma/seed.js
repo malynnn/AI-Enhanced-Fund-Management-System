@@ -286,8 +286,18 @@ async function main() {
       status: 'CONFIRMED'
     }
   ];
+  const fundCodeToDepositMap = {
+    GF: 'GENERAL_FUND',
+    UF: 'UNION_FUND',
+    LN: 'LOAN_FUND',
+    FA: 'FOREIGN_FUND',
+    DA: 'DEATH_ASSISTANCE_FUND',
+  };
   for (const record of duesRecords) {
-    await prisma.duesRecord.create({ data: record });
+    const depositFund = fundCodeToDepositMap[record.fundToCredit] || 'GENERAL_FUND';
+    await prisma.duesRecord.create({
+      data: { ...record, depositFund }
+    });
   }
   console.log(`✅ Seeded ${duesRecords.length} dues records.`);
 

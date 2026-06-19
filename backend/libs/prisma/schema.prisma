@@ -248,6 +248,7 @@ model DuesRecord {
   method          PaymentMethod
   referenceNumber String?       @map("reference_number")
   fundToCredit    String        @map("fund_to_credit")
+  depositFund     String?       @map("deposit_fund")
   status          DuesStatus     @default(PENDING)
   collectionType  CollectionType @default(DUES)
   createdAt       DateTime       @default(now()) @map("created_at")
