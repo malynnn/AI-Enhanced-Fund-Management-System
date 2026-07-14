@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo } from 'react';
 import { useSession } from "next-auth/react";
-import { CircleDollarSign, WalletCards, Activity, ShieldCheck, AlertTriangle, Clock, CheckCircle2 } from 'lucide-react';
+import { CircleDollarSign, WalletCards, Activity, ShieldCheck, AlertTriangle, Clock, CheckCircle2, Ban } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import Header from '@/components/Header';
 
@@ -12,11 +12,11 @@ export default function MemberDashboard() {
   const { data: session } = useSession();
   const [repayments, setRepayments] = useState<any[]>([]);
   const [collections, setCollections] = useState<any[]>([]);
+  const [disbursements, setDisbursements] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fallback for demonstration if session isn't fully wired yet
   const currentUser = session?.user?.name || "Ven"; 
-  const currentUserId = (session?.user as any)?.id || "BDOEA-001"; // Dynamically resolved from login session
+  const currentUserId = (session?.user as any)?.id || "BDOEA-001";
 
   useEffect(() => {
     const loadPersonalData = async () => {
@@ -24,25 +24,30 @@ export default function MemberDashboard() {
         setIsLoading(true);
         const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
         
-        // Fetch both Loans (Repayments) and Dues (Collections)
-        const [repaymentsRes, collectionsRes] = await Promise.all([
-          fetch(`${gatewayUrl}/api/finance/repayments`),
-          fetch(`${gatewayUrl}/api/finance/collections`).catch(() => fetch(`${gatewayUrl}/api/finance/dues`)) // Fallback if endpoint varies
+        // Fetch Loans (Repayments), Dues (Collections), and Disbursements
+        const [repaymentsRes, collectionsRes, disbursementsRes] = await Promise.all([
+          fetch(`${gatewayUrl}/api/finance/repayments`).catch(() => null),
+          fetch(`${gatewayUrl}/api/finance/collections`).catch(() => fetch(`${gatewayUrl}/api/finance/dues`).catch(() => null)),
+          fetch(`${gatewayUrl}/api/finance/disbursements`).catch(() => null)
         ]);
         
-        if (repaymentsRes.ok) {
+        if (repaymentsRes && repaymentsRes.ok) {
           const repData = await repaymentsRes.json();
-          setRepayments(repData.filter((r: any) => r.memberName.toLowerCase().includes(currentUser.toLowerCase())));
+          setRepayments(repData.filter((r: any) => r.memberName?.toLowerCase().includes(currentUser.toLowerCase())));
         }
 
         if (collectionsRes && collectionsRes.ok) {
           const colData = await collectionsRes.json();
-          // Filter collections specifically for 'DUES' for this user
           const userDues = colData.filter((c: any) => 
             c.name?.toLowerCase().includes(currentUser.toLowerCase()) && 
             (c.collectionType === 'DUES' || c.type === 'DUES')
           );
           setCollections(userDues);
+        }
+
+        if (disbursementsRes && disbursementsRes.ok) {
+          const disbData = await disbursementsRes.json();
+          setDisbursements(disbData.filter((d: any) => d.memberName?.toLowerCase().includes(currentUser.toLowerCase())));
         }
       } catch (error) {
         console.error('Error loading personal ledger:', error);
@@ -56,12 +61,12 @@ export default function MemberDashboard() {
 
   // --- LOAN COMPUTATIONS ---
   const assumedOriginalCapital = 50000.00; 
-  const processedLoans = repayments.filter(r => r.status === 'PROCESSED');
+  const processedLoans = repayments.filter(r => r.status === 'PROCESSED' || r.status === 'COMPLETED');
   const totalPrincipalPaid = processedLoans.reduce((acc, curr) => acc + Number(curr.principalAmount || 0), 0);
   const remainingBalance = Math.max(0, assumedOriginalCapital - totalPrincipalPaid);
 
   // --- DUES COMPUTATIONS ---
-  const monthsPaid = collections.filter(c => c.status === 'CONFIRMED').length;
+  const monthsPaid = collections.filter(c => c.status === 'CONFIRMED' || c.status === 'PROCESSED').length;
   const monthsPending = collections.filter(c => c.status === 'PENDING').length;
   const monthsUnpaid = Math.max(0, 12 - (monthsPaid + monthsPending));
 
@@ -123,10 +128,10 @@ export default function MemberDashboard() {
         {/* Table & Details */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
-          {/* Dues History Table */}
+          {/* Transaction History Table */}
           <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
             <div className="p-6 border-b border-gray-50">
-              <h2 className="text-lg font-black text-[#04152d] text-left">Recent Transactions (Dues & Loans)</h2>
+              <h2 className="text-lg font-black text-[#04152d] text-left">Recent Transactions</h2>
             </div>
             <div className="overflow-x-auto flex-1">
               <table className="w-full text-left whitespace-nowrap min-w-[600px]">
@@ -141,25 +146,48 @@ export default function MemberDashboard() {
                 <tbody className="divide-y divide-gray-50">
                   {isLoading ? (
                     <tr><td colSpan={4} className="px-6 py-12 text-center text-gray-400 font-medium text-left">Loading records...</td></tr>
-                  ) : [...collections, ...repayments].sort((a, b) => new Date(b.createdAt || b.processedAt).getTime() - new Date(a.createdAt || a.processedAt).getTime()).slice(0, 8).map((row, idx) => {
+                  ) : [...collections, ...repayments, ...disbursements].sort((a, b) => new Date(b.createdAt || b.processedAt).getTime() - new Date(a.createdAt || a.processedAt).getTime()).slice(0, 10).map((row, idx) => {
                     
-                    const isLoan = !!row.loanReference;
+                    const isDisbursement = !!row.disbursementType;
+                    const isLoanRepayment = !!row.principalAmount;
+                    
                     const dateDisplay = new Date(row.createdAt || row.processedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
                     const amount = Number(row.amountPaid || row.amount || 0);
+                    const typeLabel = isDisbursement ? row.disbursementType.replace('_', ' ') : isLoanRepayment ? 'Loan Repayment' : 'Union Dues';
+
+                    const isCompleted = row.status === 'CONFIRMED' || row.status === 'PROCESSED' || row.status === 'COMPLETED';
+                    const isRejected = row.status === 'REJECTED';
 
                     return (
                       <tr key={idx} className="hover:bg-[#e8edf8]/40 transition-colors">
-                        <td className="px-6 py-4 text-sm font-medium text-gray-600 text-left">{dateDisplay}</td>
-                        <td className="px-6 py-4 text-sm text-left">
-                          <span className="font-bold text-[#04152d] block">{isLoan ? 'Loan Repayment' : 'Union Dues'}</span>
-                          <span className="text-[10px] font-mono text-gray-400 block uppercase tracking-widest mt-0.5">{row.paymentMethod || row.method}</span>
+                        <td className="px-6 py-4 text-sm font-medium text-gray-600 text-left align-top">{dateDisplay}</td>
+                        <td className="px-6 py-4 text-sm text-left align-top">
+                          <span className="font-bold text-[#04152d] block">{typeLabel}</span>
+                          <span className="text-[10px] font-mono text-gray-400 block uppercase tracking-widest mt-0.5">
+                            {row.paymentMethod || row.method || 'N/A'}
+                          </span>
+                          {/* Display Reference Number if verified by Treasurer */}
+                          {isCompleted && row.referenceNumber && (
+                            <span className="text-[10px] font-bold text-emerald-600 block mt-1.5 uppercase">
+                              REF: {row.referenceNumber}
+                            </span>
+                          )}
                         </td>
-                        <td className="px-6 py-4 text-sm font-black text-[#04152d] text-left">₱{amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                        <td className="px-6 py-4 text-left">
-                          {(row.status === 'CONFIRMED' || row.status === 'PROCESSED') ? (
+                        <td className="px-6 py-4 text-sm font-black text-[#04152d] text-left align-top">₱{amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                        <td className="px-6 py-4 text-left align-top">
+                          {isCompleted ? (
                             <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2 py-1 rounded border border-emerald-100 uppercase tracking-wide">
                               <CheckCircle2 size={10} /> Verified
                             </span>
+                          ) : isRejected ? (
+                            <div className="flex flex-col gap-1">
+                              <span className="inline-flex w-fit items-center gap-1 bg-red-50 text-red-700 text-[10px] font-bold px-2 py-1 rounded border border-red-100 uppercase tracking-wide">
+                                <Ban size={10} /> Rejected
+                              </span>
+                              <span className="text-[9px] text-red-600 font-medium max-w-[200px] whitespace-normal leading-tight">
+                                Reason: {row.reason || row.rejectedReason || 'No reason provided.'}
+                              </span>
+                            </div>
                           ) : (
                             <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-700 text-[10px] font-bold px-2 py-1 rounded border border-amber-100 uppercase tracking-wide">
                               <Clock size={10} /> Pending
@@ -169,7 +197,7 @@ export default function MemberDashboard() {
                       </tr>
                     );
                   })}
-                  {!isLoading && collections.length === 0 && repayments.length === 0 && (
+                  {!isLoading && collections.length === 0 && repayments.length === 0 && disbursements.length === 0 && (
                     <tr><td colSpan={4} className="px-6 py-12 text-center text-gray-400 font-medium text-left">No recent transactions found.</td></tr>
                   )}
                 </tbody>
@@ -178,7 +206,7 @@ export default function MemberDashboard() {
           </div>
 
           {/* Current Details Card */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 h-fit">
             <h2 className="text-lg font-black text-[#04152d] mb-6 text-left">Account Overview</h2>
             <div className="space-y-4">
               <div className="flex justify-between items-center py-2 border-b border-gray-50">
@@ -196,7 +224,7 @@ export default function MemberDashboard() {
                     <span className="text-[10px] font-black uppercase tracking-wider">Information</span>
                  </div>
                  <p className="text-[11px] leading-relaxed font-medium text-left">
-                   This dashboard is for monitoring purposes only. If you identify any discrepancies in your transaction ledger or loan balance, please contact the BDOEA Treasurer directly for reconciliation.
+                   This dashboard is for monitoring purposes only. If you identify any discrepancies in your transaction ledger, notice a rejected transaction, or need clarification on a loan balance, please contact the BDOEA Treasurer directly for reconciliation.
                  </p>
               </div>
             </div>

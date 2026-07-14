@@ -7,7 +7,8 @@ import {
   Home, Calendar, CreditCard, CircleDollarSign, Book, LogOut, ChevronDown,
   PanelLeftClose, PanelLeftOpen, LayoutDashboard, WalletCards, Send,
   Briefcase, ClipboardList, PieChart, FileText, User, Users
-  , Settings } from 'lucide-react';
+  , Settings, Activity
+} from 'lucide-react';
 import { signOut, useSession } from "next-auth/react";
 import ActionModal from '@/components/ActionModal';
 
@@ -60,6 +61,7 @@ export default function Sidebar() {
       subItems: [
         // MEMBER 
         { label: 'My Summary', href: '/member/dashboard', icon: PieChart, roles: ['User'] },
+        { label: 'Benefits & Assistance', href: '/member/requests', icon: Activity, roles: ['User'] },
         
         // ADMIN 
         { label: 'User Management', href: '/admin/dashboard', icon: Users, roles: ['Officer/Admin'] },
@@ -76,6 +78,7 @@ export default function Sidebar() {
         { label: 'Audit Dashboard', href: '/auditor/dashboard', icon: ClipboardList, roles: ['Auditor'] },
         { label: 'Loan Ledger', href: '/auditor/loans', icon: CircleDollarSign, roles: ['Auditor'] },
         { label: 'Funds', href: '/auditor/funds', icon: Briefcase, roles: ['Auditor'] },
+        { label: 'Disbursement', href: '/auditor/disbursement', icon: Send, roles: ['Auditor'] },
       ]
     },
   ];

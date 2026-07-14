@@ -24,6 +24,7 @@ const ADMIN_TAB_TITLES: Record<string, string> = {
 
 const PAGE_TITLES: Record<string, string> = {
   '/member/dashboard':        'My Dashboard',
+  '/member/requests':         'Benefits & Assistance',
   '/treasurer/dashboard':     'Dashboard',
   '/treasurer/collections':   'Collections',
   '/treasurer/disbursement':  'Disbursement',
@@ -32,6 +33,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/admin/dashboard':         'User Management',
   '/admin/settings':          'Settings',
   '/auditor/dashboard':       'Audit Oversight',
+  '/auditor/disbursement':    'Disbursement',
   '/profile':                 'Settings',
   '/events':                  'Events',
   '/documents':               'Documents',
