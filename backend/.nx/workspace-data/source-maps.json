@@ -72,6 +72,10 @@
       "apps/disbursement-svc/package.json",
       "nx/core/package-json"
     ],
+    "metadata.targetGroups.NPM Scripts.12": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
     "metadata.description": [
       "apps/disbursement-svc/package.json",
       "nx/core/package-json"
@@ -149,6 +153,34 @@
       "nx/core/package-json"
     ],
     "targets.format.metadata.runCommand": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve.executor": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve.options": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve.metadata": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve.options.script": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve.metadata.scriptContent": [
+      "apps/disbursement-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve.metadata.runCommand": [
       "apps/disbursement-svc/package.json",
       "nx/core/package-json"
     ],
@@ -506,6 +538,10 @@
       "apps/dues-collection-svc/package.json",
       "nx/core/package-json"
     ],
+    "metadata.targetGroups.NPM Scripts.12": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
     "metadata.description": [
       "apps/dues-collection-svc/package.json",
       "nx/core/package-json"
@@ -583,6 +619,34 @@
       "nx/core/package-json"
     ],
     "targets.format.metadata.runCommand": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve.executor": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve.options": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve.metadata": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve.options.script": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve.metadata.scriptContent": [
+      "apps/dues-collection-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve.metadata.runCommand": [
       "apps/dues-collection-svc/package.json",
       "nx/core/package-json"
     ],
@@ -940,6 +1004,10 @@
       "apps/expense-budget-svc/package.json",
       "nx/core/package-json"
     ],
+    "metadata.targetGroups.NPM Scripts.12": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
     "metadata.description": [
       "apps/expense-budget-svc/package.json",
       "nx/core/package-json"
@@ -1017,6 +1085,34 @@
       "nx/core/package-json"
     ],
     "targets.format.metadata.runCommand": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve.executor": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve.options": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve.metadata": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve.options.script": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve.metadata.scriptContent": [
+      "apps/expense-budget-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve.metadata.runCommand": [
       "apps/expense-budget-svc/package.json",
       "nx/core/package-json"
     ],
@@ -1374,6 +1470,10 @@
       "apps/fs-gateway/package.json",
       "nx/core/package-json"
     ],
+    "metadata.targetGroups.NPM Scripts.12": [
+      "apps/fs-gateway/package.json",
+      "nx/core/package-json"
+    ],
     "metadata.description": [
       "apps/fs-gateway/package.json",
       "nx/core/package-json"
@@ -1451,6 +1551,34 @@
       "nx/core/package-json"
     ],
     "targets.format.metadata.runCommand": [
+      "apps/fs-gateway/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve": [
+      "apps/fs-gateway/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve.executor": [
+      "apps/fs-gateway/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve.options": [
+      "apps/fs-gateway/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve.metadata": [
+      "apps/fs-gateway/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve.options.script": [
+      "apps/fs-gateway/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve.metadata.scriptContent": [
+      "apps/fs-gateway/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve.metadata.runCommand": [
       "apps/fs-gateway/package.json",
       "nx/core/package-json"
     ],
@@ -1808,6 +1936,10 @@
       "apps/ledger-accounts-svc/package.json",
       "nx/core/package-json"
     ],
+    "metadata.targetGroups.NPM Scripts.12": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
     "metadata.description": [
       "apps/ledger-accounts-svc/package.json",
       "nx/core/package-json"
@@ -1885,6 +2017,34 @@
       "nx/core/package-json"
     ],
     "targets.format.metadata.runCommand": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve.executor": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve.options": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve.metadata": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve.options.script": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve.metadata.scriptContent": [
+      "apps/ledger-accounts-svc/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.serve.metadata.runCommand": [
       "apps/ledger-accounts-svc/package.json",
       "nx/core/package-json"
     ],

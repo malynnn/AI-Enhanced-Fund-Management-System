@@ -14,6 +14,7 @@
             "NPM Scripts": [
               "build",
               "format",
+              "serve",
               "start",
               "start:dev",
               "start:debug",
@@ -54,6 +55,18 @@
             "metadata": {
               "scriptContent": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
               "runCommand": "npm run format"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "serve": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "serve"
+            },
+            "metadata": {
+              "scriptContent": "npm run start:dev",
+              "runCommand": "npm run serve"
             },
             "configurations": {},
             "parallelism": true
@@ -196,6 +209,7 @@
             "NPM Scripts": [
               "build",
               "format",
+              "serve",
               "start",
               "start:dev",
               "start:debug",
@@ -236,6 +250,18 @@
             "metadata": {
               "scriptContent": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
               "runCommand": "npm run format"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "serve": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "serve"
+            },
+            "metadata": {
+              "scriptContent": "npm run start:dev",
+              "runCommand": "npm run serve"
             },
             "configurations": {},
             "parallelism": true
@@ -378,6 +404,7 @@
             "NPM Scripts": [
               "build",
               "format",
+              "serve",
               "start",
               "start:dev",
               "start:debug",
@@ -418,6 +445,18 @@
             "metadata": {
               "scriptContent": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
               "runCommand": "npm run format"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "serve": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "serve"
+            },
+            "metadata": {
+              "scriptContent": "npm run start:dev",
+              "runCommand": "npm run serve"
             },
             "configurations": {},
             "parallelism": true
@@ -560,6 +599,7 @@
             "NPM Scripts": [
               "build",
               "format",
+              "serve",
               "start",
               "start:dev",
               "start:debug",
@@ -600,6 +640,18 @@
             "metadata": {
               "scriptContent": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
               "runCommand": "npm run format"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "serve": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "serve"
+            },
+            "metadata": {
+              "scriptContent": "npm run start:dev",
+              "runCommand": "npm run serve"
             },
             "configurations": {},
             "parallelism": true
@@ -742,6 +794,7 @@
             "NPM Scripts": [
               "build",
               "format",
+              "serve",
               "start",
               "start:dev",
               "start:debug",
@@ -782,6 +835,18 @@
             "metadata": {
               "scriptContent": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
               "runCommand": "npm run format"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "serve": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "serve"
+            },
+            "metadata": {
+              "scriptContent": "npm run start:dev",
+              "runCommand": "npm run serve"
             },
             "configurations": {},
             "parallelism": true
@@ -1587,6 +1652,15 @@
         "version": "7.29.7",
         "packageName": "@babel/plugin-syntax-typescript",
         "hash": "sha512-ngr+82Sh0xMz25TPCZi+nC2iTzjfCdWS2ONXTp/PtSCHCgaCNBpdMqgvJ2ccdLlClVZ7sisIgB914j/JFe+RZA=="
+      }
+    },
+    "npm:@babel/runtime": {
+      "type": "npm",
+      "name": "npm:@babel/runtime",
+      "data": {
+        "version": "7.29.7",
+        "packageName": "@babel/runtime",
+        "hash": "sha512-Nq8OhGWiZIZGV6hLHoyAKLLcJihP/xFeBMGJoUrxTX2psI8dCifzLhZISFb+VWS3wFMRDmCGw5R+dOySCqPLhw=="
       }
     },
     "npm:@babel/template": {
@@ -4595,6 +4669,42 @@
         "hash": "sha512-MWufYdFw53ccGjCA+Ol7XJYpAlW6/prSMzuPOTRnJGcGzuhLn4Scrz7qf6o8bROZ514ltazcIFJZevcfbo0x7A=="
       }
     },
+    "npm:concurrently": {
+      "type": "npm",
+      "name": "npm:concurrently",
+      "data": {
+        "version": "8.2.2",
+        "packageName": "concurrently",
+        "hash": "sha512-1dP4gpXFhei8IOtlXRE/T/4H88ElHgTiUzh71YUmtjTEHMSRS2Z/fgOxHSxxusGHogsRfxNq1vyAwxSC+EVyDg=="
+      }
+    },
+    "npm:supports-color@8.1.1": {
+      "type": "npm",
+      "name": "npm:supports-color@8.1.1",
+      "data": {
+        "version": "8.1.1",
+        "packageName": "supports-color",
+        "hash": "sha512-MpUEN2OodtUzxvKQl72cUF7RQ5EiHsGvSsVG0ia9c5RbWGL2CI4C7EpPS8UTBIplnlzZiNuV56w+FuNxy3ty2Q=="
+      }
+    },
+    "npm:supports-color@5.5.0": {
+      "type": "npm",
+      "name": "npm:supports-color@5.5.0",
+      "data": {
+        "version": "5.5.0",
+        "packageName": "supports-color",
+        "hash": "sha512-QjVjwdXIt408MIiAqCX4oUKsgU2EqAGzs2Ppkm4aQYbjm+ZEWEcW4SfFNTr4uMNZma0ey4f5lgLrkB0aX0QMow=="
+      }
+    },
+    "npm:supports-color": {
+      "type": "npm",
+      "name": "npm:supports-color",
+      "data": {
+        "version": "7.2.0",
+        "packageName": "supports-color",
+        "hash": "sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw=="
+      }
+    },
     "npm:content-disposition": {
       "type": "npm",
       "name": "npm:content-disposition",
@@ -4692,6 +4802,15 @@
         "version": "7.0.6",
         "packageName": "cross-spawn",
         "hash": "sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA=="
+      }
+    },
+    "npm:date-fns": {
+      "type": "npm",
+      "name": "npm:date-fns",
+      "data": {
+        "version": "2.30.0",
+        "packageName": "date-fns",
+        "hash": "sha512-fnULvOpxnC5/Vg3NCiWelDsLiUc9bRwAPs/+LfTLNvetFCtCTN+yQz15C/fs4AwX1R9K5GLtLfn8QW+dWisaAw=="
       }
     },
     "npm:dedent": {
@@ -6152,33 +6271,6 @@
         "hash": "sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg=="
       }
     },
-    "npm:supports-color@8.1.1": {
-      "type": "npm",
-      "name": "npm:supports-color@8.1.1",
-      "data": {
-        "version": "8.1.1",
-        "packageName": "supports-color",
-        "hash": "sha512-MpUEN2OodtUzxvKQl72cUF7RQ5EiHsGvSsVG0ia9c5RbWGL2CI4C7EpPS8UTBIplnlzZiNuV56w+FuNxy3ty2Q=="
-      }
-    },
-    "npm:supports-color@5.5.0": {
-      "type": "npm",
-      "name": "npm:supports-color@5.5.0",
-      "data": {
-        "version": "5.5.0",
-        "packageName": "supports-color",
-        "hash": "sha512-QjVjwdXIt408MIiAqCX4oUKsgU2EqAGzs2Ppkm4aQYbjm+ZEWEcW4SfFNTr4uMNZma0ey4f5lgLrkB0aX0QMow=="
-      }
-    },
-    "npm:supports-color": {
-      "type": "npm",
-      "name": "npm:supports-color",
-      "data": {
-        "version": "7.2.0",
-        "packageName": "supports-color",
-        "hash": "sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw=="
-      }
-    },
     "npm:js-tokens": {
       "type": "npm",
       "name": "npm:js-tokens",
@@ -7223,6 +7315,15 @@
         "hash": "sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A=="
       }
     },
+    "npm:shell-quote": {
+      "type": "npm",
+      "name": "npm:shell-quote",
+      "data": {
+        "version": "1.10.0",
+        "packageName": "shell-quote",
+        "hash": "sha512-w1aiOKwKuRgtwAReIIj89puqg+I7GvX4IbLrvmhXbzQsj1+Zwi4VO3+fa6ZF91TWSjIxoEkKnMeHcLEODK5ZXA=="
+      }
+    },
     "npm:side-channel": {
       "type": "npm",
       "name": "npm:side-channel",
@@ -7284,6 +7385,15 @@
         "version": "1.6.1",
         "packageName": "smol-toml",
         "hash": "sha512-dWUG8F5sIIARXih1DTaQAX4SsiTXhInKf1buxdY9DIg4ZYPZK5nGM1VRIYmEbDbsHt7USo99xSLFu5Q1IqTmsg=="
+      }
+    },
+    "npm:spawn-command": {
+      "type": "npm",
+      "name": "npm:spawn-command",
+      "data": {
+        "version": "0.0.2",
+        "packageName": "spawn-command",
+        "hash": "sha512-zC8zGoGkmc8J9ndvml8Xksr1Amk9qBujgbF0JAIWO7kXr43w0h/0GJNM/Vustixu+YE8N/MTrQ7N31FvHUACxQ=="
       }
     },
     "npm:sprintf-js": {
@@ -13148,6 +13258,60 @@
         "type": "static"
       }
     ],
+    "npm:concurrently": [
+      {
+        "source": "npm:concurrently",
+        "target": "npm:chalk",
+        "type": "static"
+      },
+      {
+        "source": "npm:concurrently",
+        "target": "npm:date-fns",
+        "type": "static"
+      },
+      {
+        "source": "npm:concurrently",
+        "target": "npm:lodash",
+        "type": "static"
+      },
+      {
+        "source": "npm:concurrently",
+        "target": "npm:rxjs",
+        "type": "static"
+      },
+      {
+        "source": "npm:concurrently",
+        "target": "npm:shell-quote",
+        "type": "static"
+      },
+      {
+        "source": "npm:concurrently",
+        "target": "npm:spawn-command",
+        "type": "static"
+      },
+      {
+        "source": "npm:concurrently",
+        "target": "npm:supports-color@8.1.1",
+        "type": "static"
+      },
+      {
+        "source": "npm:concurrently",
+        "target": "npm:tree-kill",
+        "type": "static"
+      },
+      {
+        "source": "npm:concurrently",
+        "target": "npm:yargs",
+        "type": "static"
+      }
+    ],
+    "npm:supports-color@8.1.1": [
+      {
+        "source": "npm:supports-color@8.1.1",
+        "target": "npm:has-flag",
+        "type": "static"
+      }
+    ],
     "npm:cors": [
       {
         "source": "npm:cors",
@@ -13201,6 +13365,13 @@
       {
         "source": "npm:cross-spawn",
         "target": "npm:which",
+        "type": "static"
+      }
+    ],
+    "npm:date-fns": [
+      {
+        "source": "npm:date-fns",
+        "target": "npm:@babel/runtime",
         "type": "static"
       }
     ],
@@ -15488,13 +15659,6 @@
       {
         "source": "npm:jest-worker",
         "target": "npm:supports-color@8.1.1",
-        "type": "static"
-      }
-    ],
-    "npm:supports-color@8.1.1": [
-      {
-        "source": "npm:supports-color@8.1.1",
-        "target": "npm:has-flag",
         "type": "static"
       }
     ],
@@ -18065,5 +18229,5 @@
   },
   "version": "6.0",
   "errors": [],
-  "computedAt": 1781802894784
+  "computedAt": 1784143745687
 }

@@ -1,21 +1,9 @@
 {
   "run": {
-    "command": "nx build fs-gateway",
-    "startTime": "2026-06-18T17:14:54.968Z",
-    "endTime": "2026-06-18T17:15:03.767Z",
+    "command": "nx run-many --target=serve --all",
+    "startTime": "2026-07-15T19:23:34.084Z",
+    "endTime": "2026-07-15T19:23:34.108Z",
     "inner": false
   },
-  "tasks": [
-    {
-      "taskId": "fs-gateway:build",
-      "target": "build",
-      "projectName": "fs-gateway",
-      "hash": "17901300302669544683",
-      "startTime": "2026-06-18T17:14:54.989Z",
-      "endTime": "2026-06-18T17:15:03.680Z",
-      "params": "",
-      "cacheStatus": "cache-miss",
-      "status": 0
-    }
-  ]
+  "tasks": []
 }

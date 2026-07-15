@@ -14489,3 +14489,1624 @@ DEBUG nx::native::telemetry::service: Sent 1 events: [nx/js/dependencies-and-loc
 [NX v22.7.5 Daemon Server] - 2026-06-18T17:15:04.684Z - Time taken for 'createMetadata' 0.027699999511241913ms
 [NX v22.7.5 Daemon Server] - 2026-06-18T17:15:04.684Z - Time taken for 'serialize graph' 5.3282999992370605ms
 DEBUG nx::native::telemetry::service: Sent 1 events: [nx/js/dependencies-and-lockfile:createDe]
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:11:06.772Z - [Client] Starting new daemon server in background
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:11:06.784Z - [Client] Waiting for server (max: 6000 attempts, 10ms interval)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:08.226Z - Time taken for 'workspace context init' 17.77280000000019ms
+DEBUG nx::native::telemetry: Telemetry service initialized successfully
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:09.168Z - New daemon starting from: C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\daemon\server\server.js
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:09.168Z - New daemon __dirname: C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\daemon\server
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:09.168Z - New daemon nxVersion: 22.7.5
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:09.169Z - New daemon getInstalledNxVersion(): 22.7.5
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:09.175Z - [Server] Starting outdated check interval (20ms)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:09.181Z - Started listening on: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\ca344bb9745a4d097f01\d.sock
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:09.190Z - [WATCHER]: Subscribed to changes within: C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend (native)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:09.193Z - [LATEST-NX]: Pulling latest Nx...
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:11:09.205Z - [Client] Server available
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:11:09.206Z - [Client] Daemon server started, pid=13148
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:11:09.210Z - [Messenger] Setting up socket listeners
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:11:09.211Z - [Messenger] listen() complete
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:09.215Z - [AI-AGENTS]: Starting agent configuration status computation
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:09.221Z - Established a connection. Number of open connections: 1
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:09.222Z - Established a connection. Number of open connections: 2
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:09.224Z - Closed a connection. Number of open connections: 1
+[isolated-plugin] spawned worker for "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\js" (pid: 25572, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-0-2491.2665.sock)
+[isolated-plugin] spawned worker for "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\package-json" (pid: 3664, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-1-2505.9862.sock)
+[isolated-plugin] spawned worker for "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\project-json\build-nodes\project-json" (pid: 9608, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-2-2518.8734.sock)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:09.340Z - Time taken for 'loadSpecifiedNxPlugins' 40.240800000000036ms
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:11:10.103Z - [Messenger] Sending message type: REQUEST_PROJECT_GRAPH
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:11:10.104Z - [Messenger] Message sent
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:10.114Z - Received raw message of length 4717
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:10.115Z - Received json message of type REQUEST_PROJECT_GRAPH
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:10.116Z - [REQUEST]: Client Request for Project Graph Received
+[isolated-plugin] connected to worker for "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\js" (pid: 25572)
+[plugin-worker] "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\js" (pid: 25572) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-0-2491.2665.sock
+[1m[33mTime taken for 'plugin worker 25572 code loading' 854.611ms[39m[22m
+[plugin-worker] "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\js" (pid: 25572) connected
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:10.278Z - Time taken for 'start-plugin-worker:C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\js' 974.279ms
+[plugin-worker] "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\package-json" (pid: 3664) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-1-2505.9862.sock
+[1m[33mTime taken for 'plugin worker 3664 code loading' 857.4872ms[39m[22m
+[plugin-worker] "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\project-json\build-nodes\project-json" (pid: 9608) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-2-2518.8734.sock
+[isolated-plugin] connected to worker for "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\package-json" (pid: 3664)
+[1m[33mTime taken for 'plugin worker 9608 code loading' 851.4118ms[39m[22m
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:10.294Z - Time taken for 'start-plugin-worker:C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\package-json' 978.1104ms
+[isolated-plugin] connected to worker for "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\project-json\build-nodes\project-json" (pid: 9608)
+[plugin-worker] "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\package-json" (pid: 3664) connected
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:10.296Z - Time taken for 'start-plugin-worker:C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\project-json\build-nodes\project-json' 967.3760000000002ms
+[plugin-worker] "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\project-json\build-nodes\project-json" (pid: 9608) connected
+[plugin-worker] "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\project-json\build-nodes\project-json" (pid: 9608) loaded successfully
+[plugin-worker] "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\package-json" (pid: 3664) loaded successfully
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:10.629Z - Time taken for 'Load Nx Plugin: C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\project-json\build-nodes\project-json' 1329.781ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:10.630Z - Time taken for 'Load Nx Plugin: C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\package-json' 1331.4324000000001ms
+[plugin-worker] "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\js" (pid: 25572) loaded successfully
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:10.687Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:10.687Z - [REQUEST]: 
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:10.687Z - [REQUEST]: 
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:10.693Z - Reusing in-memory cached project graph because no files changed.
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:10.695Z - Streaming message to client: progress update for topic graph-construction
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:11:10.695Z - [Messenger] Received message, length: 47
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:10.709Z - Time taken for 'loadDefaultNxPlugins' 1387.3091ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:10.710Z - Time taken for 'Load Nx Plugin: C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\js' 1386.8442999999997ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:10.710Z - Time taken for 'hash changed files from watcher' 2.0387000000000626ms
+[1m[33mTime taken for 'nx/core/project-json:createNodes' 0.3290999999999258ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/project-json" after createNodes
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:11.694Z - Streaming message to client: progress update for topic graph-construction
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:11:11.695Z - [Messenger] Received message, length: 153
+[1m[33mTime taken for 'nx/core/package-json:createNodes' 19.020899999999983ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/package-json" after createNodes
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:11.717Z - Streaming message to client: progress update for topic graph-construction
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:11:11.717Z - [Messenger] Received message, length: 112
+[1m[33mTime taken for 'nx/js/dependencies-and-lockfile:createNodes' 15.232800000000225ms[39m[22m
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:11.757Z - Streaming message to client: progress update for topic graph-construction
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:11:11.757Z - [Messenger] Received message, length: 47
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:11.804Z - Streaming message to client: progress update for topic graph-construction
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:11.806Z - Time taken for 'build-project-configs' 1073.6432ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:11.807Z - Time taken for 'createNodes:merge' 9.42909999999938ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:11.807Z - Time taken for 'native-file-deps' 0.01540000000022701ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:11.807Z - Time taken for 'get-workspace-files' 2.0282999999999447ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:11.807Z - Time taken for 'get-all-workspace-files' 0.402299999999741ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:11.807Z - Time taken for 'read cache' 2.4353999999993903ms
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:11:11.811Z - [Messenger] Received message, length: 47
+[1m[33mTime taken for 'build typescript dependencies' 3.2062999999998283ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/js/dependencies-and-lockfile" after createDependencies
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:11.836Z - Streaming message to client: progress update for topic graph-construction
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:11:11.836Z - [Messenger] Received message, length: 47
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:11.846Z - [SYNC]: collect registered sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:11.861Z - Wrote project graph cache to C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\.nx\workspace-data\project-graph.json
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:11.861Z - Serializing response for REQUEST_PROJECT_GRAPH message in json mode
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:11.861Z - Responding to REQUEST_PROJECT_GRAPH message
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:11.861Z - [REQUEST]: Responding to the client. project-graph
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:11.862Z - Time taken for 'total for creating and serializing project graph' 1745.3377ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:11.862Z - Time taken for 'total execution time for createProjectGraph()' 53.918799999999464ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:11.862Z - Time taken for 'createDependencies' 38.39339999999993ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:11.862Z - Time taken for 'nx/js/dependencies-and-lockfile:createDependencies' 37.84949999999935ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:11.862Z - Time taken for 'createMetadata' 0.051499999999577994ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:11.862Z - Time taken for 'serialize graph' 2.016200000000026ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:11.862Z - Time taken for 'write cache' 12.616800000000694ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:11.868Z - Done responding to the client project-graph
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:11.868Z - Handled json message REQUEST_PROJECT_GRAPH. Handling time: 1746. Response time: 7.
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:11:11.868Z - [Messenger] Received message, length: 402156
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:11:11.875Z - [Messenger] Sending message type: PRE_TASKS_EXECUTION
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:11:11.876Z - [Messenger] Message sent
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:11.878Z - Received raw message of length 497
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:11.879Z - Received json message of type PRE_TASKS_EXECUTION
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:11.882Z - Serializing response for PRE_TASKS_EXECUTION message in json mode
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:11.882Z - Responding to PRE_TASKS_EXECUTION message
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:11.882Z - [REQUEST]: Responding to the client. handleRunPreTasksExecution
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:11.882Z - Time taken for 'preTasksExecution' 2.3969999999999345ms
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:11:11.882Z - [Messenger] Received message, length: 2
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:11.885Z - Done responding to the client handleRunPreTasksExecution
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:11.886Z - Handled json message PRE_TASKS_EXECUTION. Handling time: 3. Response time: 4.
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:11:12.024Z - [Messenger] Sending message type: HASH_TASKS
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:11:12.025Z - [Messenger] Message sent
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.029Z - Received raw message of length 572
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.029Z - Received json message of type HASH_TASKS
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.030Z - Reusing in-memory cached project graph because no files changed.
+DEBUG nx::native::tasks::hash_planner: get_plans_internal COMPLETED in 1.6634ms - processed 0 tasks (setup: 1.6231ms, parallel_planning: 12.7µs)
+DEBUG nx::native::tasks::task_hasher: hash_plans COMPLETED in 522.3µs - processed 0 plans (setup: 123.2µs, hashing: 397.2µs, assembly: 8.8µs)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.046Z - Serializing response for HASH_TASKS message in json mode
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.046Z - Responding to HASH_TASKS message
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.046Z - [REQUEST]: Responding to the client. handleHashTasks
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:11:12.046Z - [Messenger] Received message, length: 2
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.050Z - Done responding to the client handleHashTasks
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.051Z - Handled json message HASH_TASKS. Handling time: 17. Response time: 5.
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:11:12.066Z - [Messenger] Sending message type: GET_ESTIMATED_TASK_TIMINGS
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:11:12.067Z - [Messenger] Message sent
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.076Z - Received raw message of length 50
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.076Z - Received json message of type GET_ESTIMATED_TASK_TIMINGS
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.084Z - Serializing response for GET_ESTIMATED_TASK_TIMINGS message in json mode
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.084Z - Responding to GET_ESTIMATED_TASK_TIMINGS message
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.084Z - [REQUEST]: Responding to the client. handleGetEstimatedTaskTimings
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.084Z - Done responding to the client handleGetEstimatedTaskTimings
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.084Z - Handled json message GET_ESTIMATED_TASK_TIMINGS. Handling time: 8. Response time: 0.
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:11:12.084Z - [Messenger] Received message, length: 2
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:11:12.089Z - [Messenger] Sending message type: RECORD_TASK_RUNS
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:11:12.090Z - [Messenger] Message sent
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.094Z - Received raw message of length 41
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.094Z - Received json message of type RECORD_TASK_RUNS
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.094Z - Serializing response for RECORD_TASK_RUNS message in json mode
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.095Z - Responding to RECORD_TASK_RUNS message
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.095Z - [REQUEST]: Responding to the client. handleRecordTaskRuns
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.095Z - Done responding to the client handleRecordTaskRuns
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.095Z - Handled json message RECORD_TASK_RUNS. Handling time: 0. Response time: 1.
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:11:12.094Z - [Messenger] Received message, length: 4
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.113Z - Established a connection. Number of open connections: 2
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:11:12.113Z - [Messenger] Sending message type: GET_CONFIGURE_AI_AGENTS_STATUS
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.113Z - Closed a connection. Number of open connections: 1
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:11:12.113Z - [Messenger] Message sent
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.116Z - Received raw message of length 41
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.116Z - Received json message of type GET_CONFIGURE_AI_AGENTS_STATUS
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.117Z - Serializing response for GET_CONFIGURE_AI_AGENTS_STATUS message in json mode
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.117Z - Responding to GET_CONFIGURE_AI_AGENTS_STATUS message
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.117Z - [REQUEST]: Responding to the client. handleGetConfigureAiAgentsStatus
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.117Z - Done responding to the client handleGetConfigureAiAgentsStatus
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.117Z - Handled json message GET_CONFIGURE_AI_AGENTS_STATUS. Handling time: 0. Response time: 0.
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:11:12.117Z - [Messenger] Received message, length: 104
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:11:12.118Z - [Messenger] Sending message type: POST_TASKS_EXECUTION
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:11:12.119Z - [Messenger] Message sent
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.121Z - Received raw message of length 565
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.121Z - Received json message of type POST_TASKS_EXECUTION
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.123Z - Serializing response for POST_TASKS_EXECUTION message in json mode
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.123Z - Responding to POST_TASKS_EXECUTION message
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.123Z - [REQUEST]: Responding to the client. handleRunPostTasksExecution
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.123Z - Time taken for 'postTasksExecution' 1.268699999999626ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.124Z - Done responding to the client handleRunPostTasksExecution
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:11:12.123Z - [Messenger] Received message, length: 4
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:12.124Z - Handled json message POST_TASKS_EXECUTION. Handling time: 2. Response time: 1.
+DEBUG nx::native::telemetry::service: Sent 1 events: [nx/js/dependencies-and-lockfile:createDe]
+Fetching nx...
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:14.744Z - Closed a connection. Number of open connections: 0
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:34.856Z - [LATEST-NX]: Successfully pulled latest Nx to C:\Users\ANGELA~1\AppData\Local\Temp\tmp-13148-hDvkC1AbS7wo
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:34.859Z - [NX-CONSOLE]: Using local implementation (NX_USE_LOCAL=true or inner call)
+DEBUG nx::native::ide::preferences: Loaded console preferences: NxConsolePreferences { auto_install_console: Some(true), path: "C:\\Users\\Angel Aubrey\\.nx\\ide.json" }
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:34.862Z - [AI-AGENTS]: Failed to compute agent configuration status from latest Nx. Error: Only URLs with a scheme in: file, data, and node are supported by the default ESM loader. On Windows, absolute paths must be valid file:// URLs. Received protocol 'c:'
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:34.862Z - [AI-AGENTS]: Agent configuration status computation completed: 0 fully configured, 0 outdated, 0 partially configured, 0 non-configured
+DEBUG nx::native::ide::install: Detected editor: VSCode
+DEBUG nx::native::ide::install: Checking if Nx Console extension is installed with: code.cmd --list-extensions
+DEBUG nx::native::ide::install: Nx Console extension is installed
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:11:36.033Z - [NX-CONSOLE]: Console status check completed, shouldPrompt: false
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:19:16.931Z - [WATCHER]: 0 file(s) created or restored, 0 file(s) modified, 0 file(s) deleted
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:19:17.034Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:19:17.034Z - [REQUEST]: 
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:19:17.034Z - [REQUEST]: 
+[plugin-client] restarting worker for "nx/js/dependencies-and-lockfile"
+[isolated-plugin] spawned worker for "nx/js/dependencies-and-lockfile" (pid: 28192, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-3-490230.9956.sock)
+[plugin-client] restarting worker for "nx/core/package-json"
+[isolated-plugin] spawned worker for "nx/core/package-json" (pid: 27848, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-4-490274.2495.sock)
+[plugin-client] restarting worker for "nx/core/project-json"
+[isolated-plugin] spawned worker for "nx/core/project-json" (pid: 26328, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-5-490290.5077.sock)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:19:17.120Z - Time taken for 'hash changed files from watcher' 0.663799999980256ms
+[plugin-worker] "nx/core/project-json" (pid: 26328) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-5-490290.5077.sock
+[1m[33mTime taken for 'plugin worker 26328 code loading' 1631.0004ms[39m[22m
+[isolated-plugin] connected to worker for "nx/core/project-json" (pid: 26328)
+[plugin-worker] "nx/core/project-json" (pid: 26328) connected
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:19:18.906Z - Time taken for 'start-plugin-worker:nx/core/project-json' 1804.2410999999847ms
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 28192) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-3-490230.9956.sock
+[isolated-plugin] connected to worker for "nx/js/dependencies-and-lockfile" (pid: 28192)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:19:18.911Z - Time taken for 'start-plugin-worker:nx/js/dependencies-and-lockfile' 1869.9444000000367ms
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 28192) connected
+[1m[33mTime taken for 'plugin worker 28192 code loading' 1690.8146ms[39m[22m
+[plugin-worker] "nx/core/package-json" (pid: 27848) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-4-490274.2495.sock
+[isolated-plugin] connected to worker for "nx/core/package-json" (pid: 27848)
+[1m[33mTime taken for 'plugin worker 27848 code loading' 1690.1035ms[39m[22m
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:19:18.950Z - Time taken for 'start-plugin-worker:nx/core/package-json' 1865.584199999983ms
+[plugin-worker] "nx/core/package-json" (pid: 27848) connected
+[plugin-worker] "nx/core/project-json" (pid: 26328) loaded successfully
+[plugin-worker] "nx/core/package-json" (pid: 27848) loaded successfully
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 28192) loaded successfully
+[1m[33mTime taken for 'nx/core/project-json:createNodes' 0.7165999999997439ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/project-json" after createNodes
+[1m[33mTime taken for 'nx/core/package-json:createNodes' 29.691100000000006ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/package-json" after createNodes
+[1m[33mTime taken for 'nx/js/dependencies-and-lockfile:createNodes' 20.312199999999848ms[39m[22m
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:19:20.718Z - Time taken for 'build-project-configs' 3665.447599999956ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:19:20.718Z - Time taken for 'createNodes:merge' 4.738499999977648ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:19:20.718Z - Time taken for 'get-all-workspace-files' 0.3207999999867752ms
+[1m[33mTime taken for 'build typescript dependencies' 0.2319999999999709ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/js/dependencies-and-lockfile" after createDependencies
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:19:20.757Z - [SYNC]: collect registered sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:19:20.759Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:19:20.759Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:19:20.760Z - Time taken for 'total execution time for createProjectGraph()' 49.288999999989755ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:19:20.760Z - Time taken for 'createDependencies' 35.62939999997616ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:19:20.760Z - Time taken for 'nx/js/dependencies-and-lockfile:createDependencies' 35.31200000003446ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:19:20.760Z - Time taken for 'createMetadata' 0.10360000003129244ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:19:20.760Z - Time taken for 'serialize graph' 3.325200000021141ms
+DEBUG nx::native::telemetry::service: Sent 1 events: [nx/js/dependencies-and-lockfile:createDe]
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:32.816Z - Established a connection. Number of open connections: 1
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:32.817Z - Closed a connection. Number of open connections: 0
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:32.820Z - Established a connection. Number of open connections: 1
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:32.820Z - Closed a connection. Number of open connections: 0
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:32.822Z - Established a connection. Number of open connections: 1
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:23:32.821Z - [Messenger] Setting up socket listeners
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:23:32.822Z - [Messenger] listen() complete
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:23:33.523Z - [Messenger] Sending message type: GET_NX_CONSOLE_STATUS
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:23:33.526Z - [Messenger] Message sent
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:33.531Z - Received raw message of length 4717
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:33.531Z - Received json message of type GET_NX_CONSOLE_STATUS
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:33.532Z - Serializing response for GET_NX_CONSOLE_STATUS message in json mode
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:33.532Z - Responding to GET_NX_CONSOLE_STATUS message
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:33.533Z - [REQUEST]: Responding to the client. handleGetNxConsoleStatus
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:33.533Z - Done responding to the client handleGetNxConsoleStatus
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:33.533Z - Handled json message GET_NX_CONSOLE_STATUS. Handling time: 0. Response time: 1.
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:23:33.533Z - [Messenger] Received message, length: 22
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:23:33.931Z - [Messenger] Sending message type: REQUEST_PROJECT_GRAPH
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:23:33.932Z - [Messenger] Message sent
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:33.935Z - Received raw message of length 32
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:33.935Z - Received json message of type REQUEST_PROJECT_GRAPH
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:33.936Z - [REQUEST]: Client Request for Project Graph Received
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:33.938Z - Reusing in-memory cached project graph because no files changed.
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:33.939Z - Serializing response for REQUEST_PROJECT_GRAPH message in json mode
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:33.939Z - Responding to REQUEST_PROJECT_GRAPH message
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:33.939Z - [REQUEST]: Responding to the client. project-graph
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:33.940Z - Time taken for 'total for creating and serializing project graph' 2.944499999983236ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:33.941Z - Done responding to the client project-graph
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:33.941Z - Handled json message REQUEST_PROJECT_GRAPH. Handling time: 3. Response time: 2.
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:23:33.940Z - [Messenger] Received message, length: 402156
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:23:33.948Z - [Messenger] Sending message type: PRE_TASKS_EXECUTION
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:23:33.949Z - [Messenger] Message sent
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:33.952Z - Received raw message of length 497
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:33.952Z - Received json message of type PRE_TASKS_EXECUTION
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:33.953Z - Serializing response for PRE_TASKS_EXECUTION message in json mode
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:33.953Z - Responding to PRE_TASKS_EXECUTION message
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:33.953Z - [REQUEST]: Responding to the client. handleRunPreTasksExecution
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:33.953Z - Time taken for 'preTasksExecution' 0.5118000000948086ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:33.953Z - Done responding to the client handleRunPreTasksExecution
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:33.953Z - Handled json message PRE_TASKS_EXECUTION. Handling time: 1. Response time: 0.
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:23:33.952Z - [Messenger] Received message, length: 2
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:23:34.067Z - [Messenger] Sending message type: HASH_TASKS
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:23:34.068Z - [Messenger] Message sent
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.070Z - Received raw message of length 572
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.070Z - Received json message of type HASH_TASKS
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.071Z - Reusing in-memory cached project graph because no files changed.
+DEBUG nx::native::tasks::hash_planner: get_plans_internal COMPLETED in 2.3145ms - processed 0 tasks (setup: 2.3027ms, parallel_planning: 4.2µs)
+DEBUG nx::native::tasks::task_hasher: hash_plans COMPLETED in 431.7µs - processed 0 plans (setup: 142.4µs, hashing: 287.2µs, assembly: 11.7µs)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.081Z - Serializing response for HASH_TASKS message in json mode
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.081Z - Responding to HASH_TASKS message
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.081Z - [REQUEST]: Responding to the client. handleHashTasks
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.081Z - Done responding to the client handleHashTasks
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.081Z - Handled json message HASH_TASKS. Handling time: 11. Response time: 0.
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:23:34.081Z - [Messenger] Received message, length: 2
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:23:34.098Z - [Messenger] Sending message type: GET_ESTIMATED_TASK_TIMINGS
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:23:34.099Z - [Messenger] Message sent
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.104Z - Received raw message of length 50
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.104Z - Received json message of type GET_ESTIMATED_TASK_TIMINGS
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.105Z - Serializing response for GET_ESTIMATED_TASK_TIMINGS message in json mode
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.105Z - Responding to GET_ESTIMATED_TASK_TIMINGS message
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.105Z - [REQUEST]: Responding to the client. handleGetEstimatedTaskTimings
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.105Z - Done responding to the client handleGetEstimatedTaskTimings
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.105Z - Handled json message GET_ESTIMATED_TASK_TIMINGS. Handling time: 1. Response time: 0.
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:23:34.105Z - [Messenger] Received message, length: 2
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:23:34.110Z - [Messenger] Sending message type: RECORD_TASK_RUNS
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:23:34.111Z - [Messenger] Message sent
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.113Z - Received raw message of length 41
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.113Z - Received json message of type RECORD_TASK_RUNS
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.114Z - Serializing response for RECORD_TASK_RUNS message in json mode
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.114Z - Responding to RECORD_TASK_RUNS message
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.114Z - [REQUEST]: Responding to the client. handleRecordTaskRuns
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.114Z - Done responding to the client handleRecordTaskRuns
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.114Z - Handled json message RECORD_TASK_RUNS. Handling time: 1. Response time: 0.
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:23:34.114Z - [Messenger] Received message, length: 4
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.136Z - Established a connection. Number of open connections: 2
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.137Z - Closed a connection. Number of open connections: 1
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:23:34.136Z - [Messenger] Sending message type: GET_CONFIGURE_AI_AGENTS_STATUS
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:23:34.137Z - [Messenger] Message sent
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.139Z - Received raw message of length 41
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.139Z - Received json message of type GET_CONFIGURE_AI_AGENTS_STATUS
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.139Z - [AI-AGENTS]: Returning cached agent configuration status
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.139Z - Serializing response for GET_CONFIGURE_AI_AGENTS_STATUS message in json mode
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.139Z - Responding to GET_CONFIGURE_AI_AGENTS_STATUS message
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.139Z - [REQUEST]: Responding to the client. handleGetConfigureAiAgentsStatus
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.139Z - Done responding to the client handleGetConfigureAiAgentsStatus
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.139Z - Handled json message GET_CONFIGURE_AI_AGENTS_STATUS. Handling time: 0. Response time: 0.
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:23:34.139Z - [Messenger] Received message, length: 104
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:23:34.140Z - [Messenger] Sending message type: POST_TASKS_EXECUTION
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:23:34.141Z - [Messenger] Message sent
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.142Z - Received raw message of length 565
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.143Z - Received json message of type POST_TASKS_EXECUTION
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.144Z - Serializing response for POST_TASKS_EXECUTION message in json mode
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.144Z - Responding to POST_TASKS_EXECUTION message
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.144Z - [REQUEST]: Responding to the client. handleRunPostTasksExecution
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.144Z - Time taken for 'postTasksExecution' 0.9368999999715015ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.144Z - Done responding to the client handleRunPostTasksExecution
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.144Z - Handled json message POST_TASKS_EXECUTION. Handling time: 1. Response time: 0.
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:23:34.144Z - [Messenger] Received message, length: 4
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:23:34.401Z - Closed a connection. Number of open connections: 0
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:48.571Z - Established a connection. Number of open connections: 1
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:48.572Z - Closed a connection. Number of open connections: 0
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:48.574Z - Established a connection. Number of open connections: 1
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:48.574Z - Closed a connection. Number of open connections: 0
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:48.576Z - Established a connection. Number of open connections: 1
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:25:48.575Z - [Messenger] Setting up socket listeners
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:25:48.576Z - [Messenger] listen() complete
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:25:48.972Z - [Messenger] Sending message type: GET_NX_CONSOLE_STATUS
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:25:48.974Z - [Messenger] Message sent
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:48.976Z - Received raw message of length 9379
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:48.976Z - Received json message of type GET_NX_CONSOLE_STATUS
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:48.977Z - Refreshing env var AGY_BROWSER_ACTIVE_PORT_FILE from client connection.
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:48.977Z - Refreshing env var AGY_BROWSER_WS_URL from client connection.
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:48.977Z - Refreshing env var ANTIGRAVITY_AGENT from client connection.
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:48.977Z - Refreshing env var ANTIGRAVITY_CSRF_TOKEN from client connection.
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:48.977Z - Refreshing env var ANTIGRAVITY_LS_ADDRESS from client connection.
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:48.977Z - Refreshing env var ANTIGRAVITY_PROJECT_ID from client connection.
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:48.977Z - Refreshing env var ANTIGRAVITY_SOURCE_METADATA from client connection.
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:48.977Z - Refreshing env var ANTIGRAVITY_TRAJECTORY_ID from client connection.
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:48.977Z - Refreshing env var CHROME_DEVTOOLS_MCP_JS from client connection.
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:48.977Z - Refreshing env var COLOR from client connection.
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:48.977Z - Refreshing env var PATH from client connection.
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:48.977Z - Graph recompute necessary due to env variable refresh
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:48.978Z - Serializing response for GET_NX_CONSOLE_STATUS message in json mode
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:48.978Z - Responding to GET_NX_CONSOLE_STATUS message
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:48.978Z - [REQUEST]: Responding to the client. handleGetNxConsoleStatus
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:48.978Z - Done responding to the client handleGetNxConsoleStatus
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:48.978Z - Handled json message GET_NX_CONSOLE_STATUS. Handling time: 0. Response time: 0.
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:25:48.978Z - [Messenger] Received message, length: 22
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:25:49.037Z - [Messenger] Sending message type: REQUEST_PROJECT_GRAPH
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:25:49.038Z - [Messenger] Message sent
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:49.040Z - Received raw message of length 32
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:49.040Z - Received json message of type REQUEST_PROJECT_GRAPH
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:49.040Z - [REQUEST]: Client Request for Project Graph Received
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:49.041Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:49.041Z - [REQUEST]: 
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:49.041Z - [REQUEST]: 
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:49.043Z - No files changed, but no in-memory cached project graph found. Recomputing it...
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:49.043Z - Streaming message to client: progress update for topic graph-construction
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:25:49.043Z - [Messenger] Received message, length: 47
+[plugin-client] restarting worker for "nx/js/dependencies-and-lockfile"
+[isolated-plugin] spawned worker for "nx/js/dependencies-and-lockfile" (pid: 26940, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-6-882235.5436.sock)
+[plugin-client] restarting worker for "nx/core/package-json"
+[isolated-plugin] spawned worker for "nx/core/package-json" (pid: 29380, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-7-882251.3394.sock)
+[plugin-client] restarting worker for "nx/core/project-json"
+[isolated-plugin] spawned worker for "nx/core/project-json" (pid: 11216, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-8-882263.6564.sock)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:49.085Z - Time taken for 'hash changed files from watcher' 0.43810000002849847ms
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 26940) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-6-882235.5436.sock
+[isolated-plugin] connected to worker for "nx/core/project-json" (pid: 11216)
+[isolated-plugin] connected to worker for "nx/js/dependencies-and-lockfile" (pid: 26940)
+[plugin-worker] "nx/core/project-json" (pid: 11216) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-8-882263.6564.sock
+[plugin-worker] "nx/core/project-json" (pid: 11216) connected
+[1m[33mTime taken for 'plugin worker 11216 code loading' 873.1401000000001ms[39m[22m
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 26940) connected
+[1m[33mTime taken for 'plugin worker 26940 code loading' 886.8001ms[39m[22m
+[plugin-worker] "nx/core/package-json" (pid: 29380) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-7-882251.3394.sock
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:50.046Z - Time taken for 'start-plugin-worker:nx/js/dependencies-and-lockfile' 1000.7793000000529ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:50.047Z - Time taken for 'start-plugin-worker:nx/core/project-json' 971.4308999999193ms
+[1m[33mTime taken for 'plugin worker 29380 code loading' 885.8955ms[39m[22m
+[isolated-plugin] connected to worker for "nx/core/package-json" (pid: 29380)
+[plugin-worker] "nx/core/package-json" (pid: 29380) connected
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:50.070Z - Time taken for 'start-plugin-worker:nx/core/package-json' 1008.6263999999501ms
+[plugin-worker] "nx/core/project-json" (pid: 11216) loaded successfully
+[plugin-worker] "nx/core/package-json" (pid: 29380) loaded successfully
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 26940) loaded successfully
+[1m[33mTime taken for 'nx/core/project-json:createNodes' 0.4203000000002248ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/project-json" after createNodes
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:51.224Z - Streaming message to client: progress update for topic graph-construction
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:25:51.224Z - [Messenger] Received message, length: 153
+[1m[33mTime taken for 'nx/core/package-json:createNodes' 17.811499999999796ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/package-json" after createNodes
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:51.248Z - Streaming message to client: progress update for topic graph-construction
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:25:51.248Z - [Messenger] Received message, length: 112
+[1m[33mTime taken for 'nx/js/dependencies-and-lockfile:createNodes' 12.741599999999835ms[39m[22m
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:51.274Z - Streaming message to client: progress update for topic graph-construction
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:25:51.273Z - [Messenger] Received message, length: 47
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:51.285Z - Streaming message to client: progress update for topic graph-construction
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:51.287Z - Time taken for 'build-project-configs' 2233.6964000000153ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:51.287Z - Time taken for 'createNodes:merge' 2.2139000000897795ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:51.287Z - Time taken for 'get-all-workspace-files' 0.210300000035204ms
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:25:51.287Z - [Messenger] Received message, length: 47
+[1m[33mTime taken for 'build typescript dependencies' 0.26040000000011787ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/js/dependencies-and-lockfile" after createDependencies
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:51.302Z - Streaming message to client: progress update for topic graph-construction
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:25:51.302Z - [Messenger] Received message, length: 47
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:51.340Z - Wrote project graph cache to C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\.nx\workspace-data\project-graph.json
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:51.341Z - Serializing response for REQUEST_PROJECT_GRAPH message in json mode
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:51.341Z - Responding to REQUEST_PROJECT_GRAPH message
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:51.341Z - [REQUEST]: Responding to the client. project-graph
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:51.341Z - Time taken for 'total for creating and serializing project graph' 2300.715599999996ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:51.341Z - Time taken for 'total execution time for createProjectGraph()' 28.882600000011735ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:51.341Z - Time taken for 'createDependencies' 20.299700000090525ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:51.341Z - Time taken for 'nx/js/dependencies-and-lockfile:createDependencies' 19.855699999956414ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:51.341Z - Time taken for 'createMetadata' 0.0971999999601394ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:51.341Z - Time taken for 'serialize graph' 3.005100000067614ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:51.341Z - Time taken for 'write cache' 30.4421999999322ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:51.345Z - Done responding to the client project-graph
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:51.345Z - Handled json message REQUEST_PROJECT_GRAPH. Handling time: 2301. Response time: 4.
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:25:51.344Z - [Messenger] Received message, length: 402156
+DEBUG nx::native::telemetry::service: Sent 1 events: [nx/js/dependencies-and-lockfile:createDe]
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:25:51.949Z - Closed a connection. Number of open connections: 0
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:30.888Z - [WATCHER]: apps/fs-gateway/package.json was modified
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:30.888Z - [WATCHER]: File changes detected:
+Created:
+(none)
+Updated:
+  - apps/fs-gateway/package.json
+Deleted:
+(none)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:30.889Z - [SYNC]: clearing sync generators cache due to file changes
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:30.893Z - [WATCHER]: Processing file changes in outputs
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:31.000Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:31.000Z - [REQUEST]: apps/fs-gateway/package.json
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:31.000Z - [REQUEST]: 
+[plugin-client] restarting worker for "nx/js/dependencies-and-lockfile"
+[isolated-plugin] spawned worker for "nx/js/dependencies-and-lockfile" (pid: 13912, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-9-984194.8911.sock)
+[plugin-client] restarting worker for "nx/core/package-json"
+[isolated-plugin] spawned worker for "nx/core/package-json" (pid: 10236, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-10-984212.4898.sock)
+[plugin-client] restarting worker for "nx/core/project-json"
+[isolated-plugin] spawned worker for "nx/core/project-json" (pid: 29496, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-11-984225.2166.sock)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:31.047Z - Time taken for 'hash changed files from watcher' 1.7018999999854714ms
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 13912) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-9-984194.8911.sock
+[1m[33mTime taken for 'plugin worker 13912 code loading' 1162.9074ms[39m[22m
+[isolated-plugin] connected to worker for "nx/js/dependencies-and-lockfile" (pid: 13912)
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 13912) connected
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:32.293Z - Time taken for 'start-plugin-worker:nx/js/dependencies-and-lockfile' 1287.546800000011ms
+[plugin-worker] "nx/core/project-json" (pid: 29496) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-11-984225.2166.sock
+[isolated-plugin] connected to worker for "nx/core/project-json" (pid: 29496)
+[1m[33mTime taken for 'plugin worker 29496 code loading' 1226.8899000000001ms[39m[22m
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:32.382Z - Time taken for 'start-plugin-worker:nx/core/project-json' 1346.675500000012ms
+[plugin-worker] "nx/core/project-json" (pid: 29496) connected
+[plugin-worker] "nx/core/package-json" (pid: 10236) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-10-984212.4898.sock
+[1m[33mTime taken for 'plugin worker 10236 code loading' 1249.7487999999998ms[39m[22m
+[isolated-plugin] connected to worker for "nx/core/package-json" (pid: 10236)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:32.394Z - Time taken for 'start-plugin-worker:nx/core/package-json' 1372.5890999999829ms
+[plugin-worker] "nx/core/package-json" (pid: 10236) connected
+[plugin-worker] "nx/core/project-json" (pid: 29496) loaded successfully
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 13912) loaded successfully
+[plugin-worker] "nx/core/package-json" (pid: 10236) loaded successfully
+[1m[33mTime taken for 'nx/core/project-json:createNodes' 0.5048999999999069ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/project-json" after createNodes
+[1m[33mTime taken for 'nx/js/dependencies-and-lockfile:createNodes' 14.847700000000259ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/package-json" after createNodes
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:33.897Z - Time taken for 'build-project-configs' 2882.790799999959ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:33.897Z - Time taken for 'createNodes:merge' 2.651799999992363ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:33.897Z - Time taken for 'native-file-deps' 0.04469999996945262ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:33.897Z - Time taken for 'get-workspace-files' 1.20429999998305ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:33.897Z - Time taken for 'get-all-workspace-files' 0.31170000007841736ms
+[1m[33mTime taken for 'build typescript dependencies' 528.3952999999997ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/js/dependencies-and-lockfile" after createDependencies
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:34.449Z - [SYNC]: collect registered sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:34.450Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:34.451Z - Time taken for 'total execution time for createProjectGraph()' 559.5324000000255ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:34.451Z - Time taken for 'createDependencies' 551.3979999999283ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:34.451Z - Time taken for 'nx/js/dependencies-and-lockfile:createDependencies' 551.2486000000499ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:34.451Z - Time taken for 'createMetadata' 0.01049999997485429ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:34.451Z - Time taken for 'serialize graph' 1.4576999999117106ms
+DEBUG nx::native::telemetry::service: Sent 1 events: [nx/js/dependencies-and-lockfile:createDe]
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:41.159Z - [WATCHER]: apps/disbursement-svc/package.json was modified
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:41.160Z - [WATCHER]: File changes detected:
+Created:
+(none)
+Updated:
+  - apps/disbursement-svc/package.json
+Deleted:
+(none)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:41.160Z - [SYNC]: clearing sync generators cache due to file changes
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:41.160Z - [WATCHER]: Processing file changes in outputs
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:41.375Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:41.375Z - [REQUEST]: apps/disbursement-svc/package.json
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:41.375Z - [REQUEST]: 
+[plugin-client] restarting worker for "nx/js/dependencies-and-lockfile"
+[isolated-plugin] spawned worker for "nx/js/dependencies-and-lockfile" (pid: 25996, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-12-994568.2901.sock)
+[plugin-client] restarting worker for "nx/core/package-json"
+[isolated-plugin] spawned worker for "nx/core/package-json" (pid: 13884, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-13-994582.8087.sock)
+[plugin-client] restarting worker for "nx/core/project-json"
+[isolated-plugin] spawned worker for "nx/core/project-json" (pid: 28360, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-14-994596.0397.sock)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:41.422Z - Time taken for 'hash changed files from watcher' 0.9006999999983236ms
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 25996) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-12-994568.2901.sock
+[isolated-plugin] connected to worker for "nx/js/dependencies-and-lockfile" (pid: 25996)
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 25996) connected
+[1m[33mTime taken for 'plugin worker 25996 code loading' 1005.3388000000001ms[39m[22m
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:42.499Z - Time taken for 'start-plugin-worker:nx/js/dependencies-and-lockfile' 1120.4658000000054ms
+[plugin-worker] "nx/core/package-json" (pid: 13884) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-13-994582.8087.sock
+[1m[33mTime taken for 'plugin worker 13884 code loading' 1017.4246999999999ms[39m[22m
+[isolated-plugin] connected to worker for "nx/core/package-json" (pid: 13884)
+[plugin-worker] "nx/core/package-json" (pid: 13884) connected
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:42.538Z - Time taken for 'start-plugin-worker:nx/core/package-json' 1143.6898999999976ms
+[plugin-worker] "nx/core/project-json" (pid: 28360) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-14-994596.0397.sock
+[isolated-plugin] connected to worker for "nx/core/project-json" (pid: 28360)
+[plugin-worker] "nx/core/project-json" (pid: 28360) connected
+[1m[33mTime taken for 'plugin worker 28360 code loading' 1032.7963000000002ms[39m[22m
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:42.560Z - Time taken for 'start-plugin-worker:nx/core/project-json' 1154.1507999999449ms
+[plugin-worker] "nx/core/project-json" (pid: 28360) loaded successfully
+[plugin-worker] "nx/core/package-json" (pid: 13884) loaded successfully
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 25996) loaded successfully
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:43.879Z - [WATCHER]: Processing file changes in outputs
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:43.879Z - [WATCHER]: apps/dues-collection-svc/package.json was modified
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:43.879Z - [WATCHER]: File changes detected:
+Created:
+(none)
+Updated:
+  - apps/dues-collection-svc/package.json
+Deleted:
+(none)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:43.880Z - [SYNC]: clearing sync generators cache due to file changes
+[1m[33mTime taken for 'nx/core/project-json:createNodes' 0.28890000000001237ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/project-json" after createNodes
+[1m[33mTime taken for 'nx/core/package-json:createNodes' 23.435299999999643ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/package-json" after createNodes
+[1m[33mTime taken for 'nx/js/dependencies-and-lockfile:createNodes' 12.946200000000317ms[39m[22m
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:43.973Z - Time taken for 'build-project-configs' 2582.092399999965ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:43.974Z - Time taken for 'createNodes:merge' 2.3993999999947846ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:43.974Z - Time taken for 'native-file-deps' 0.07550000003539026ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:43.974Z - Time taken for 'get-workspace-files' 1.0171000000555068ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:43.974Z - Time taken for 'get-all-workspace-files' 0.3575999999884516ms
+[1m[33mTime taken for 'build typescript dependencies' 156.0881999999997ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/js/dependencies-and-lockfile" after createDependencies
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:44.166Z - [SYNC]: collect registered sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:44.167Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:44.167Z - Time taken for 'total execution time for createProjectGraph()' 202.75340000004508ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:44.167Z - Time taken for 'createDependencies' 192.38570000010077ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:44.167Z - Time taken for 'nx/js/dependencies-and-lockfile:createDependencies' 191.8652000000002ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:44.167Z - Time taken for 'createMetadata' 0.017099999939091504ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:44.167Z - Time taken for 'serialize graph' 2.461600000038743ms
+DEBUG nx::native::telemetry::service: Sent 1 events: [nx/js/dependencies-and-lockfile:createDe]
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:44.295Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:44.295Z - [REQUEST]: apps/dues-collection-svc/package.json
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:44.295Z - [REQUEST]: 
+[plugin-client] restarting worker for "nx/js/dependencies-and-lockfile"
+[isolated-plugin] spawned worker for "nx/js/dependencies-and-lockfile" (pid: 21960, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-15-997487.6403.sock)
+[plugin-client] restarting worker for "nx/core/package-json"
+[isolated-plugin] spawned worker for "nx/core/package-json" (pid: 17824, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-16-997501.962.sock)
+[plugin-client] restarting worker for "nx/core/project-json"
+[isolated-plugin] spawned worker for "nx/core/project-json" (pid: 25424, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-17-997516.9003.sock)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:44.344Z - Time taken for 'hash changed files from watcher' 0.8856000000378117ms
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 21960) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-15-997487.6403.sock
+[1m[33mTime taken for 'plugin worker 21960 code loading' 1014.075ms[39m[22m
+[isolated-plugin] connected to worker for "nx/js/dependencies-and-lockfile" (pid: 21960)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:45.444Z - Time taken for 'start-plugin-worker:nx/js/dependencies-and-lockfile' 1146.828600000008ms
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 21960) connected
+[plugin-worker] "nx/core/package-json" (pid: 17824) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-16-997501.962.sock
+[1m[33mTime taken for 'plugin worker 17824 code loading' 1015.7343ms[39m[22m
+[isolated-plugin] connected to worker for "nx/core/project-json" (pid: 25424)
+[isolated-plugin] connected to worker for "nx/core/package-json" (pid: 17824)
+[plugin-worker] "nx/core/project-json" (pid: 25424) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-17-997516.9003.sock
+[1m[33mTime taken for 'plugin worker 25424 code loading' 1016.4724000000001ms[39m[22m
+[plugin-worker] "nx/core/project-json" (pid: 25424) connected
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:45.468Z - Time taken for 'start-plugin-worker:nx/core/package-json' 1156.4142999999458ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:45.468Z - Time taken for 'start-plugin-worker:nx/core/project-json' 1140.387400000007ms
+[plugin-worker] "nx/core/package-json" (pid: 17824) connected
+[plugin-worker] "nx/core/project-json" (pid: 25424) loaded successfully
+[plugin-worker] "nx/core/package-json" (pid: 17824) loaded successfully
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 21960) loaded successfully
+[1m[33mTime taken for 'nx/core/project-json:createNodes' 0.4351000000001477ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/project-json" after createNodes
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:46.767Z - [WATCHER]: apps/expense-budget-svc/package.json was modified
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:46.768Z - [WATCHER]: File changes detected:
+Created:
+(none)
+Updated:
+  - apps/expense-budget-svc/package.json
+Deleted:
+(none)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:46.768Z - [SYNC]: clearing sync generators cache due to file changes
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:46.768Z - [WATCHER]: Processing file changes in outputs
+[isolated-plugin] shutting down worker for "nx/core/package-json" after createNodes
+[1m[33mTime taken for 'nx/js/dependencies-and-lockfile:createNodes' 15.985000000000127ms[39m[22m
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:46.843Z - Time taken for 'build-project-configs' 2535.734400000074ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:46.843Z - Time taken for 'createNodes:merge' 1.6929999999701977ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:46.843Z - Time taken for 'native-file-deps' 0.006399999954737723ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:46.843Z - Time taken for 'get-workspace-files' 0.815900000045076ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:46.843Z - Time taken for 'get-all-workspace-files' 0.24009999993722886ms
+[1m[33mTime taken for 'build typescript dependencies' 39.50909999999976ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/js/dependencies-and-lockfile" after createDependencies
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:46.915Z - [SYNC]: collect registered sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:46.917Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:46.917Z - Time taken for 'total execution time for createProjectGraph()' 79.38610000000335ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:46.918Z - Time taken for 'createDependencies' 70.72389999998268ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:46.918Z - Time taken for 'nx/js/dependencies-and-lockfile:createDependencies' 70.56570000003558ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:46.918Z - Time taken for 'createMetadata' 0.023899999912828207ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:46.918Z - Time taken for 'serialize graph' 2.9277000000001863ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:46.949Z - [WATCHER]: Processing file changes in outputs
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:46.950Z - [WATCHER]: apps/ledger-accounts-svc/package.json was modified
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:46.950Z - [WATCHER]: File changes detected:
+Created:
+(none)
+Updated:
+  - apps/ledger-accounts-svc/package.json
+Deleted:
+(none)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:46.951Z - [SYNC]: clearing sync generators cache due to file changes
+DEBUG nx::native::telemetry::service: Sent 1 events: [nx/js/dependencies-and-lockfile:createDe]
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:47.574Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:47.574Z - [REQUEST]: apps/expense-budget-svc/package.json,apps/ledger-accounts-svc/package.json
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:47.574Z - [REQUEST]: 
+[plugin-client] restarting worker for "nx/js/dependencies-and-lockfile"
+[isolated-plugin] spawned worker for "nx/js/dependencies-and-lockfile" (pid: 17704, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-18-1000766.6144.sock)
+[plugin-client] restarting worker for "nx/core/package-json"
+[isolated-plugin] spawned worker for "nx/core/package-json" (pid: 28956, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-19-1000780.6269.sock)
+[plugin-client] restarting worker for "nx/core/project-json"
+[isolated-plugin] spawned worker for "nx/core/project-json" (pid: 27992, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-20-1000793.4173.sock)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:47.613Z - Time taken for 'hash changed files from watcher' 0.8645999999716878ms
+[plugin-worker] "nx/core/package-json" (pid: 28956) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-19-1000780.6269.sock
+[1m[33mTime taken for 'plugin worker 28956 code loading' 883.5268ms[39m[22m
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 17704) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-18-1000766.6144.sock
+[isolated-plugin] connected to worker for "nx/js/dependencies-and-lockfile" (pid: 17704)
+[isolated-plugin] connected to worker for "nx/core/package-json" (pid: 28956)
+[plugin-worker] "nx/core/package-json" (pid: 28956) connected
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 17704) connected
+[1m[33mTime taken for 'plugin worker 17704 code loading' 907.4059ms[39m[22m
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:48.603Z - Time taken for 'start-plugin-worker:nx/js/dependencies-and-lockfile' 1024.3003000000026ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:48.603Z - Time taken for 'start-plugin-worker:nx/core/package-json' 1011.9503000000259ms
+[plugin-worker] "nx/core/project-json" (pid: 27992) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-20-1000793.4173.sock
+[1m[33mTime taken for 'plugin worker 27992 code loading' 901.1436000000001ms[39m[22m
+[isolated-plugin] connected to worker for "nx/core/project-json" (pid: 27992)
+[plugin-worker] "nx/core/project-json" (pid: 27992) connected
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:48.631Z - Time taken for 'start-plugin-worker:nx/core/project-json' 1028.2931000000099ms
+[plugin-worker] "nx/core/package-json" (pid: 28956) loaded successfully
+[plugin-worker] "nx/core/project-json" (pid: 27992) loaded successfully
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 17704) loaded successfully
+[1m[33mTime taken for 'nx/core/project-json:createNodes' 0.27620000000024447ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/project-json" after createNodes
+[1m[33mTime taken for 'nx/core/package-json:createNodes' 20.843799999999646ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/package-json" after createNodes
+[1m[33mTime taken for 'nx/js/dependencies-and-lockfile:createNodes' 9.474900000000162ms[39m[22m
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:49.830Z - Time taken for 'build-project-configs' 2247.0664000000106ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:49.830Z - Time taken for 'createNodes:merge' 1.4234000000869855ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:49.830Z - Time taken for 'native-file-deps' 0.0071000000461936ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:49.830Z - Time taken for 'get-workspace-files' 0.5862999999662861ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:49.830Z - Time taken for 'get-all-workspace-files' 0.17090000002644956ms
+[1m[33mTime taken for 'build typescript dependencies' 155.36940000000004ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/js/dependencies-and-lockfile" after createDependencies
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:50.014Z - [SYNC]: collect registered sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:50.015Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:50.015Z - Time taken for 'total execution time for createProjectGraph()' 189.28669999993872ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:50.015Z - Time taken for 'createDependencies' 183.48729999992065ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:50.015Z - Time taken for 'nx/js/dependencies-and-lockfile:createDependencies' 183.25370000000112ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:50.015Z - Time taken for 'createMetadata' 0.016299999901093543ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:50.015Z - Time taken for 'serialize graph' 1.6080999999539927ms
+DEBUG nx::native::telemetry::service: Sent 1 events: [nx/js/dependencies-and-lockfile:createDe]
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:57.808Z - [WATCHER]: package.json was modified
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:57.808Z - [WATCHER]: File changes detected:
+Created:
+(none)
+Updated:
+  - package.json
+Deleted:
+(none)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:57.809Z - [SYNC]: clearing sync generators cache due to file changes
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:57.809Z - [WATCHER]: Processing file changes in outputs
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:59.409Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:59.409Z - [REQUEST]: package.json
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:59.409Z - [REQUEST]: 
+[plugin-client] restarting worker for "nx/js/dependencies-and-lockfile"
+[isolated-plugin] spawned worker for "nx/js/dependencies-and-lockfile" (pid: 11536, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-21-1012602.5931.sock)
+[plugin-client] restarting worker for "nx/core/package-json"
+[isolated-plugin] spawned worker for "nx/core/package-json" (pid: 16304, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-22-1012615.6187.sock)
+[plugin-client] restarting worker for "nx/core/project-json"
+[isolated-plugin] spawned worker for "nx/core/project-json" (pid: 26364, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-23-1012627.8167.sock)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:27:59.449Z - Time taken for 'hash changed files from watcher' 0.5795999999390915ms
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 11536) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-21-1012602.5931.sock
+[1m[33mTime taken for 'plugin worker 11536 code loading' 958.7703ms[39m[22m
+[isolated-plugin] connected to worker for "nx/js/dependencies-and-lockfile" (pid: 11536)
+[plugin-worker] "nx/core/package-json" (pid: 16304) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-22-1012615.6187.sock
+[1m[33mTime taken for 'plugin worker 16304 code loading' 963.6477000000001ms[39m[22m
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 11536) connected
+[plugin-worker] "nx/core/project-json" (pid: 26364) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin13148-23-1012627.8167.sock
+[1m[33mTime taken for 'plugin worker 26364 code loading' 952.0962ms[39m[22m
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:00.500Z - Time taken for 'start-plugin-worker:nx/js/dependencies-and-lockfile' 1088.0422999999719ms
+[isolated-plugin] connected to worker for "nx/core/project-json" (pid: 26364)
+[isolated-plugin] connected to worker for "nx/core/package-json" (pid: 16304)
+[plugin-worker] "nx/core/package-json" (pid: 16304) connected
+[plugin-worker] "nx/core/project-json" (pid: 26364) connected
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:00.513Z - Time taken for 'start-plugin-worker:nx/core/package-json' 1087.1888000000035ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:00.513Z - Time taken for 'start-plugin-worker:nx/core/project-json' 1074.405400000047ms
+[plugin-worker] "nx/core/project-json" (pid: 26364) loaded successfully
+[plugin-worker] "nx/core/package-json" (pid: 16304) loaded successfully
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 11536) loaded successfully
+[1m[33mTime taken for 'nx/core/project-json:createNodes' 0.5508000000004358ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/project-json" after createNodes
+[1m[33mTime taken for 'nx/core/package-json:createNodes' 20.197400000000016ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/package-json" after createNodes
+[1m[33mTime taken for 'nx/js/dependencies-and-lockfile:createNodes' 12.35550000000012ms[39m[22m
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:01.869Z - Time taken for 'build-project-configs' 2435.656500000041ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:01.869Z - Time taken for 'createNodes:merge' 1.6820000000298023ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:01.869Z - Time taken for 'get-all-workspace-files' 0.36210000002756715ms
+[1m[33mTime taken for 'build typescript dependencies' 0.5434000000000196ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/js/dependencies-and-lockfile" after createDependencies
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:01.897Z - [SYNC]: collect registered sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:01.898Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:01.898Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:01.898Z - Time taken for 'total execution time for createProjectGraph()' 35.1256000000285ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:01.898Z - Time taken for 'createDependencies' 28.037200000020675ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:01.898Z - Time taken for 'nx/js/dependencies-and-lockfile:createDependencies' 27.897800000035204ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:01.898Z - Time taken for 'createMetadata' 0.02590000000782311ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:01.898Z - Time taken for 'serialize graph' 2.0106000000378117ms
+DEBUG nx::native::telemetry::service: Sent 1 events: [nx/js/dependencies-and-lockfile:createDe]
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:47.535Z - [Server] lock file hash changed! old=6680369480757246877, new=1003392342260469197
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:47.535Z - [Server] Daemon outdated: LOCK_FILES_CHANGED
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:47.535Z - [Server] Restarting daemon...
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:47.550Z - [WATCHER]: Processing file changes in outputs
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:47.550Z - [WATCHER]: package-lock.json was modified
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:47.550Z - [WATCHER]: File changes detected:
+Created:
+(none)
+Updated:
+  - package-lock.json
+Deleted:
+(none)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:47.551Z - [SYNC]: clearing sync generators cache due to file changes
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:47.553Z - Restarting daemon with script: C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\daemon\server\start.js
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:47.554Z - Old daemon __dirname: C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\daemon\server
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:47.554Z - Current process.execPath: C:\Program Files\nodejs\node.exe
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:47.572Z - Started new daemon process in background
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:47.575Z - [WATCHER]: Stopping the watcher for C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend (sources)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:47.575Z - [WATCHER]: Stopping the watcher for C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend (outputs)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:47.577Z - [LATEST-NX]: Cleaning up latest Nx installation from C:\Users\ANGELA~1\AppData\Local\Temp\tmp-13148-hDvkC1AbS7wo
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:47.583Z - Server stopped because: "this process is no longer the current daemon (native)"
+Failed to flush telemetry: Telemetry channel closed
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:49.427Z - Time taken for 'workspace context init' 2.537900000000036ms
+DEBUG nx::native::telemetry: Telemetry service initialized successfully
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:50.289Z - New daemon starting from: C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\daemon\server\server.js
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:50.289Z - New daemon __dirname: C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\daemon\server
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:50.289Z - New daemon nxVersion: 22.7.5
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:50.291Z - New daemon getInstalledNxVersion(): 22.7.5
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:50.294Z - [Server] Starting outdated check interval (20ms)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:50.296Z - Started listening on: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\63e5db2f9f2050ae4af2\d.sock
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:50.300Z - [WATCHER]: Subscribed to changes within: C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend (native)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:50.301Z - [LATEST-NX]: Pulling latest Nx...
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:50.326Z - [AI-AGENTS]: Starting agent configuration status computation
+[isolated-plugin] spawned worker for "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\js" (pid: 26188, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-0-2776.7043.sock)
+[isolated-plugin] spawned worker for "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\package-json" (pid: 22324, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-1-2789.009.sock)
+[isolated-plugin] spawned worker for "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\project-json\build-nodes\project-json" (pid: 18324, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-2-2800.9623.sock)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:50.448Z - Time taken for 'loadSpecifiedNxPlugins' 38.24519999999984ms
+[plugin-worker] "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\package-json" (pid: 22324) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-1-2789.009.sock
+[1m[33mTime taken for 'plugin worker 22324 code loading' 1191.5303999999999ms[39m[22m
+[isolated-plugin] connected to worker for "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\package-json" (pid: 22324)
+[plugin-worker] "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\package-json" (pid: 22324) connected
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:51.777Z - Time taken for 'start-plugin-worker:C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\package-json' 1345.3647ms
+[isolated-plugin] connected to worker for "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\js" (pid: 26188)
+[plugin-worker] "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\js" (pid: 26188) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-0-2776.7043.sock
+[plugin-worker] "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\js" (pid: 26188) connected
+[1m[33mTime taken for 'plugin worker 26188 code loading' 1362.0191ms[39m[22m
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:51.896Z - Time taken for 'start-plugin-worker:C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\js' 1485.5230000000001ms
+[plugin-worker] "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\project-json\build-nodes\project-json" (pid: 18324) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-2-2800.9623.sock
+[1m[33mTime taken for 'plugin worker 18324 code loading' 1390.3744000000002ms[39m[22m
+[isolated-plugin] connected to worker for "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\project-json\build-nodes\project-json" (pid: 18324)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:51.951Z - Time taken for 'start-plugin-worker:C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\project-json\build-nodes\project-json' 1516.2350000000001ms
+[plugin-worker] "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\project-json\build-nodes\project-json" (pid: 18324) connected
+[plugin-worker] "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\package-json" (pid: 22324) loaded successfully
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:52.365Z - Time taken for 'Load Nx Plugin: C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\package-json' 1956.5068000000006ms
+[plugin-worker] "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\project-json\build-nodes\project-json" (pid: 18324) loaded successfully
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:52.478Z - Time taken for 'Load Nx Plugin: C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\project-json\build-nodes\project-json' 2069.1321ms
+[plugin-worker] "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\js" (pid: 26188) loaded successfully
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:52.545Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:52.545Z - [REQUEST]: 
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:52.545Z - [REQUEST]: 
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:52.566Z - Time taken for 'loadDefaultNxPlugins' 2138.4925ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:52.566Z - Time taken for 'Load Nx Plugin: C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\js' 2137.7623000000003ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:52.566Z - Time taken for 'hash changed files from watcher' 0.4750999999996566ms
+[1m[33mTime taken for 'nx/core/package-json:createNodes' 31.621399999999994ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/package-json" after createNodes
+[1m[33mTime taken for 'nx/core/project-json:createNodes' 0.6977999999999156ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/project-json" after createNodes
+[1m[33mTime taken for 'nx/js/dependencies-and-lockfile:createNodes' 36.822999999999865ms[39m[22m
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:53.890Z - Time taken for 'build-project-configs' 1296.5152000000007ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:53.890Z - Time taken for 'createNodes:merge' 26.1875ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:53.890Z - Time taken for 'native-file-deps' 0.022700000000440923ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:53.890Z - Time taken for 'get-workspace-files' 1.0529999999998836ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:53.890Z - Time taken for 'get-all-workspace-files' 0.636199999999917ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:53.890Z - Time taken for 'read cache' 3.0882000000001426ms
+[1m[33mTime taken for 'build typescript dependencies' 113.76159999999982ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/js/dependencies-and-lockfile" after createDependencies
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:54.093Z - [SYNC]: collect registered sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:54.095Z - Time taken for 'total execution time for createProjectGraph()' 221.1322ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:54.096Z - Time taken for 'createDependencies' 202.22130000000016ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:54.096Z - Time taken for 'nx/js/dependencies-and-lockfile:createDependencies' 201.4435000000003ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:54.096Z - Time taken for 'createMetadata' 0.068000000000211ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:28:54.096Z - Time taken for 'serialize graph' 2.332399999999325ms
+DEBUG nx::native::telemetry::service: Sent 1 events: [nx/js/dependencies-and-lockfile:createDe]
+Fetching nx...
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:02.537Z - Established a connection. Number of open connections: 1
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:02.538Z - Closed a connection. Number of open connections: 0
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:02.542Z - Established a connection. Number of open connections: 1
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:02.542Z - Established a connection. Number of open connections: 2
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:02.543Z - Closed a connection. Number of open connections: 1
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:29:02.543Z - [Messenger] Setting up socket listeners
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:29:02.544Z - [Messenger] listen() complete
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:29:02.950Z - [Messenger] Sending message type: GET_NX_CONSOLE_STATUS
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:29:02.952Z - [Messenger] Message sent
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:02.956Z - Received raw message of length 5691
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:02.957Z - Received json message of type GET_NX_CONSOLE_STATUS
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:02.957Z - Refreshing env var ANTIGRAVITY_SOURCE_METADATA from client connection.
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:02.957Z - Graph recompute necessary due to env variable refresh
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:02.959Z - Serializing response for GET_NX_CONSOLE_STATUS message in json mode
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:02.959Z - Responding to GET_NX_CONSOLE_STATUS message
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:02.959Z - [REQUEST]: Responding to the client. handleGetNxConsoleStatus
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:02.959Z - Done responding to the client handleGetNxConsoleStatus
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:02.959Z - Handled json message GET_NX_CONSOLE_STATUS. Handling time: 0. Response time: 0.
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:29:02.960Z - [Messenger] Received message, length: 22
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:29:03.214Z - [Messenger] Sending message type: REQUEST_PROJECT_GRAPH
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:29:03.215Z - [Messenger] Message sent
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:03.215Z - Received raw message of length 32
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:03.215Z - Received json message of type REQUEST_PROJECT_GRAPH
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:03.216Z - [REQUEST]: Client Request for Project Graph Received
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:03.217Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:03.217Z - [REQUEST]: 
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:03.217Z - [REQUEST]: 
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:03.218Z - No files changed, but no in-memory cached project graph found. Recomputing it...
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:03.218Z - Streaming message to client: progress update for topic graph-construction
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:29:03.219Z - [Messenger] Received message, length: 47
+[plugin-client] restarting worker for "nx/js/dependencies-and-lockfile"
+[isolated-plugin] spawned worker for "nx/js/dependencies-and-lockfile" (pid: 22920, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-3-15586.3156.sock)
+[plugin-client] restarting worker for "nx/core/package-json"
+[isolated-plugin] spawned worker for "nx/core/package-json" (pid: 28340, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-4-15598.2664.sock)
+[plugin-client] restarting worker for "nx/core/project-json"
+[isolated-plugin] spawned worker for "nx/core/project-json" (pid: 17196, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-5-15610.1051.sock)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:03.257Z - Time taken for 'hash changed files from watcher' 0.18549999999959255ms
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 22920) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-3-15586.3156.sock
+[1m[33mTime taken for 'plugin worker 22920 code loading' 925.0201ms[39m[22m
+[plugin-worker] "nx/core/project-json" (pid: 17196) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-5-15610.1051.sock
+[1m[33mTime taken for 'plugin worker 17196 code loading' 913.4051ms[39m[22m
+[isolated-plugin] connected to worker for "nx/core/project-json" (pid: 17196)
+[isolated-plugin] connected to worker for "nx/js/dependencies-and-lockfile" (pid: 22920)
+[plugin-worker] "nx/core/project-json" (pid: 17196) connected
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 22920) connected
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:04.273Z - Time taken for 'start-plugin-worker:nx/js/dependencies-and-lockfile' 1052.652ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:04.273Z - Time taken for 'start-plugin-worker:nx/core/project-json' 1027.9630000000016ms
+[plugin-worker] "nx/core/package-json" (pid: 28340) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-4-15598.2664.sock
+[1m[33mTime taken for 'plugin worker 28340 code loading' 922.0798ms[39m[22m
+[isolated-plugin] connected to worker for "nx/core/package-json" (pid: 28340)
+[plugin-worker] "nx/core/package-json" (pid: 28340) connected
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:04.304Z - Time taken for 'start-plugin-worker:nx/core/package-json' 1071.2392ms
+[plugin-worker] "nx/core/project-json" (pid: 17196) loaded successfully
+[plugin-worker] "nx/core/package-json" (pid: 28340) loaded successfully
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 22920) loaded successfully
+[1m[33mTime taken for 'nx/core/project-json:createNodes' 0.47710000000006403ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/project-json" after createNodes
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.526Z - Streaming message to client: progress update for topic graph-construction
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:29:05.527Z - [Messenger] Received message, length: 153
+[1m[33mTime taken for 'nx/core/package-json:createNodes' 19.111599999999726ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/package-json" after createNodes
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.582Z - Streaming message to client: progress update for topic graph-construction
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:29:05.582Z - [Messenger] Received message, length: 112
+[1m[33mTime taken for 'nx/js/dependencies-and-lockfile:createNodes' 13.22440000000006ms[39m[22m
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.629Z - Streaming message to client: progress update for topic graph-construction
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:29:05.630Z - [Messenger] Received message, length: 47
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.646Z - Streaming message to client: progress update for topic graph-construction
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.649Z - Time taken for 'build-project-configs' 2414.0594999999994ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.649Z - Time taken for 'createNodes:merge' 2.192800000000716ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.650Z - Time taken for 'get-all-workspace-files' 0.25820000000021537ms
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:29:05.658Z - [Messenger] Received message, length: 47
+[1m[33mTime taken for 'build typescript dependencies' 0.39239999999972497ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/js/dependencies-and-lockfile" after createDependencies
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.677Z - Streaming message to client: progress update for topic graph-construction
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:29:05.678Z - [Messenger] Received message, length: 47
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.698Z - Wrote project graph cache to C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\.nx\workspace-data\project-graph.json
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.699Z - Serializing response for REQUEST_PROJECT_GRAPH message in json mode
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.699Z - Responding to REQUEST_PROJECT_GRAPH message
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.699Z - [REQUEST]: Responding to the client. project-graph
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.699Z - Time taken for 'total for creating and serializing project graph' 2483.2775ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.699Z - Time taken for 'total execution time for createProjectGraph()' 50.311100000002625ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.699Z - Time taken for 'createDependencies' 37.464200000002165ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.699Z - Time taken for 'nx/js/dependencies-and-lockfile:createDependencies' 36.88349999999991ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.699Z - Time taken for 'createMetadata' 0.020399999997607665ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.700Z - Time taken for 'serialize graph' 2.5156999999999243ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.700Z - Time taken for 'write cache' 11.944100000000617ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.704Z - Done responding to the client project-graph
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.704Z - Handled json message REQUEST_PROJECT_GRAPH. Handling time: 2484. Response time: 5.
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:29:05.705Z - [Messenger] Received message, length: 408633
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:29:05.711Z - [Messenger] Sending message type: PRE_TASKS_EXECUTION
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:29:05.712Z - [Messenger] Message sent
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.714Z - Received raw message of length 509
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.714Z - Received json message of type PRE_TASKS_EXECUTION
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.717Z - Serializing response for PRE_TASKS_EXECUTION message in json mode
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.717Z - Responding to PRE_TASKS_EXECUTION message
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.717Z - [REQUEST]: Responding to the client. handleRunPreTasksExecution
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.717Z - Time taken for 'preTasksExecution' 2.200300000000425ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.717Z - Done responding to the client handleRunPreTasksExecution
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.717Z - Handled json message PRE_TASKS_EXECUTION. Handling time: 3. Response time: 0.
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:29:05.718Z - [Messenger] Received message, length: 2
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:29:05.813Z - [Messenger] Sending message type: HASH_TASKS
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:29:05.813Z - [Messenger] Message sent
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.814Z - Received raw message of length 38402
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.815Z - Received json message of type HASH_TASKS
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.815Z - Reusing in-memory cached project graph because no files changed.
+DEBUG nx::native::tasks::hash_planner: get_plans_internal COMPLETED in 5.9422ms - processed 5 tasks (setup: 1.6162ms, parallel_planning: 4.2641ms)
+DEBUG nx::native::tasks::hashers::hash_workspace_files: Hashing workspace fileset with inputs: Adding "4121383594453999496" ("nx.json") to hash
+DEBUG nx::native::tasks::hashers::hash_workspace_files: Hashing workspace fileset with inputs: Hash Value: "11519682898367188692"
+DEBUG nx::native::tasks::task_hasher: hash_plans COMPLETED in 18.4922ms - processed 5 plans (setup: 742.2µs, hashing: 17.7427ms, assembly: 9.8108ms)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.865Z - Serializing response for HASH_TASKS message in json mode
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.866Z - Responding to HASH_TASKS message
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.866Z - [REQUEST]: Responding to the client. handleHashTasks
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:29:05.867Z - [Messenger] Received message, length: 158099
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.872Z - Done responding to the client handleHashTasks
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.872Z - Handled json message HASH_TASKS. Handling time: 50. Response time: 7.
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:29:05.886Z - [Messenger] Sending message type: GET_ESTIMATED_TASK_TIMINGS
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:29:05.887Z - [Messenger] Message sent
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.895Z - Received raw message of length 291
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.895Z - Received json message of type GET_ESTIMATED_TASK_TIMINGS
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.901Z - Serializing response for GET_ESTIMATED_TASK_TIMINGS message in json mode
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.901Z - Responding to GET_ESTIMATED_TASK_TIMINGS message
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.901Z - [REQUEST]: Responding to the client. handleGetEstimatedTaskTimings
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.901Z - Done responding to the client handleGetEstimatedTaskTimings
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:05.901Z - Handled json message GET_ESTIMATED_TASK_TIMINGS. Handling time: 6. Response time: 0.
+[NX v22.7.5 Daemon Client] - 2026-07-15T19:29:05.902Z - [Messenger] Received message, length: 2
+DEBUG nx::native::telemetry::service: Sent 1 events: [nx/js/dependencies-and-lockfile:createDe]
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:19.128Z - [LATEST-NX]: Successfully pulled latest Nx to C:\Users\ANGELA~1\AppData\Local\Temp\tmp-25076-774CL2ddV9mx
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:19.130Z - [NX-CONSOLE]: Using local implementation (NX_USE_LOCAL=true or inner call)
+DEBUG nx::native::ide::preferences: Loaded console preferences: NxConsolePreferences { auto_install_console: Some(true), path: "C:\\Users\\Angel Aubrey\\.nx\\ide.json" }
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:19.133Z - [AI-AGENTS]: Failed to compute agent configuration status from latest Nx. Error: Only URLs with a scheme in: file, data, and node are supported by the default ESM loader. On Windows, absolute paths must be valid file:// URLs. Received protocol 'c:'
+DEBUG nx::native::ide::install: Detected editor: VSCode
+DEBUG nx::native::ide::install: Checking if Nx Console extension is installed with: code.cmd --list-extensions
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:19.133Z - [AI-AGENTS]: Agent configuration status computation completed: 0 fully configured, 0 outdated, 0 partially configured, 0 non-configured
+DEBUG nx::native::ide::install: Nx Console extension is installed
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:20.260Z - [NX-CONSOLE]: Console status check completed, shouldPrompt: false
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:22.621Z - [WATCHER]: 0 file(s) created or restored, 0 file(s) modified, 0 file(s) deleted
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:22.732Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:22.732Z - [REQUEST]: 
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:22.732Z - [REQUEST]: 
+[plugin-client] restarting worker for "nx/js/dependencies-and-lockfile"
+[isolated-plugin] spawned worker for "nx/js/dependencies-and-lockfile" (pid: 24936, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-6-35100.9286.sock)
+[plugin-client] restarting worker for "nx/core/package-json"
+[isolated-plugin] spawned worker for "nx/core/package-json" (pid: 26576, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-7-35114.2432.sock)
+[plugin-client] restarting worker for "nx/core/project-json"
+[isolated-plugin] spawned worker for "nx/core/project-json" (pid: 29048, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-8-35126.2343.sock)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:22.775Z - Time taken for 'hash changed files from watcher' 0.24569999999948777ms
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 24936) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-6-35100.9286.sock
+[isolated-plugin] connected to worker for "nx/js/dependencies-and-lockfile" (pid: 24936)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:23.796Z - Time taken for 'start-plugin-worker:nx/js/dependencies-and-lockfile' 1061.6429999999964ms
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 24936) connected
+[1m[33mTime taken for 'plugin worker 24936 code loading' 939.0355ms[39m[22m
+[plugin-worker] "nx/core/project-json" (pid: 29048) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-8-35126.2343.sock
+[1m[33mTime taken for 'plugin worker 29048 code loading' 927.8509999999999ms[39m[22m
+[isolated-plugin] connected to worker for "nx/core/project-json" (pid: 29048)
+[isolated-plugin] connected to worker for "nx/core/package-json" (pid: 26576)
+[plugin-worker] "nx/core/package-json" (pid: 26576) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-7-35114.2432.sock
+[plugin-worker] "nx/core/project-json" (pid: 29048) connected
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:23.810Z - Time taken for 'start-plugin-worker:nx/core/package-json' 1062.1794999999984ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:23.811Z - Time taken for 'start-plugin-worker:nx/core/project-json' 1049.5282000000007ms
+[plugin-worker] "nx/core/package-json" (pid: 26576) connected
+[1m[33mTime taken for 'plugin worker 26576 code loading' 943.965ms[39m[22m
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:24.100Z - [WATCHER]: 0 file(s) created or restored, 0 file(s) modified, 0 file(s) deleted
+[plugin-worker] "nx/core/project-json" (pid: 29048) loaded successfully
+[plugin-worker] "nx/core/package-json" (pid: 26576) loaded successfully
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 24936) loaded successfully
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:24.302Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:24.303Z - [REQUEST]: 
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:24.303Z - [REQUEST]: 
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:24.310Z - Time taken for 'hash changed files from watcher' 0.3022999999957392ms
+[1m[33mTime taken for 'nx/core/project-json:createNodes' 0.2992999999996755ms[39m[22m
+[1m[33mTime taken for 'nx/core/project-json:createNodes' 0.8823999999999614ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/project-json" after createNodes
+[1m[33mTime taken for 'nx/core/package-json:createNodes' 14.460199999999986ms[39m[22m
+[1m[33mTime taken for 'nx/core/package-json:createNodes' 14.663299999999708ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/package-json" after createNodes
+[1m[33mTime taken for 'nx/js/dependencies-and-lockfile:createNodes' 12.492400000000089ms[39m[22m
+[1m[33mTime taken for 'nx/js/dependencies-and-lockfile:createNodes' 12.734100000000126ms[39m[22m
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:25.176Z - Time taken for 'build-project-configs' 853.3854999999967ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:25.176Z - Time taken for 'build-project-configs' 855.0281999999934ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:25.176Z - Time taken for 'createNodes:merge' 2.308599999996659ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:25.176Z - Time taken for 'createNodes:merge' 1.5640999999959604ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:25.177Z - Time taken for 'get-all-workspace-files' 0.20080000000598375ms
+[1m[33mTime taken for 'build typescript dependencies' 0.2960000000002765ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/js/dependencies-and-lockfile" after createDependencies
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:25.200Z - [SYNC]: collect registered sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:25.201Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:25.201Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:25.201Z - [SYNC]: collect registered sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:25.202Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:25.202Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:25.203Z - Time taken for 'total execution time for createProjectGraph()' 32.42210000000341ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:25.203Z - Time taken for 'createDependencies' 22.00669999999809ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:25.203Z - Time taken for 'nx/js/dependencies-and-lockfile:createDependencies' 21.841699999997218ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:25.203Z - Time taken for 'createMetadata' 0.02530000000115251ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:29:25.203Z - Time taken for 'serialize graph' 3.1592000000018743ms
+DEBUG nx::native::telemetry::service: Sent 1 events: [nx/js/dependencies-and-lockfile:createDe]
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:00.109Z - Closed a connection. Number of open connections: 0
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:34.423Z - [WATCHER]: apps/fs-gateway/dist was deleted
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:34.423Z - [WATCHER]: File changes detected:
+Created:
+(none)
+Updated:
+(none)
+Deleted:
+  - apps/fs-gateway/dist
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:34.424Z - [SYNC]: clearing sync generators cache due to file changes
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:34.424Z - [WATCHER]: Processing file changes in outputs
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:34.515Z - [WATCHER]: 0 file(s) created or restored, 0 file(s) modified, 0 file(s) deleted
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:34.826Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:34.827Z - [REQUEST]: 
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:34.827Z - [REQUEST]: apps/fs-gateway/dist
+[plugin-client] restarting worker for "nx/js/dependencies-and-lockfile"
+[isolated-plugin] spawned worker for "nx/js/dependencies-and-lockfile" (pid: 26340, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-9-107197.6881.sock)
+[plugin-client] restarting worker for "nx/core/package-json"
+[isolated-plugin] spawned worker for "nx/core/package-json" (pid: 27468, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-10-107214.647.sock)
+[plugin-client] restarting worker for "nx/core/project-json"
+[isolated-plugin] spawned worker for "nx/core/project-json" (pid: 23308, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-11-107228.615.sock)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:34.876Z - Time taken for 'hash changed files from watcher' 0.4918000000034226ms
+[isolated-plugin] connected to worker for "nx/js/dependencies-and-lockfile" (pid: 26340)
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 26340) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-9-107197.6881.sock
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 26340) connected
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:36.512Z - Time taken for 'start-plugin-worker:nx/js/dependencies-and-lockfile' 1680.4804999999906ms
+[plugin-worker] "nx/core/project-json" (pid: 23308) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-11-107228.615.sock
+[1m[33mTime taken for 'plugin worker 23308 code loading' 1475.0191ms[39m[22m
+[1m[33mTime taken for 'plugin worker 26340 code loading' 1533.6261000000002ms[39m[22m
+[isolated-plugin] connected to worker for "nx/core/project-json" (pid: 23308)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:36.525Z - Time taken for 'start-plugin-worker:nx/core/project-json' 1662.4446000000025ms
+[plugin-worker] "nx/core/project-json" (pid: 23308) connected
+[plugin-worker] "nx/core/package-json" (pid: 27468) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-10-107214.647.sock
+[1m[33mTime taken for 'plugin worker 27468 code loading' 1631.104ms[39m[22m
+[isolated-plugin] connected to worker for "nx/core/package-json" (pid: 27468)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:36.625Z - Time taken for 'start-plugin-worker:nx/core/package-json' 1776.2209000000003ms
+[plugin-worker] "nx/core/package-json" (pid: 27468) connected
+[plugin-worker] "nx/core/project-json" (pid: 23308) loaded successfully
+[plugin-worker] "nx/core/package-json" (pid: 27468) loaded successfully
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 26340) loaded successfully
+[1m[33mTime taken for 'nx/core/project-json:createNodes' 0.5223999999998341ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/project-json" after createNodes
+[1m[33mTime taken for 'nx/core/package-json:createNodes' 29.75420000000031ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/package-json" after createNodes
+[1m[33mTime taken for 'nx/js/dependencies-and-lockfile:createNodes' 15.318499999999403ms[39m[22m
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:39.187Z - Time taken for 'build-project-configs' 4343.040399999998ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:39.187Z - Time taken for 'createNodes:merge' 2.211200000005192ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:39.187Z - Time taken for 'get-all-workspace-files' 0.3922000000020489ms
+[1m[33mTime taken for 'build typescript dependencies' 0.711699999999837ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/js/dependencies-and-lockfile" after createDependencies
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:39.225Z - [SYNC]: collect registered sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:39.226Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:39.226Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:39.227Z - Time taken for 'total execution time for createProjectGraph()' 46.79640000000654ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:39.227Z - Time taken for 'createDependencies' 36.48729999999341ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:39.227Z - Time taken for 'nx/js/dependencies-and-lockfile:createDependencies' 36.15320000000065ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:39.227Z - Time taken for 'createMetadata' 0.046699999991687946ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:39.227Z - Time taken for 'serialize graph' 3.1647999999986496ms
+DEBUG nx::native::telemetry::service: Sent 1 events: [nx/js/dependencies-and-lockfile:createDe]
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:42.460Z - [WATCHER]: 0 file(s) created or restored, 0 file(s) modified, 0 file(s) deleted
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:43.268Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:43.268Z - [REQUEST]: 
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:43.268Z - [REQUEST]: 
+[plugin-client] restarting worker for "nx/js/dependencies-and-lockfile"
+[isolated-plugin] spawned worker for "nx/js/dependencies-and-lockfile" (pid: 10136, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-12-115636.0115.sock)
+[plugin-client] restarting worker for "nx/core/package-json"
+[isolated-plugin] spawned worker for "nx/core/package-json" (pid: 30008, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-13-115647.9973.sock)
+[plugin-client] restarting worker for "nx/core/project-json"
+[isolated-plugin] spawned worker for "nx/core/project-json" (pid: 16304, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-14-115660.4932.sock)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:43.305Z - Time taken for 'hash changed files from watcher' 0.25190000000293367ms
+[isolated-plugin] connected to worker for "nx/js/dependencies-and-lockfile" (pid: 10136)
+[isolated-plugin] connected to worker for "nx/core/package-json" (pid: 30008)
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 10136) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-12-115636.0115.sock
+[1m[33mTime taken for 'plugin worker 10136 code loading' 1001.8765000000001ms[39m[22m
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 10136) connected
+[plugin-worker] "nx/core/package-json" (pid: 30008) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-13-115647.9973.sock
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:44.395Z - Time taken for 'start-plugin-worker:nx/js/dependencies-and-lockfile' 1123.9340999999986ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:44.396Z - Time taken for 'start-plugin-worker:nx/core/package-json' 1113.0529999999999ms
+[plugin-worker] "nx/core/package-json" (pid: 30008) connected
+[1m[33mTime taken for 'plugin worker 30008 code loading' 996.6036999999999ms[39m[22m
+[plugin-worker] "nx/core/project-json" (pid: 16304) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-14-115660.4932.sock
+[isolated-plugin] connected to worker for "nx/core/project-json" (pid: 16304)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:44.464Z - Time taken for 'start-plugin-worker:nx/core/project-json' 1169.7666000000027ms
+[1m[33mTime taken for 'plugin worker 16304 code loading' 1042.6966ms[39m[22m
+[plugin-worker] "nx/core/project-json" (pid: 16304) connected
+[plugin-worker] "nx/core/package-json" (pid: 30008) loaded successfully
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 10136) loaded successfully
+[plugin-worker] "nx/core/project-json" (pid: 16304) loaded successfully
+[1m[33mTime taken for 'nx/core/package-json:createNodes' 18.55919999999969ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/package-json" after createNodes
+[1m[33mTime taken for 'nx/js/dependencies-and-lockfile:createNodes' 12.187199999999848ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/project-json" after createNodes
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:45.671Z - Time taken for 'build-project-configs' 2395.6342000000004ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:45.671Z - Time taken for 'createNodes:merge' 1.7396000000007916ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:45.671Z - Time taken for 'get-all-workspace-files' 0.18740000000980217ms
+[1m[33mTime taken for 'build typescript dependencies' 0.5543999999999869ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/js/dependencies-and-lockfile" after createDependencies
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:45.696Z - [SYNC]: collect registered sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:45.696Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:45.697Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:45.697Z - Time taken for 'total execution time for createProjectGraph()' 28.022600000011153ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:45.697Z - Time taken for 'createDependencies' 22.98300000000745ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:45.697Z - Time taken for 'nx/js/dependencies-and-lockfile:createDependencies' 22.72280000000319ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:45.697Z - Time taken for 'createMetadata' 0.044800000003306195ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:30:45.697Z - Time taken for 'serialize graph' 2.023400000005495ms
+DEBUG nx::native::telemetry::service: Sent 1 events: [nx/js/dependencies-and-lockfile:createDe]
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:30.923Z - [WATCHER]: apps/fs-gateway/dist was deleted
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:30.924Z - [WATCHER]: File changes detected:
+Created:
+(none)
+Updated:
+(none)
+Deleted:
+  - apps/fs-gateway/dist
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:30.924Z - [SYNC]: clearing sync generators cache due to file changes
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:30.924Z - [WATCHER]: Processing file changes in outputs
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:32.533Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:32.534Z - [REQUEST]: 
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:32.534Z - [REQUEST]: apps/fs-gateway/dist
+[plugin-client] restarting worker for "nx/js/dependencies-and-lockfile"
+[isolated-plugin] spawned worker for "nx/js/dependencies-and-lockfile" (pid: 27252, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-15-764912.401.sock)
+[plugin-client] restarting worker for "nx/core/package-json"
+[isolated-plugin] spawned worker for "nx/core/package-json" (pid: 30232, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-16-764938.3109.sock)
+[plugin-client] restarting worker for "nx/core/project-json"
+[isolated-plugin] spawned worker for "nx/core/project-json" (pid: 23672, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-17-764954.6133.sock)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:32.603Z - Time taken for 'hash changed files from watcher' 0.7628000000258908ms
+[plugin-worker] "nx/core/package-json" (pid: 30232) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-16-764938.3109.sock
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 27252) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-15-764912.401.sock
+[isolated-plugin] connected to worker for "nx/core/project-json" (pid: 23672)
+[isolated-plugin] connected to worker for "nx/js/dependencies-and-lockfile" (pid: 27252)
+[isolated-plugin] connected to worker for "nx/core/package-json" (pid: 30232)
+[plugin-worker] "nx/core/project-json" (pid: 23672) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-17-764954.6133.sock
+[1m[33mTime taken for 'plugin worker 23672 code loading' 1194.2777999999998ms[39m[22m
+[plugin-worker] "nx/core/project-json" (pid: 23672) connected
+[1m[33mTime taken for 'plugin worker 27252 code loading' 1215.9236ms[39m[22m
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 27252) connected
+[1m[33mTime taken for 'plugin worker 30232 code loading' 1202.2335ms[39m[22m
+[plugin-worker] "nx/core/package-json" (pid: 30232) connected
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:33.884Z - Time taken for 'start-plugin-worker:nx/js/dependencies-and-lockfile' 1337.560999999987ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:33.885Z - Time taken for 'start-plugin-worker:nx/core/package-json' 1312.2917000000598ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:33.885Z - Time taken for 'start-plugin-worker:nx/core/project-json' 1294.516500000027ms
+[plugin-worker] "nx/core/project-json" (pid: 23672) loaded successfully
+[plugin-worker] "nx/core/package-json" (pid: 30232) loaded successfully
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 27252) loaded successfully
+[1m[33mTime taken for 'nx/core/project-json:createNodes' 0.33029999999962456ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/project-json" after createNodes
+[1m[33mTime taken for 'nx/core/package-json:createNodes' 18.58179999999993ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/package-json" after createNodes
+[1m[33mTime taken for 'nx/js/dependencies-and-lockfile:createNodes' 15.312700000000405ms[39m[22m
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:35.321Z - Time taken for 'build-project-configs' 2768.267200000002ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:35.322Z - Time taken for 'createNodes:merge' 1.8555999998934567ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:35.322Z - Time taken for 'get-all-workspace-files' 0.2153999999864027ms
+[1m[33mTime taken for 'build typescript dependencies' 0.26099999999996726ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/js/dependencies-and-lockfile" after createDependencies
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:35.347Z - [SYNC]: collect registered sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:35.348Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:35.348Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:35.348Z - Time taken for 'total execution time for createProjectGraph()' 29.10840000002645ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:35.349Z - Time taken for 'createDependencies' 22.253500000108033ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:35.349Z - Time taken for 'nx/js/dependencies-and-lockfile:createDependencies' 21.95389999996405ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:35.349Z - Time taken for 'createMetadata' 0.023200000054202974ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:35.349Z - Time taken for 'serialize graph' 3.1208999999798834ms
+DEBUG nx::native::telemetry::service: Sent 1 events: [nx/js/dependencies-and-lockfile:createDe]
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:36.844Z - [WATCHER]: 0 file(s) created or restored, 0 file(s) modified, 0 file(s) deleted
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:40.050Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:40.050Z - [REQUEST]: 
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:40.050Z - [REQUEST]: 
+[plugin-client] restarting worker for "nx/js/dependencies-and-lockfile"
+[isolated-plugin] spawned worker for "nx/js/dependencies-and-lockfile" (pid: 17920, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-18-772419.0905.sock)
+[plugin-client] restarting worker for "nx/core/package-json"
+[isolated-plugin] spawned worker for "nx/core/package-json" (pid: 24072, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-19-772430.0646.sock)
+[plugin-client] restarting worker for "nx/core/project-json"
+[isolated-plugin] spawned worker for "nx/core/project-json" (pid: 5084, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-20-772439.6878.sock)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:40.084Z - Time taken for 'hash changed files from watcher' 0.2169999999459833ms
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 17920) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-18-772419.0905.sock
+[isolated-plugin] connected to worker for "nx/js/dependencies-and-lockfile" (pid: 17920)
+[1m[33mTime taken for 'plugin worker 17920 code loading' 999.6945000000001ms[39m[22m
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 17920) connected
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:41.151Z - Time taken for 'start-plugin-worker:nx/js/dependencies-and-lockfile' 1097.7616999999154ms
+[plugin-worker] "nx/core/package-json" (pid: 24072) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-19-772430.0646.sock
+[1m[33mTime taken for 'plugin worker 24072 code loading' 996.8841ms[39m[22m
+[plugin-worker] "nx/core/project-json" (pid: 5084) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-20-772439.6878.sock
+[isolated-plugin] connected to worker for "nx/core/project-json" (pid: 5084)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:41.160Z - Time taken for 'start-plugin-worker:nx/core/project-json' 1086.8377999999793ms
+[isolated-plugin] connected to worker for "nx/core/package-json" (pid: 24072)
+[plugin-worker] "nx/core/project-json" (pid: 5084) connected
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:41.162Z - Time taken for 'start-plugin-worker:nx/core/package-json' 1097.8701000000583ms
+[plugin-worker] "nx/core/package-json" (pid: 24072) connected
+[1m[33mTime taken for 'plugin worker 5084 code loading' 989.4562ms[39m[22m
+[plugin-worker] "nx/core/project-json" (pid: 5084) loaded successfully
+[plugin-worker] "nx/core/package-json" (pid: 24072) loaded successfully
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 17920) loaded successfully
+[1m[33mTime taken for 'nx/core/project-json:createNodes' 0.43129999999973734ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/project-json" after createNodes
+[1m[33mTime taken for 'nx/core/package-json:createNodes' 24.04390000000012ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/package-json" after createNodes
+[1m[33mTime taken for 'nx/js/dependencies-and-lockfile:createNodes' 11.423399999999674ms[39m[22m
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:42.526Z - Time taken for 'build-project-configs' 2467.4154000000563ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:42.526Z - Time taken for 'createNodes:merge' 1.1152000000001863ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:42.526Z - Time taken for 'get-all-workspace-files' 0.16899999999441206ms
+[1m[33mTime taken for 'build typescript dependencies' 0.27309999999988577ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/js/dependencies-and-lockfile" after createDependencies
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:42.552Z - [SYNC]: collect registered sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:42.552Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:42.552Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:42.553Z - Time taken for 'total execution time for createProjectGraph()' 29.18619999999646ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:42.553Z - Time taken for 'createDependencies' 24.697599999955855ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:42.553Z - Time taken for 'nx/js/dependencies-and-lockfile:createDependencies' 24.516200000070967ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:42.553Z - Time taken for 'createMetadata' 0.01959999999962747ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:41:42.553Z - Time taken for 'serialize graph' 2.478000000002794ms
+DEBUG nx::native::telemetry::service: Sent 1 events: [nx/js/dependencies-and-lockfile:createDe]
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:43:13.176Z - [WATCHER]: Processing file changes in outputs
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:43:13.176Z - [WATCHER]: package-lock.json was modified
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:43:13.182Z - [WATCHER]: File changes detected:
+Created:
+(none)
+Updated:
+  - package-lock.json
+Deleted:
+(none)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:43:13.182Z - [SYNC]: clearing sync generators cache due to file changes
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:43:19.600Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:43:19.600Z - [REQUEST]: package-lock.json
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:43:19.600Z - [REQUEST]: 
+[plugin-client] restarting worker for "nx/js/dependencies-and-lockfile"
+[isolated-plugin] spawned worker for "nx/js/dependencies-and-lockfile" (pid: 29376, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-21-871970.7226.sock)
+[plugin-client] restarting worker for "nx/core/package-json"
+[isolated-plugin] spawned worker for "nx/core/package-json" (pid: 19208, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-22-871990.3637.sock)
+[plugin-client] restarting worker for "nx/core/project-json"
+[isolated-plugin] spawned worker for "nx/core/project-json" (pid: 13448, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-23-872004.7337.sock)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:43:19.654Z - Time taken for 'hash changed files from watcher' 13.503900000010617ms
+[isolated-plugin] connected to worker for "nx/core/package-json" (pid: 19208)
+[isolated-plugin] connected to worker for "nx/js/dependencies-and-lockfile" (pid: 29376)
+[plugin-worker] "nx/core/package-json" (pid: 19208) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-22-871990.3637.sock
+[1m[33mTime taken for 'plugin worker 19208 code loading' 998.9560000000001ms[39m[22m
+[plugin-worker] "nx/core/package-json" (pid: 19208) connected
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 29376) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-21-871970.7226.sock
+[1m[33mTime taken for 'plugin worker 29376 code loading' 1005.7338000000001ms[39m[22m
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:43:20.742Z - Time taken for 'start-plugin-worker:nx/js/dependencies-and-lockfile' 1137.0642000000225ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:43:20.742Z - Time taken for 'start-plugin-worker:nx/core/package-json' 1116.2399999999907ms
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 29376) connected
+[plugin-worker] "nx/core/project-json" (pid: 13448) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-23-872004.7337.sock
+[isolated-plugin] connected to worker for "nx/core/project-json" (pid: 13448)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:43:20.755Z - Time taken for 'start-plugin-worker:nx/core/project-json' 1117.2228999999352ms
+[plugin-worker] "nx/core/project-json" (pid: 13448) connected
+[1m[33mTime taken for 'plugin worker 13448 code loading' 1006.4387ms[39m[22m
+[plugin-worker] "nx/core/project-json" (pid: 13448) loaded successfully
+[plugin-worker] "nx/core/package-json" (pid: 19208) loaded successfully
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 29376) loaded successfully
+[isolated-plugin] shutting down worker for "nx/core/project-json" after createNodes
+[1m[33mTime taken for 'nx/core/package-json:createNodes' 20.541799999999967ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/package-json" after createNodes
+[1m[33mTime taken for 'nx/js/dependencies-and-lockfile:createNodes' 14.302000000000135ms[39m[22m
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:43:22.035Z - Time taken for 'build-project-configs' 2420.3778000000166ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:43:22.035Z - Time taken for 'createNodes:merge' 2.357899999944493ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:43:22.035Z - Time taken for 'get-all-workspace-files' 0.3312000000150874ms
+[1m[33mTime taken for 'build typescript dependencies' 0.2622000000001208ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/js/dependencies-and-lockfile" after createDependencies
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:43:22.070Z - [SYNC]: collect registered sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:43:22.071Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:43:22.071Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:43:22.071Z - Time taken for 'total execution time for createProjectGraph()' 43.08129999996163ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:43:22.071Z - Time taken for 'createDependencies' 34.509399999980815ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:43:22.071Z - Time taken for 'nx/js/dependencies-and-lockfile:createDependencies' 34.29060000006575ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:43:22.071Z - Time taken for 'createMetadata' 0.015499999979510903ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:43:22.071Z - Time taken for 'serialize graph' 2.3519999999552965ms
+DEBUG nx::native::telemetry::service: Sent 1 events: [nx/js/dependencies-and-lockfile:createDe]
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:44:50.319Z - [WATCHER]: apps/fs-gateway/dist was deleted
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:44:50.319Z - [WATCHER]: File changes detected:
+Created:
+(none)
+Updated:
+(none)
+Deleted:
+  - apps/fs-gateway/dist
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:44:50.319Z - [SYNC]: clearing sync generators cache due to file changes
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:44:50.319Z - [WATCHER]: Processing file changes in outputs
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:44:56.732Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:44:56.733Z - [REQUEST]: 
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:44:56.733Z - [REQUEST]: apps/fs-gateway/dist
+[plugin-client] restarting worker for "nx/js/dependencies-and-lockfile"
+[isolated-plugin] spawned worker for "nx/js/dependencies-and-lockfile" (pid: 23228, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-24-969101.1539.sock)
+[plugin-client] restarting worker for "nx/core/package-json"
+[isolated-plugin] spawned worker for "nx/core/package-json" (pid: 3928, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-25-969111.6699.sock)
+[plugin-client] restarting worker for "nx/core/project-json"
+[isolated-plugin] spawned worker for "nx/core/project-json" (pid: 29436, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-26-969121.8284.sock)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:44:56.772Z - Time taken for 'hash changed files from watcher' 0.3362999999662861ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:44:57.716Z - [WATCHER]: 0 file(s) created or restored, 0 file(s) modified, 0 file(s) deleted
+[plugin-worker] "nx/core/package-json" (pid: 3928) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-25-969111.6699.sock
+[1m[33mTime taken for 'plugin worker 3928 code loading' 926.6578ms[39m[22m
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 23228) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-24-969101.1539.sock
+[isolated-plugin] connected to worker for "nx/core/project-json" (pid: 29436)
+[isolated-plugin] connected to worker for "nx/js/dependencies-and-lockfile" (pid: 23228)
+[isolated-plugin] connected to worker for "nx/core/package-json" (pid: 3928)
+[1m[33mTime taken for 'plugin worker 23228 code loading' 925.2101ms[39m[22m
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 23228) connected
+[plugin-worker] "nx/core/project-json" (pid: 29436) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-26-969121.8284.sock
+[1m[33mTime taken for 'plugin worker 29436 code loading' 914.0156ms[39m[22m
+[plugin-worker] "nx/core/package-json" (pid: 3928) connected
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:44:57.791Z - Time taken for 'start-plugin-worker:nx/js/dependencies-and-lockfile' 1054.8460000000196ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:44:57.791Z - Time taken for 'start-plugin-worker:nx/core/package-json' 1044.965599999996ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:44:57.791Z - Time taken for 'start-plugin-worker:nx/core/project-json' 1033.3900999999605ms
+[plugin-worker] "nx/core/project-json" (pid: 29436) connected
+[plugin-worker] "nx/core/project-json" (pid: 29436) loaded successfully
+[plugin-worker] "nx/core/package-json" (pid: 3928) loaded successfully
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 23228) loaded successfully
+[isolated-plugin] shutting down worker for "nx/core/project-json" after createNodes
+[1m[33mTime taken for 'nx/core/package-json:createNodes' 31.979499999999916ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/package-json" after createNodes
+[1m[33mTime taken for 'nx/js/dependencies-and-lockfile:createNodes' 12.572299999999814ms[39m[22m
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:44:59.503Z - Time taken for 'build-project-configs' 2759.308799999999ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:44:59.503Z - Time taken for 'createNodes:merge' 1.231800000066869ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:44:59.503Z - Time taken for 'get-all-workspace-files' 0.19040000007953495ms
+[1m[33mTime taken for 'build typescript dependencies' 0.39589999999998327ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/js/dependencies-and-lockfile" after createDependencies
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:44:59.533Z - [SYNC]: collect registered sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:44:59.534Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:44:59.534Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:44:59.535Z - Time taken for 'total execution time for createProjectGraph()' 36.056400000001304ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:44:59.535Z - Time taken for 'createDependencies' 28.331000000005588ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:44:59.535Z - Time taken for 'nx/js/dependencies-and-lockfile:createDependencies' 28.12639999995008ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:44:59.535Z - Time taken for 'createMetadata' 0.029300000052899122ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:44:59.535Z - Time taken for 'serialize graph' 3.2643000000389293ms
+DEBUG nx::native::telemetry::service: Sent 1 events: [nx/js/dependencies-and-lockfile:createDe]
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:45:04.127Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:45:04.127Z - [REQUEST]: 
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:45:04.127Z - [REQUEST]: 
+[plugin-client] restarting worker for "nx/js/dependencies-and-lockfile"
+[isolated-plugin] spawned worker for "nx/js/dependencies-and-lockfile" (pid: 32692, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-27-976495.3805.sock)
+[plugin-client] restarting worker for "nx/core/package-json"
+[isolated-plugin] spawned worker for "nx/core/package-json" (pid: 32700, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-28-976508.2819.sock)
+[plugin-client] restarting worker for "nx/core/project-json"
+[isolated-plugin] spawned worker for "nx/core/project-json" (pid: 32732, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-29-976521.8831.sock)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:45:04.168Z - Time taken for 'hash changed files from watcher' 0.22829999995883554ms
+[plugin-worker] "nx/core/package-json" (pid: 32700) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-28-976508.2819.sock
+[1m[33mTime taken for 'plugin worker 32700 code loading' 954.0324ms[39m[22m
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 32692) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-27-976495.3805.sock
+[1m[33mTime taken for 'plugin worker 32692 code loading' 972.2561000000001ms[39m[22m
+[plugin-worker] "nx/core/project-json" (pid: 32732) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-29-976521.8831.sock
+[1m[33mTime taken for 'plugin worker 32732 code loading' 957.4186ms[39m[22m
+[isolated-plugin] connected to worker for "nx/core/project-json" (pid: 32732)
+[isolated-plugin] connected to worker for "nx/js/dependencies-and-lockfile" (pid: 32692)
+[isolated-plugin] connected to worker for "nx/core/package-json" (pid: 32700)
+[plugin-worker] "nx/core/project-json" (pid: 32732) connected
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 32692) connected
+[plugin-worker] "nx/core/package-json" (pid: 32700) connected
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:45:05.223Z - Time taken for 'start-plugin-worker:nx/js/dependencies-and-lockfile' 1093.2959000000264ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:45:05.223Z - Time taken for 'start-plugin-worker:nx/core/package-json' 1081.1774999999907ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:45:05.223Z - Time taken for 'start-plugin-worker:nx/core/project-json' 1066.3040000000037ms
+[plugin-worker] "nx/core/package-json" (pid: 32700) loaded successfully
+[plugin-worker] "nx/core/project-json" (pid: 32732) loaded successfully
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 32692) loaded successfully
+[1m[33mTime taken for 'nx/core/project-json:createNodes' 0.5879999999997381ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/project-json" after createNodes
+[1m[33mTime taken for 'nx/core/package-json:createNodes' 27.23739999999998ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/package-json" after createNodes
+[1m[33mTime taken for 'nx/js/dependencies-and-lockfile:createNodes' 16.762500000000273ms[39m[22m
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:45:06.724Z - Time taken for 'build-project-configs' 2582.610500000068ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:45:06.724Z - Time taken for 'createNodes:merge' 1.4549000000115484ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:45:06.724Z - Time taken for 'get-all-workspace-files' 0.2842999999411404ms
+[1m[33mTime taken for 'build typescript dependencies' 0.24400000000014188ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/js/dependencies-and-lockfile" after createDependencies
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:45:06.746Z - [SYNC]: collect registered sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:45:06.747Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:45:06.747Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:45:06.747Z - Time taken for 'total execution time for createProjectGraph()' 31.84030000003986ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:45:06.747Z - Time taken for 'createDependencies' 21.911599999992177ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:45:06.747Z - Time taken for 'nx/js/dependencies-and-lockfile:createDependencies' 21.723699999973178ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:45:06.747Z - Time taken for 'createMetadata' 0.02410000003874302ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:45:06.747Z - Time taken for 'serialize graph' 2.0553000000072643ms
+DEBUG nx::native::telemetry::service: Sent 1 events: [nx/js/dependencies-and-lockfile:createDe]
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:47:34.574Z - [WATCHER]: 0 file(s) created or restored, 6 file(s) modified, 0 file(s) deleted
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:47:34.575Z - [WATCHER]: File changes detected:
+Created:
+(none)
+Updated:
+  - apps/expense-budget-svc/package.json
+  - apps/dues-collection-svc/package.json
+  - apps/ledger-accounts-svc/package.json
+  - package.json
+  - apps/disbursement-svc/package.json
+  - apps/fs-gateway/package.json
+Deleted:
+(none)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:47:34.576Z - [SYNC]: clearing sync generators cache due to file changes
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:47:34.576Z - [WATCHER]: Processing file changes in outputs
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:47:41.001Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:47:41.001Z - [REQUEST]: apps/expense-budget-svc/package.json,apps/dues-collection-svc/package.json,apps/ledger-accounts-svc/package.json,package.json,apps/disbursement-svc/package.json,apps/fs-gateway/package.json
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:47:41.001Z - [REQUEST]: 
+[plugin-client] restarting worker for "nx/js/dependencies-and-lockfile"
+[isolated-plugin] spawned worker for "nx/js/dependencies-and-lockfile" (pid: 29564, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-30-1133369.2515.sock)
+[plugin-client] restarting worker for "nx/core/package-json"
+[isolated-plugin] spawned worker for "nx/core/package-json" (pid: 24432, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-31-1133382.1413.sock)
+[plugin-client] restarting worker for "nx/core/project-json"
+[isolated-plugin] spawned worker for "nx/core/project-json" (pid: 10540, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-32-1133395.9675.sock)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:47:41.043Z - Time taken for 'hash changed files from watcher' 13.205900000175461ms
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 29564) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-30-1133369.2515.sock
+[isolated-plugin] connected to worker for "nx/js/dependencies-and-lockfile" (pid: 29564)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:47:42.026Z - Time taken for 'start-plugin-worker:nx/js/dependencies-and-lockfile' 1022.435599999968ms
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 29564) connected
+[1m[33mTime taken for 'plugin worker 29564 code loading' 901.479ms[39m[22m
+[plugin-worker] "nx/core/package-json" (pid: 24432) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-31-1133382.1413.sock
+[1m[33mTime taken for 'plugin worker 24432 code loading' 894.4443ms[39m[22m
+[isolated-plugin] connected to worker for "nx/core/package-json" (pid: 24432)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:47:42.038Z - Time taken for 'start-plugin-worker:nx/core/package-json' 1021.6363999999594ms
+[plugin-worker] "nx/core/package-json" (pid: 24432) connected
+[isolated-plugin] connected to worker for "nx/core/project-json" (pid: 10540)
+[plugin-worker] "nx/core/project-json" (pid: 10540) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin25076-32-1133395.9675.sock
+[plugin-worker] "nx/core/project-json" (pid: 10540) connected
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:47:42.061Z - Time taken for 'start-plugin-worker:nx/core/project-json' 1030.7724999999627ms
+[1m[33mTime taken for 'plugin worker 10540 code loading' 903.9812000000001ms[39m[22m
+[plugin-worker] "nx/core/package-json" (pid: 24432) loaded successfully
+[plugin-worker] "nx/core/project-json" (pid: 10540) loaded successfully
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 29564) loaded successfully
+[1m[33mTime taken for 'nx/core/project-json:createNodes' 0.32669999999961874ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/project-json" after createNodes
+[1m[33mTime taken for 'nx/core/package-json:createNodes' 20.321100000000115ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/package-json" after createNodes
+[1m[33mTime taken for 'nx/js/dependencies-and-lockfile:createNodes' 11.823499999999967ms[39m[22m
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:47:43.397Z - Time taken for 'build-project-configs' 2385.035799999954ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:47:43.397Z - Time taken for 'createNodes:merge' 2.2651999997906387ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:47:43.397Z - Time taken for 'native-file-deps' 0.023099999874830246ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:47:43.397Z - Time taken for 'get-workspace-files' 0.9930000000167638ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:47:43.397Z - Time taken for 'get-all-workspace-files' 0.2824999999720603ms
+[1m[33mTime taken for 'build typescript dependencies' 63.32330000000002ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/js/dependencies-and-lockfile" after createDependencies
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:47:43.482Z - [SYNC]: collect registered sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:47:43.482Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:47:43.483Z - Time taken for 'total execution time for createProjectGraph()' 90.57260000007227ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:47:43.483Z - Time taken for 'createDependencies' 83.6207000000868ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:47:43.483Z - Time taken for 'nx/js/dependencies-and-lockfile:createDependencies' 83.44699999992736ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:47:43.483Z - Time taken for 'createMetadata' 0.01069999998435378ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:47:43.483Z - Time taken for 'serialize graph' 2.0752000000793487ms
+DEBUG nx::native::telemetry::service: Sent 1 events: [nx/js/dependencies-and-lockfile:createDe]
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:44.901Z - [Server] lock file hash changed! old=1003392342260469197, new=10143056223373694518
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:44.901Z - [Server] Daemon outdated: LOCK_FILES_CHANGED
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:44.901Z - [Server] Restarting daemon...
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:44.921Z - Restarting daemon with script: C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\daemon\server\start.js
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:44.921Z - Old daemon __dirname: C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\daemon\server
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:44.921Z - Current process.execPath: C:\Program Files\nodejs\node.exe
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:44.934Z - Started new daemon process in background
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:44.935Z - [WATCHER]: Stopping the watcher for C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend (sources)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:44.935Z - [WATCHER]: Stopping the watcher for C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend (outputs)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:44.936Z - [LATEST-NX]: Cleaning up latest Nx installation from C:\Users\ANGELA~1\AppData\Local\Temp\tmp-25076-774CL2ddV9mx
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:44.941Z - Server stopped because: "this process is no longer the current daemon (native)"
+Failed to flush telemetry: Telemetry channel closed
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:46.484Z - Time taken for 'workspace context init' 2.0750000000000455ms
+DEBUG nx::native::telemetry: Telemetry service initialized successfully
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:47.211Z - New daemon starting from: C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\daemon\server\server.js
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:47.212Z - New daemon __dirname: C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\daemon\server
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:47.212Z - New daemon nxVersion: 22.7.5
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:47.213Z - New daemon getInstalledNxVersion(): 22.7.5
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:47.216Z - [Server] Starting outdated check interval (20ms)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:47.218Z - Started listening on: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\5f0a495ca90de7ba23b4\d.sock
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:47.221Z - [WATCHER]: Subscribed to changes within: C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend (native)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:47.222Z - [LATEST-NX]: Pulling latest Nx...
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:47.240Z - [AI-AGENTS]: Starting agent configuration status computation
+[isolated-plugin] spawned worker for "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\js" (pid: 9868, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin4724-0-2338.8744.sock)
+[isolated-plugin] spawned worker for "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\package-json" (pid: 14048, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin4724-1-2349.3752.sock)
+[isolated-plugin] spawned worker for "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\project-json\build-nodes\project-json" (pid: 12988, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin4724-2-2358.2108.sock)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:47.372Z - Time taken for 'loadSpecifiedNxPlugins' 31.1866ms
+[plugin-worker] "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\package-json" (pid: 14048) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin4724-1-2349.3752.sock
+[1m[33mTime taken for 'plugin worker 14048 code loading' 996.4056999999999ms[39m[22m
+[plugin-worker] "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\project-json\build-nodes\project-json" (pid: 12988) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin4724-2-2358.2108.sock
+[isolated-plugin] connected to worker for "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\package-json" (pid: 14048)
+[isolated-plugin] connected to worker for "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\project-json\build-nodes\project-json" (pid: 12988)
+[plugin-worker] "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\package-json" (pid: 14048) connected
+[plugin-worker] "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\project-json\build-nodes\project-json" (pid: 12988) connected
+[1m[33mTime taken for 'plugin worker 12988 code loading' 994.0962ms[39m[22m
+[plugin-worker] "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\js" (pid: 9868) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin4724-0-2338.8744.sock
+[1m[33mTime taken for 'plugin worker 9868 code loading' 1019.5720999999999ms[39m[22m
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:48.448Z - Time taken for 'start-plugin-worker:C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\package-json' 1094.5216999999998ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:48.448Z - Time taken for 'start-plugin-worker:C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\project-json\build-nodes\project-json' 1089.2776ms
+[isolated-plugin] connected to worker for "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\js" (pid: 9868)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:48.455Z - Time taken for 'start-plugin-worker:C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\js' 1116.9182ms
+[plugin-worker] "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\js" (pid: 9868) connected
+[plugin-worker] "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\package-json" (pid: 14048) loaded successfully
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:48.946Z - Time taken for 'Load Nx Plugin: C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\package-json' 1609.6218ms
+[plugin-worker] "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\project-json\build-nodes\project-json" (pid: 12988) loaded successfully
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:49.003Z - Time taken for 'Load Nx Plugin: C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\project-json\build-nodes\project-json' 1665.5787999999998ms
+[plugin-worker] "C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\js" (pid: 9868) loaded successfully
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:49.068Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:49.068Z - [REQUEST]: 
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:49.069Z - [REQUEST]: 
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:49.081Z - Time taken for 'loadDefaultNxPlugins' 1732.0072ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:49.081Z - Time taken for 'Load Nx Plugin: C:\Users\Angel Aubrey\Documents\FMS-AI-Enhanced\AI-Enhanced-Fund-Management-System\backend\node_modules\nx\dist\src\plugins\js' 1731.6765999999998ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:49.081Z - Time taken for 'hash changed files from watcher' 0.4341999999996915ms
+[1m[33mTime taken for 'nx/core/package-json:createNodes' 25.955799999999726ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/package-json" after createNodes
+[1m[33mTime taken for 'nx/core/project-json:createNodes' 0.4076000000000022ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/project-json" after createNodes
+[1m[33mTime taken for 'nx/js/dependencies-and-lockfile:createNodes' 26.359300000000076ms[39m[22m
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:50.244Z - Time taken for 'build-project-configs' 1142.9401000000003ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:50.244Z - Time taken for 'createNodes:merge' 9.59940000000006ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:50.244Z - Time taken for 'native-file-deps' 0.012800000000424916ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:50.244Z - Time taken for 'get-workspace-files' 0.8091999999996915ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:50.244Z - Time taken for 'get-all-workspace-files' 0.2966999999998734ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:50.244Z - Time taken for 'read cache' 2.6997999999994136ms
+[1m[33mTime taken for 'build typescript dependencies' 60.00530000000026ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/js/dependencies-and-lockfile" after createDependencies
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:50.358Z - [SYNC]: collect registered sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:50.360Z - Time taken for 'total execution time for createProjectGraph()' 125.86499999999978ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:50.360Z - Time taken for 'createDependencies' 112.60090000000037ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:50.360Z - Time taken for 'nx/js/dependencies-and-lockfile:createDependencies' 112.29560000000038ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:50.360Z - Time taken for 'createMetadata' 0.04179999999996653ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:50:50.360Z - Time taken for 'serialize graph' 2.2533000000003085ms
+DEBUG nx::native::telemetry::service: Sent 1 events: [nx/js/dependencies-and-lockfile:createDe]
+Fetching nx...
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:09.249Z - [LATEST-NX]: Successfully pulled latest Nx to C:\Users\ANGELA~1\AppData\Local\Temp\tmp-4724-PWatIKZGTh0o
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:09.251Z - [NX-CONSOLE]: Using local implementation (NX_USE_LOCAL=true or inner call)
+DEBUG nx::native::ide::preferences: Loaded console preferences: NxConsolePreferences { auto_install_console: Some(true), path: "C:\\Users\\Angel Aubrey\\.nx\\ide.json" }
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:09.252Z - [AI-AGENTS]: Failed to compute agent configuration status from latest Nx. Error: Only URLs with a scheme in: file, data, and node are supported by the default ESM loader. On Windows, absolute paths must be valid file:// URLs. Received protocol 'c:'
+DEBUG nx::native::ide::install: Detected editor: VSCode
+DEBUG nx::native::ide::install: Checking if Nx Console extension is installed with: code.cmd --list-extensions
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:09.252Z - [AI-AGENTS]: Agent configuration status computation completed: 0 fully configured, 0 outdated, 0 partially configured, 0 non-configured
+DEBUG nx::native::ide::install: Nx Console extension is installed
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:10.270Z - [NX-CONSOLE]: Console status check completed, shouldPrompt: false
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:25.086Z - [WATCHER]: apps/fs-gateway/dist was deleted
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:25.086Z - [WATCHER]: File changes detected:
+Created:
+(none)
+Updated:
+(none)
+Deleted:
+  - apps/fs-gateway/dist
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:25.087Z - [SYNC]: clearing sync generators cache due to file changes
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:25.087Z - [WATCHER]: Processing file changes in outputs
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:25.299Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:25.299Z - [REQUEST]: 
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:25.299Z - [REQUEST]: apps/fs-gateway/dist
+[plugin-client] restarting worker for "nx/js/dependencies-and-lockfile"
+[isolated-plugin] spawned worker for "nx/js/dependencies-and-lockfile" (pid: 15040, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin4724-3-40302.594.sock)
+[plugin-client] restarting worker for "nx/core/package-json"
+[isolated-plugin] spawned worker for "nx/core/package-json" (pid: 30736, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin4724-4-40316.3508.sock)
+[plugin-client] restarting worker for "nx/core/project-json"
+[isolated-plugin] spawned worker for "nx/core/project-json" (pid: 24804, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin4724-5-40327.1188.sock)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:25.352Z - Time taken for 'hash changed files from watcher' 0.3194999999977881ms
+[plugin-worker] "nx/core/package-json" (pid: 30736) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin4724-4-40316.3508.sock
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 15040) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin4724-3-40302.594.sock
+[plugin-worker] "nx/core/project-json" (pid: 24804) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin4724-5-40327.1188.sock
+[1m[33mTime taken for 'plugin worker 30736 code loading' 880.2076000000001ms[39m[22m
+[1m[33mTime taken for 'plugin worker 15040 code loading' 890.2849ms[39m[22m
+[1m[33mTime taken for 'plugin worker 24804 code loading' 855.9087ms[39m[22m
+[isolated-plugin] connected to worker for "nx/core/project-json" (pid: 24804)
+[isolated-plugin] connected to worker for "nx/js/dependencies-and-lockfile" (pid: 15040)
+[isolated-plugin] connected to worker for "nx/core/package-json" (pid: 30736)
+[plugin-worker] "nx/core/package-json" (pid: 30736) connected
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 15040) connected
+[plugin-worker] "nx/core/project-json" (pid: 24804) connected
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:26.297Z - Time taken for 'start-plugin-worker:nx/js/dependencies-and-lockfile' 993.6296000000002ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:26.297Z - Time taken for 'start-plugin-worker:nx/core/package-json' 980.6050000000032ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:26.297Z - Time taken for 'start-plugin-worker:nx/core/project-json' 968.0152999999991ms
+[plugin-worker] "nx/core/project-json" (pid: 24804) loaded successfully
+[plugin-worker] "nx/core/package-json" (pid: 30736) loaded successfully
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 15040) loaded successfully
+[1m[33mTime taken for 'nx/core/project-json:createNodes' 0.5167999999998756ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/project-json" after createNodes
+[1m[33mTime taken for 'nx/core/package-json:createNodes' 21.488200000000234ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/package-json" after createNodes
+[1m[33mTime taken for 'nx/js/dependencies-and-lockfile:createNodes' 9.040199999999913ms[39m[22m
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:27.504Z - Time taken for 'build-project-configs' 2194.2949999999983ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:27.504Z - Time taken for 'createNodes:merge' 1.5498999999981606ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:27.504Z - Time taken for 'get-all-workspace-files' 0.17079999999987194ms
+[1m[33mTime taken for 'build typescript dependencies' 0.32629999999971915ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/js/dependencies-and-lockfile" after createDependencies
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:27.534Z - [SYNC]: collect registered sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:27.534Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:27.535Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:27.535Z - Time taken for 'total execution time for createProjectGraph()' 35.19600000000355ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:27.535Z - Time taken for 'createDependencies' 27.869700000002922ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:27.535Z - Time taken for 'nx/js/dependencies-and-lockfile:createDependencies' 27.641999999999825ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:27.535Z - Time taken for 'createMetadata' 0.020700000000942964ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:27.535Z - Time taken for 'serialize graph' 2.786000000000058ms
+DEBUG nx::native::telemetry::service: Sent 1 events: [nx/js/dependencies-and-lockfile:createDe]
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:30.732Z - [WATCHER]: 0 file(s) created or restored, 0 file(s) modified, 0 file(s) deleted
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:31.136Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:31.137Z - [REQUEST]: 
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:31.137Z - [REQUEST]: 
+[plugin-client] restarting worker for "nx/js/dependencies-and-lockfile"
+[isolated-plugin] spawned worker for "nx/js/dependencies-and-lockfile" (pid: 13316, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin4724-6-46139.714.sock)
+[plugin-client] restarting worker for "nx/core/package-json"
+[isolated-plugin] spawned worker for "nx/core/package-json" (pid: 31556, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin4724-7-46154.3731.sock)
+[plugin-client] restarting worker for "nx/core/project-json"
+[isolated-plugin] spawned worker for "nx/core/project-json" (pid: 18364, socket: \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin4724-8-46168.2358.sock)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:31.182Z - Time taken for 'hash changed files from watcher' 0.364000000001397ms
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 13316) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin4724-6-46139.714.sock
+[isolated-plugin] connected to worker for "nx/js/dependencies-and-lockfile" (pid: 13316)
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:32.488Z - Time taken for 'start-plugin-worker:nx/js/dependencies-and-lockfile' 1348.481200000002ms
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 13316) connected
+[1m[33mTime taken for 'plugin worker 13316 code loading' 1211.0418ms[39m[22m
+[plugin-worker] "nx/core/project-json" (pid: 18364) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin4724-8-46168.2358.sock
+[plugin-worker] "nx/core/package-json" (pid: 31556) listening on \\.\pipe\nx\C:\Users\ANGELA~1\AppData\Local\Temp\plugin4724-7-46154.3731.sock
+[1m[33mTime taken for 'plugin worker 18364 code loading' 1219.0724ms[39m[22m
+[isolated-plugin] connected to worker for "nx/core/package-json" (pid: 31556)
+[isolated-plugin] connected to worker for "nx/core/project-json" (pid: 18364)
+[1m[33mTime taken for 'plugin worker 31556 code loading' 1218.7542ms[39m[22m
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:32.521Z - Time taken for 'start-plugin-worker:nx/core/package-json' 1366.645199999999ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:32.522Z - Time taken for 'start-plugin-worker:nx/core/project-json' 1353.854299999999ms
+[plugin-worker] "nx/core/project-json" (pid: 18364) connected
+[plugin-worker] "nx/core/package-json" (pid: 31556) connected
+[plugin-worker] "nx/core/project-json" (pid: 18364) loaded successfully
+[plugin-worker] "nx/core/package-json" (pid: 31556) loaded successfully
+[plugin-worker] "nx/js/dependencies-and-lockfile" (pid: 13316) loaded successfully
+[1m[33mTime taken for 'nx/core/project-json:createNodes' 0.5644999999999527ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/core/project-json" after createNodes
+[isolated-plugin] shutting down worker for "nx/core/package-json" after createNodes
+[1m[33mTime taken for 'nx/js/dependencies-and-lockfile:createNodes' 19.484500000000025ms[39m[22m
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:34.464Z - Time taken for 'build-project-configs' 3313.8147000000026ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:34.464Z - Time taken for 'createNodes:merge' 2.2004999999990105ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:34.464Z - Time taken for 'get-all-workspace-files' 0.21110000000044238ms
+[1m[33mTime taken for 'build typescript dependencies' 0.2838000000001557ms[39m[22m
+[isolated-plugin] shutting down worker for "nx/js/dependencies-and-lockfile" after createDependencies
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:34.491Z - [SYNC]: collect registered sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:34.493Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:34.493Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:34.493Z - Time taken for 'total execution time for createProjectGraph()' 35.57710000000225ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:34.493Z - Time taken for 'createDependencies' 25.937999999994645ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:34.493Z - Time taken for 'nx/js/dependencies-and-lockfile:createDependencies' 25.755400000001828ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:34.493Z - Time taken for 'createMetadata' 0.022299999996903352ms
+[NX v22.7.5 Daemon Server] - 2026-07-15T19:51:34.493Z - Time taken for 'serialize graph' 2.90400000000227ms
+DEBUG nx::native::telemetry::service: Sent 1 events: [nx/js/dependencies-and-lockfile:createDe]

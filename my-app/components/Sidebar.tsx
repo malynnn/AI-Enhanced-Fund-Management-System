@@ -65,6 +65,7 @@ export default function Sidebar() {
         
         // ADMIN 
         { label: 'User Management', href: '/admin/dashboard', icon: Users, roles: ['Officer/Admin'] },
+        { label: 'AI Forecasting', href: '/admin/forecasting', icon: Activity, roles: ['Officer/Admin'] },
         { label: 'Settings', href: '/admin/settings', icon: Settings, roles: ['Officer/Admin'] },
 
         // TREASURER 
