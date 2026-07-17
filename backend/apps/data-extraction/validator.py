@@ -122,3 +122,79 @@ def validate_transactions(df):
     }
     
     return df_clean, stats
+
+
+# ─────────────────────────────────────────────
+# AFMS-009: Record Integrity Verification
+# ─────────────────────────────────────────────
+
+def verify_record_integrity(raw_df: pd.DataFrame, clean_df: pd.DataFrame, required_cols: list, label: str = "dataset"):
+    """
+    AFMS-009: Verifies that the extracted dataset matches the source data
+    in row count (before/after) and that all required columns are present
+    and non-empty in the cleaned output.
+
+    Parameters:
+        raw_df        - The original DataFrame as extracted from the source
+        clean_df      - The DataFrame after validation and cleaning
+        required_cols - List of column names that must be present and populated
+        label         - A human-readable label for the dataset (e.g., 'funds', 'transactions')
+
+    Returns a dict with:
+        passed          - True if all integrity checks pass
+        source_count    - Row count from the raw source
+        extracted_count - Row count after cleaning
+        dropped_count   - Rows removed during validation
+        drop_rate_pct   - Percentage of rows dropped
+        missing_columns - Any required columns absent from the cleaned data
+        empty_columns   - Required columns that are present but fully null/empty
+        summary         - Human-readable result message
+    """
+    source_count    = len(raw_df)
+    extracted_count = len(clean_df)
+    dropped_count   = source_count - extracted_count
+    drop_rate_pct   = round((dropped_count / source_count * 100), 2) if source_count > 0 else 0.0
+
+    # Column presence check
+    missing_columns = [c for c in required_cols if c not in clean_df.columns]
+
+    # Empty column check (all nulls or all empty strings in required cols that are present)
+    empty_columns = []
+    for col in required_cols:
+        if col in clean_df.columns:
+            series = clean_df[col]
+            if series.isna().all() or (series.astype(str).str.strip() == '').all():
+                empty_columns.append(col)
+
+    passed = (len(missing_columns) == 0 and len(empty_columns) == 0 and extracted_count > 0)
+
+    if passed:
+        summary = (
+            f"[{label}] Integrity check PASSED. "
+            f"Source: {source_count} rows → Extracted: {extracted_count} rows "
+            f"({dropped_count} dropped, {drop_rate_pct}% drop rate). "
+            f"All {len(required_cols)} required columns present and populated."
+        )
+    else:
+        issues = []
+        if extracted_count == 0:
+            issues.append("no records remain after cleaning")
+        if missing_columns:
+            issues.append(f"missing columns: {missing_columns}")
+        if empty_columns:
+            issues.append(f"empty columns: {empty_columns}")
+        summary = (
+            f"[{label}] Integrity check FAILED — {'; '.join(issues)}. "
+            f"Source: {source_count} rows → Extracted: {extracted_count} rows."
+        )
+
+    return {
+        "passed":           passed,
+        "source_count":     source_count,
+        "extracted_count":  extracted_count,
+        "dropped_count":    dropped_count,
+        "drop_rate_pct":    drop_rate_pct,
+        "missing_columns":  missing_columns,
+        "empty_columns":    empty_columns,
+        "summary":          summary,
+    }

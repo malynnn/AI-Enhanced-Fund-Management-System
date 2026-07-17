@@ -51,9 +51,15 @@ export async function POST(request: Request) {
         const resultJson = await new Promise<string>((resolve, reject) => {
             // Set PYTHONPATH so python can resolve local module imports (e.g. config.py, db_connection.py)
             const pythonPath = path.dirname(EXTRACTOR_SCRIPT_PATH);
+            // Use absolute paths for output files so they always land inside
+            // the data-extraction folder regardless of the process working directory
+            const analyticsDbPath   = path.join(pythonPath, 'analytics.db');
+            const extractionLogPath = path.join(pythonPath, 'extraction_log.json');
             const env = { 
                 ...process.env, 
-                PYTHONPATH: pythonPath 
+                PYTHONPATH:           pythonPath,
+                ANALYTICS_DB_PATH:    analyticsDbPath,
+                EXTRACTION_LOG_PATH:  extractionLogPath,
             };
 
             exec(cmd, { env }, (error, stdout, stderr) => {

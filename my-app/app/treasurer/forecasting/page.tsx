@@ -230,7 +230,7 @@ tx-107,GF,100,DEPOSIT,Invalid Date (Should Drop),REF-9999,bad-date-format`;
           </div>
           <div className="flex items-center gap-2 bg-[#f4f7fc] border border-gray-100 rounded-2xl px-4 py-2 text-xs font-bold text-gray-600">
             <ShieldCheck className="text-emerald-500 shrink-0" size={16} />
-            <span>Role: Administrator Auditing</span>
+            <span>Role: Treasurer</span>
           </div>
         </div>
 
