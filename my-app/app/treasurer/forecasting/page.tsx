@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, Suspense } from 'react';
+import { useState, useMemo, Suspense, useEffect } from 'react';
 import { 
   Database, FileSpreadsheet, ShieldCheck, ShieldAlert, Play, CheckCircle2, 
   AlertTriangle, Loader2, Search, ArrowRight, Download, RefreshCw, Layers 
@@ -192,6 +192,11 @@ tx-107,GF,100,DEPOSIT,Invalid Date (Should Drop),REF-9999,bad-date-format`;
     }
   };
 
+  // Run automatic extraction on mount for PostgreSQL
+  useEffect(() => {
+    runExtraction();
+  }, []);
+
   // Preview Data Filter & Paginate
   const activePreviewData = useMemo(() => {
     if (!result) return [];
@@ -228,95 +233,41 @@ tx-107,GF,100,DEPOSIT,Invalid Date (Should Drop),REF-9999,bad-date-format`;
             <h2 className="text-2xl font-black text-[#04152d] tracking-tight">AI Forecasting Fund Management</h2>
             <p className="text-sm text-gray-500 font-semibold mt-1">Sprint 1 - Data Extraction, Security Hardening & Data Validation Module</p>
           </div>
-          <div className="flex items-center gap-2 bg-[#f4f7fc] border border-gray-100 rounded-2xl px-4 py-2 text-xs font-bold text-gray-600">
-            <ShieldCheck className="text-emerald-500 shrink-0" size={16} />
-            <span>Role: Treasurer</span>
+          <div className="flex items-center gap-3 self-start md:self-auto">
+            <button 
+              onClick={() => setSourceTab(sourceTab === 'db' ? 'csv' : 'db')}
+              className="text-xs font-black px-4 py-2.5 bg-[#f4f7fc] border border-gray-200 rounded-xl hover:bg-gray-100 transition-all text-gray-600 hover:text-[#04152d] flex items-center gap-1.5 shadow-sm"
+            >
+              {sourceTab === 'db' ? (
+                <>
+                  <FileSpreadsheet size={14} /> Upload CSV Source
+                </>
+              ) : (
+                <>
+                  <Database size={14} /> Use Live Database Source
+                </>
+              )}
+            </button>
+            <div className="flex items-center gap-2 bg-[#f4f7fc] border border-gray-100 rounded-2xl px-4 py-2 text-xs font-bold text-gray-600">
+              <ShieldCheck className="text-emerald-500 shrink-0" size={16} />
+              <span>Role: Treasurer</span>
+            </div>
           </div>
         </div>
 
         {/* Configurations & Security Columns */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Controls Card */}
-          <div className="lg:col-span-2 bg-white rounded-3xl p-6 border border-gray-100 shadow-sm flex flex-col">
-            <h3 className="text-base font-black text-[#04152d] mb-4 flex items-center gap-2 border-b border-gray-50 pb-3">
-              <Layers size={18} className="text-[#04152d]" /> Data Extraction Source Settings
-            </h3>
+          {/* Main Controls Card (Only visible when uploading CSV) */}
+          {sourceTab === 'csv' && (
+            <div className="lg:col-span-2 bg-white rounded-3xl p-6 border border-gray-100 shadow-sm flex flex-col">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-50 pb-3 mb-6">
+                <h3 className="text-base font-black text-[#04152d] flex items-center gap-2">
+                  <Layers size={18} className="text-[#04152d]" /> Data Extraction Source Settings
+                </h3>
+              </div>
 
-            {/* Source Tab Toggle */}
-            <div className="flex gap-2 bg-[#f3f4f6] p-1.5 rounded-2xl mb-6">
-              <button 
-                onClick={() => setSourceTab('db')}
-                className={`flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl text-xs font-black transition-all ${
-                  sourceTab === 'db' 
-                    ? 'bg-white text-[#04152d] shadow-sm' 
-                    : 'text-gray-500 hover:text-[#04152d] hover:bg-white/50'
-                }`}
-              >
-                <Database size={16} /> PostgreSQL Database Connection
-              </button>
-              <button 
-                onClick={() => setSourceTab('csv')}
-                className={`flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl text-xs font-black transition-all ${
-                  sourceTab === 'csv' 
-                    ? 'bg-white text-[#04152d] shadow-sm' 
-                    : 'text-gray-500 hover:text-[#04152d] hover:bg-white/50'
-                }`}
-              >
-                <FileSpreadsheet size={16} /> CSV Files Upload
-              </button>
-            </div>
-
-            {/* Tab Forms */}
-            <div className="flex-1">
-              {sourceTab === 'db' ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Host Address</label>
-                    <input 
-                      type="text" 
-                      value={dbConfig.host} 
-                      onChange={e => setDbConfig({...dbConfig, host: e.target.value})}
-                      className="w-full rounded-xl px-4 py-3 text-sm border border-gray-200 focus:border-[#04152d] outline-none font-semibold transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Port</label>
-                    <input 
-                      type="text" 
-                      value={dbConfig.port} 
-                      onChange={e => setDbConfig({...dbConfig, port: e.target.value})}
-                      className="w-full rounded-xl px-4 py-3 text-sm border border-gray-200 focus:border-[#04152d] outline-none font-semibold transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Database Name</label>
-                    <input 
-                      type="text" 
-                      value={dbConfig.database} 
-                      onChange={e => setDbConfig({...dbConfig, database: e.target.value})}
-                      className="w-full rounded-xl px-4 py-3 text-sm border border-gray-200 focus:border-[#04152d] outline-none font-semibold transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Read-Only Database Role User</label>
-                    <input 
-                      type="text" 
-                      value={dbConfig.user} 
-                      onChange={e => setDbConfig({...dbConfig, user: e.target.value})}
-                      className="w-full rounded-xl px-4 py-3 text-sm border border-gray-200 focus:border-[#04152d] outline-none font-semibold transition-all"
-                    />
-                  </div>
-                  <div className="sm:col-span-2">
-                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Role Password</label>
-                    <input 
-                      type="password" 
-                      value={dbConfig.password} 
-                      onChange={e => setDbConfig({...dbConfig, password: e.target.value})}
-                      className="w-full rounded-xl px-4 py-3 text-sm border border-gray-200 focus:border-[#04152d] outline-none font-semibold transition-all"
-                    />
-                  </div>
-                </div>
-              ) : (
+              {/* Tab Forms */}
+              <div className="flex-1">
                 <div className="space-y-4">
                   <div className="flex justify-end">
                     <button 
@@ -356,33 +307,23 @@ tx-107,GF,100,DEPOSIT,Invalid Date (Should Drop),REF-9999,bad-date-format`;
                     </div>
                   </div>
                 </div>
-              )}
-            </div>
+              </div>
 
-            {/* Run Buttons */}
-            <div className="mt-8 pt-6 border-t border-gray-50 flex flex-col sm:flex-row gap-3">
-              <button 
-                onClick={runExtraction}
-                disabled={isLoading || isVerifyingSecurity || (sourceTab === 'csv' && (!csvFiles.fundsContent || !csvFiles.txContent))}
-                className="flex-1 bg-[#04152d] hover:bg-black text-white font-bold py-3.5 rounded-2xl transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-              >
-                {isLoading ? <Loader2 size={16} className="animate-spin" /> : <Play size={16} />} Run Secure Data Extraction
-              </button>
-
-              {sourceTab === 'db' && (
+              {/* Run Buttons */}
+              <div className="mt-8 pt-6 border-t border-gray-50 flex flex-col sm:flex-row gap-3">
                 <button 
-                  onClick={runVerifySecurity}
-                  disabled={isLoading || isVerifyingSecurity}
-                  className="bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 font-bold py-3.5 px-6 rounded-2xl transition-all flex items-center justify-center gap-2"
+                  onClick={runExtraction}
+                  disabled={isLoading || isVerifyingSecurity || !csvFiles.fundsContent || !csvFiles.txContent}
+                  className="flex-1 bg-[#04152d] hover:bg-black text-white font-bold py-3.5 rounded-2xl transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                 >
-                  {isVerifyingSecurity ? <Loader2 size={16} className="animate-spin" /> : <ShieldCheck size={16} />} Setup & Verify Read-Only Role
+                  {isLoading ? <Loader2 size={16} className="animate-spin" /> : <Play size={16} />} Run Secure Data Extraction
                 </button>
-              )}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Security Verification & Auditing Sidebar */}
-          <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm flex flex-col justify-between">
+          <div className={`${sourceTab === 'csv' ? 'lg:col-span-1' : 'lg:col-span-3'} bg-white rounded-3xl p-6 border border-gray-100 shadow-sm flex flex-col justify-between`}>
             <div>
               <h3 className="text-base font-black text-[#04152d] mb-4 flex items-center gap-2 border-b border-gray-50 pb-3">
                 <ShieldCheck size={18} className="text-[#04152d]" /> Database Security Status
