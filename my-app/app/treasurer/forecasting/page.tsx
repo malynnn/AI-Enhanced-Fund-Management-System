@@ -2,8 +2,8 @@
 
 import { useState, useMemo, Suspense, useEffect } from 'react';
 import { 
-  Database, FileSpreadsheet, ShieldCheck, ShieldAlert, Play, CheckCircle2, 
-  AlertTriangle, Loader2, Search, ArrowRight, Download, RefreshCw, Layers 
+  Database, FileSpreadsheet, Play, CheckCircle2, 
+  AlertTriangle, Loader2, Search, Download, RefreshCw, Layers 
 } from 'lucide-react';
 import Header from '@/components/Header';
 
@@ -192,12 +192,10 @@ tx-107,GF,100,DEPOSIT,Invalid Date (Should Drop),REF-9999,bad-date-format`;
     }
   };
 
-  // Run automatic extraction on mount for PostgreSQL
   useEffect(() => {
     runExtraction();
   }, []);
 
-  // Preview Data Filter & Paginate
   const activePreviewData = useMemo(() => {
     if (!result) return [];
     return previewTab === 'funds' ? result.data.funds : result.data.transactions;
@@ -222,234 +220,212 @@ tx-107,GF,100,DEPOSIT,Invalid Date (Should Drop),REF-9999,bad-date-format`;
     }
   };
 
+  // iOS 26/27-style liquid glass primitives — compact, refractive, subtly tinted
+  const ultraGlassCard = "glass-sheen bg-gradient-to-br from-white/55 via-white/40 to-white/30 backdrop-blur-[34px] backdrop-saturate-[190%] border border-white/70 shadow-[0_10px_30px_rgba(20,30,70,0.09),0_1px_1px_rgba(255,255,255,0.6),inset_0_2px_3px_rgba(255,255,255,0.9)] rounded-[24px] p-5 md:p-6 transition-all duration-400 ease-[cubic-bezier(0.25,1,0.5,1)]";
+  const pillBtn = "glass-sheen px-4 py-2 bg-white/70 hover:bg-white/90 backdrop-blur-xl backdrop-saturate-[180%] border border-white/80 shadow-[0_4px_14px_rgba(20,30,70,0.08),inset_0_1px_2px_rgba(255,255,255,1)] hover:shadow-[0_8px_20px_rgba(20,30,70,0.13),inset_0_1px_2px_rgba(255,255,255,1)] hover:-translate-y-0.5 active:scale-95 active:translate-y-0 rounded-full text-[12.5px] font-black text-[#04152d] transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] flex items-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:hover:translate-y-0";
+
   return (
-    <div className="flex flex-col min-h-screen bg-[#f3f4f6]">
+    <div className="relative flex flex-col min-h-screen bg-[#f4f5f7] overflow-hidden">
+      <style jsx global>{`
+        @keyframes liquid-drift {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          33% { transform: translate(30px, -40px) scale(1.08); }
+          66% { transform: translate(-20px, 20px) scale(0.95); }
+        }
+        /* iOS 26/27-style liquid glass: standing specular highlight + refraction rim + hover bloom */
+        .glass-sheen { position: relative; overflow: hidden; isolation: isolate; }
+        .glass-sheen::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background:
+            linear-gradient(128deg, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0.14) 28%, rgba(255,255,255,0) 46%),
+            radial-gradient(130% 110% at 12% -18%, rgba(255,255,255,0.55), rgba(255,255,255,0) 58%);
+          opacity: 0.85;
+          transition: opacity 0.35s ease;
+          pointer-events: none;
+          z-index: 1;
+        }
+        .glass-sheen:hover::before {
+          opacity: 1;
+        }
+        .glass-sheen::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.9),
+            inset 0 -10px 18px -14px rgba(80,110,220,0.22),
+            inset 1px 0 0 rgba(255,255,255,0.35),
+            inset -1px 0 0 rgba(255,255,255,0.12),
+            inset 0 0 0 1px rgba(255,255,255,0.05);
+          transition: box-shadow 0.35s ease;
+          pointer-events: none;
+          z-index: 1;
+          border-radius: inherit;
+        }
+        .glass-sheen:hover::after {
+          box-shadow:
+            inset 0 1px 0 rgba(255,255,255,1),
+            inset 0 -10px 20px -12px rgba(80,110,220,0.3),
+            inset 1px 0 0 rgba(255,255,255,0.5),
+            inset -1px 0 0 rgba(255,255,255,0.18),
+            inset 0 0 0 1px rgba(255,255,255,0.55);
+        }
+        .glass-blob {
+          position: absolute;
+          border-radius: 9999px;
+          filter: blur(100px);
+          pointer-events: none;
+          animation: liquid-drift 20s ease-in-out infinite;
+        }
+      `}</style>
+
+      {/* Ambient liquid glass backdrop */}
+      <div className="glass-blob w-[480px] h-[480px] bg-blue-400/45 -top-32 -left-20" />
+      <div className="glass-blob w-[440px] h-[440px] bg-amber-300/40 top-1/3 -right-32" style={{ animationDelay: '4s' }} />
+      <div className="glass-blob w-[360px] h-[360px] bg-emerald-300/35 bottom-0 left-1/3" style={{ animationDelay: '8s' }} />
+
       <Header />
 
-      <main className="p-4 md:p-6 max-w-[1600px] w-full mx-auto space-y-6 flex-1 text-left">
-        {/* Title Section */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
-          <div>
-            <h2 className="text-2xl font-black text-[#04152d] tracking-tight">AI Forecasting Fund Management</h2>
-            <p className="text-sm text-gray-500 font-semibold mt-1">Sprint 1 - Data Extraction, Security Hardening & Data Validation Module</p>
-          </div>
-          <div className="flex items-center gap-3 self-start md:self-auto">
+      <main className="p-4 md:p-5 max-w-[1600px] w-full mx-auto space-y-5 flex-1 text-left relative z-10">
+
+        {/* Source toggle — floating, centered, no rectangle container */}
+        <div className="flex justify-center">
+          <div className="glass-sheen flex gap-1 p-1 bg-white/55 backdrop-blur-2xl backdrop-saturate-[190%] rounded-full border border-white/70 shadow-[0_12px_28px_rgba(20,30,70,0.12),inset_0_2px_3px_rgba(255,255,255,0.95)]">
             <button 
-              onClick={() => setSourceTab(sourceTab === 'db' ? 'csv' : 'db')}
-              className="text-xs font-black px-4 py-2.5 bg-[#f4f7fc] border border-gray-200 rounded-xl hover:bg-gray-100 transition-all text-gray-600 hover:text-[#04152d] flex items-center gap-1.5 shadow-sm"
+              onClick={() => setSourceTab('db')}
+              className={`glass-sheen px-4 py-2 rounded-full text-[12.5px] font-black transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] active:scale-90 flex items-center gap-1.5 ${
+                sourceTab === 'db' 
+                  ? 'bg-white/95 shadow-[0_4px_14px_rgba(20,30,70,0.14),inset_0_1px_2px_rgba(255,255,255,1)] text-[#04152d] scale-100 border border-white' 
+                  : 'text-gray-500 hover:text-[#04152d] hover:bg-white/70 border border-transparent hover:border-white/70'
+              }`}
             >
-              {sourceTab === 'db' ? (
-                <>
-                  <FileSpreadsheet size={14} /> Upload CSV Source
-                </>
-              ) : (
-                <>
-                  <Database size={14} /> Use Live Database Source
-                </>
-              )}
+              <Database size={15} className={sourceTab === 'db' ? "text-blue-500" : "opacity-70"} /> Live Database
             </button>
-            <div className="flex items-center gap-2 bg-[#f4f7fc] border border-gray-100 rounded-2xl px-4 py-2 text-xs font-bold text-gray-600">
-              <ShieldCheck className="text-emerald-500 shrink-0" size={16} />
-              <span>Role: Treasurer</span>
-            </div>
+            <button 
+              onClick={() => setSourceTab('csv')}
+              className={`glass-sheen px-4 py-2 rounded-full text-[12.5px] font-black transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] active:scale-90 flex items-center gap-1.5 ${
+                sourceTab === 'csv' 
+                  ? 'bg-white/95 shadow-[0_4px_14px_rgba(20,30,70,0.14),inset_0_1px_2px_rgba(255,255,255,1)] text-[#04152d] scale-100 border border-white' 
+                  : 'text-gray-500 hover:text-[#04152d] hover:bg-white/70 border border-transparent hover:border-white/70'
+              }`}
+            >
+              <FileSpreadsheet size={15} className={sourceTab === 'csv' ? "text-amber-500" : "opacity-70"} /> Upload CSV
+            </button>
           </div>
         </div>
 
-        {/* Configurations & Security Columns */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Controls Card (Only visible when uploading CSV) */}
-          {sourceTab === 'csv' && (
-            <div className="lg:col-span-2 bg-white rounded-3xl p-6 border border-gray-100 shadow-sm flex flex-col">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-50 pb-3 mb-6">
-                <h3 className="text-base font-black text-[#04152d] flex items-center gap-2">
-                  <Layers size={18} className="text-[#04152d]" /> Data Extraction Source Settings
-                </h3>
-              </div>
-
-              {/* Tab Forms */}
-              <div className="flex-1">
-                <div className="space-y-4">
-                  <div className="flex justify-end">
-                    <button 
-                      onClick={handleLoadMockCsv}
-                      className="text-xs font-black text-[#04152d] bg-[#f4f7fc] border border-gray-200 rounded-xl px-4 py-2 hover:bg-gray-100 transition-all flex items-center gap-1.5"
-                    >
-                      <RefreshCw size={14} /> Preload Mock CSV with Errors
-                    </button>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="border-2 border-dashed border-gray-200 hover:border-[#04152d] rounded-2xl p-6 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all relative">
-                      <input 
-                        type="file" 
-                        accept=".csv"
-                        onChange={e => handleFileUpload('funds', e)}
-                        className="absolute inset-0 opacity-0 cursor-pointer"
-                      />
-                      <FileSpreadsheet className="text-gray-400" size={32} />
-                      <span className="text-xs font-bold text-gray-600">
-                        {csvFiles.fundsName || 'Upload funds.csv'}
-                      </span>
-                      <span className="text-[9px] text-gray-400">Required: id, name, code, balance</span>
-                    </div>
-
-                    <div className="border-2 border-dashed border-gray-200 hover:border-[#04152d] rounded-2xl p-6 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all relative">
-                      <input 
-                        type="file" 
-                        accept=".csv"
-                        onChange={e => handleFileUpload('tx', e)}
-                        className="absolute inset-0 opacity-0 cursor-pointer"
-                      />
-                      <FileSpreadsheet className="text-gray-400" size={32} />
-                      <span className="text-xs font-bold text-gray-600">
-                        {csvFiles.txName || 'Upload transactions.csv'}
-                      </span>
-                      <span className="text-[9px] text-gray-400">Required: id, fund_id, amount, type, timestamp</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Run Buttons */}
-              <div className="mt-8 pt-6 border-t border-gray-50 flex flex-col sm:flex-row gap-3">
-                <button 
-                  onClick={runExtraction}
-                  disabled={isLoading || isVerifyingSecurity || !csvFiles.fundsContent || !csvFiles.txContent}
-                  className="flex-1 bg-[#04152d] hover:bg-black text-white font-bold py-3.5 rounded-2xl transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-                >
-                  {isLoading ? <Loader2 size={16} className="animate-spin" /> : <Play size={16} />} Run Secure Data Extraction
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Security Verification & Auditing Sidebar */}
-          <div className={`${sourceTab === 'csv' ? 'lg:col-span-1' : 'lg:col-span-3'} bg-white rounded-3xl p-6 border border-gray-100 shadow-sm flex flex-col justify-between`}>
-            <div>
-              <h3 className="text-base font-black text-[#04152d] mb-4 flex items-center gap-2 border-b border-gray-50 pb-3">
-                <ShieldCheck size={18} className="text-[#04152d]" /> Database Security Status
+        {/* Data Source Settings — Security Status removed; this now fills the freed space responsively */}
+        {sourceTab === 'csv' && (
+          <div className={`flex flex-col ${ultraGlassCard}`}>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+              <h3 className="text-base font-black text-[#04152d] flex items-center gap-2 tracking-tighter">
+                <Layers size={17} className="text-amber-500" /> Data Source Settings
               </h3>
-              
-              <div className="space-y-4">
-                <div className={`p-4 rounded-2xl border flex items-start gap-3 ${
-                  !securityStatus.tested 
-                    ? 'bg-gray-50 border-gray-200 text-gray-500' 
-                    : securityStatus.secure 
-                      ? 'bg-emerald-50 border-emerald-200 text-emerald-800' 
-                      : 'bg-red-50 border-red-200 text-red-800'
-                }`}>
-                  {securityStatus.secure ? (
-                    <ShieldCheck size={28} className="text-emerald-600 mt-0.5 shrink-0" />
-                  ) : (
-                    <ShieldAlert size={28} className={securityStatus.tested ? "text-red-600 mt-0.5 shrink-0" : "text-gray-400 mt-0.5 shrink-0"} />
-                  )}
-                  <div>
-                    <h4 className="text-xs font-black uppercase tracking-wider">
-                      {securityStatus.tested 
-                        ? (securityStatus.secure ? 'Read-Only Hardened' : 'Vulnerable Connection') 
-                        : 'Security Audit Required'}
-                    </h4>
-                    <p className="text-xs font-semibold mt-1 leading-relaxed">
-                      {securityStatus.message}
-                    </p>
+              <button 
+                onClick={handleLoadMockCsv}
+                className={pillBtn}
+              >
+                <RefreshCw size={15} /> Preload Mock Data
+              </button>
+            </div>
+
+            <div className="flex-1 space-y-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* File Upload 1 */}
+                <div className="glass-sheen bg-gradient-to-br from-blue-50/50 via-white/45 to-white/35 backdrop-blur-2xl backdrop-saturate-[180%] border border-white/70 hover:border-white hover:shadow-[0_12px_28px_rgba(20,60,150,0.1)] rounded-[20px] p-6 md:p-7 flex flex-col items-center justify-center gap-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] hover:-translate-y-1 active:scale-[0.97] active:translate-y-0 relative shadow-[0_4px_16px_rgba(20,30,70,0.05),inset_0_2px_6px_rgba(255,255,255,0.9)] group">
+                  <input 
+                    type="file" 
+                    accept=".csv"
+                    onChange={e => handleFileUpload('funds', e)}
+                    className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                  />
+                  <div className="w-11 h-11 rounded-full bg-white/90 shadow-[0_4px_14px_rgba(20,60,150,0.12),inset_0_1px_2px_rgba(255,255,255,1)] flex items-center justify-center group-hover:scale-110 transition-transform duration-400 ease-out">
+                    <FileSpreadsheet className="text-blue-600" size={20} strokeWidth={2.5} />
+                  </div>
+                  <div className="text-center">
+                    <span className="block text-[12.5px] font-black text-[#04152d] tracking-tight">
+                      {csvFiles.fundsName || 'Upload funds.csv'}
+                    </span>
+                    <span className="block text-[9.5px] font-black text-gray-400 uppercase tracking-widest mt-1">id, name, code, balance</span>
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs">
-                  <div className="flex items-center gap-2 font-black mb-1.5">
-                    <AlertTriangle size={15} className="text-amber-700" />
-                    <span>How it works:</span>
+                {/* File Upload 2 */}
+                <div className="glass-sheen bg-gradient-to-br from-emerald-50/50 via-white/45 to-white/35 backdrop-blur-2xl backdrop-saturate-[180%] border border-white/70 hover:border-white hover:shadow-[0_12px_28px_rgba(16,150,90,0.1)] rounded-[20px] p-6 md:p-7 flex flex-col items-center justify-center gap-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] hover:-translate-y-1 active:scale-[0.97] active:translate-y-0 relative shadow-[0_4px_16px_rgba(20,30,70,0.05),inset_0_2px_6px_rgba(255,255,255,0.9)] group">
+                  <input 
+                    type="file" 
+                    accept=".csv"
+                    onChange={e => handleFileUpload('tx', e)}
+                    className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                  />
+                  <div className="w-11 h-11 rounded-full bg-white/90 shadow-[0_4px_14px_rgba(16,150,90,0.12),inset_0_1px_2px_rgba(255,255,255,1)] flex items-center justify-center group-hover:scale-110 transition-transform duration-400 ease-out">
+                    <FileSpreadsheet className="text-emerald-600" size={20} strokeWidth={2.5} />
                   </div>
-                  <p className="font-semibold leading-relaxed">
-                    To prevent malicious data manipulation during extraction, the system enforces a secure database policy. The extraction script connects using a limited role and executes an assertion write command (<code className="bg-amber-100 px-1 rounded">INSERT</code>). If the database throws an Access Denied error, the transaction rolls back, verifying that database integrity is enforced.
-                  </p>
+                  <div className="text-center">
+                    <span className="block text-[12.5px] font-black text-[#04152d] tracking-tight">
+                      {csvFiles.txName || 'Upload transactions.csv'}
+                    </span>
+                    <span className="block text-[9.5px] font-black text-gray-400 uppercase tracking-widest mt-1">id, fund, amount, type</span>
+                  </div>
                 </div>
               </div>
             </div>
-            
-            <div className="text-[10px] text-gray-400 font-bold border-t border-gray-50 pt-4 mt-6">
-              BDOEA CAPSTONE SYSTEM AUDIT MODULE V1.0.0
-            </div>
-          </div>
-        </div>
 
-        {/* Error Message Box */}
-        {errorMsg && (
-          <div className="bg-red-50 border border-red-200 text-red-800 p-4 rounded-3xl flex items-start gap-3">
-            <XCircleIcon className="text-red-600 shrink-0 mt-0.5" size={18} />
-            <div>
-              <h4 className="text-sm font-black">Data Extraction Execution Error</h4>
-              <p className="text-xs font-semibold mt-1">{errorMsg}</p>
+            <div className="mt-5 flex">
+              <button 
+                onClick={runExtraction}
+                disabled={isLoading || isVerifyingSecurity || !csvFiles.fundsContent || !csvFiles.txContent}
+                className="glass-sheen w-full bg-[#04152d]/88 backdrop-blur-2xl backdrop-saturate-150 text-white font-black py-3 rounded-full transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] hover:-translate-y-1 hover:bg-[#04152d]/95 hover:shadow-[0_14px_30px_rgba(4,21,45,0.4)] active:scale-[0.97] active:translate-y-0 flex items-center justify-center gap-2 shadow-[0_8px_22px_rgba(4,21,45,0.3),inset_0_1px_0_rgba(255,255,255,0.18)] disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-[0_8px_22px_rgba(4,21,45,0.3)] tracking-tight text-[12.5px] border border-white/10"
+              >
+                {isLoading ? <Loader2 size={17} className="animate-spin" /> : <Play size={17} className="fill-white" />} 
+                Execute Secure Extraction
+              </button>
             </div>
           </div>
         )}
 
-        {/* Results Displays */}
+        {/* Results */}
         {result && result.success && (
-          <div className="space-y-6">
+          <div className="space-y-5 animate-in fade-in slide-in-from-bottom-8 duration-700">
             
-            {/* Extraction Summary Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              
-              {/* Funds Stats Card */}
-              <div className="bg-white rounded-3xl p-5 border border-gray-100 shadow-sm flex items-center justify-between">
-                <div>
-                  <span className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Funds Extracted</span>
-                  <p className="text-3xl font-black text-[#04152d] mt-1.5">{result.stats.funds.initial_count}</p>
+            {/* Stats */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[
+                { title: 'Funds Extracted', val: result.stats.funds.initial_count, icon: Database, color: 'text-blue-600', tint: 'from-blue-50/55 via-white/45 to-white/30' },
+                { title: 'Clean Funds', val: result.stats.funds.final_count, icon: CheckCircle2, color: 'text-emerald-500', tint: 'from-emerald-50/55 via-white/45 to-white/30' },
+                { title: 'Tx Extracted', val: result.stats.transactions.initial_count, icon: FileSpreadsheet, color: 'text-amber-500', tint: 'from-amber-50/55 via-white/45 to-white/30' },
+                { title: 'Clean Tx', val: result.stats.transactions.final_count, icon: CheckCircle2, color: 'text-emerald-500', tint: 'from-emerald-50/55 via-white/45 to-white/30' },
+              ].map((stat, i) => (
+                <div key={i} className={`glass-sheen bg-gradient-to-br ${stat.tint} backdrop-blur-[34px] backdrop-saturate-[190%] border border-white/70 shadow-[0_8px_24px_rgba(20,30,70,0.06),inset_0_2px_3px_rgba(255,255,255,0.9)] rounded-[20px] p-5 flex flex-col items-center text-center group hover:-translate-y-1 hover:shadow-[0_14px_30px_rgba(20,30,70,0.1),inset_0_2px_3px_rgba(255,255,255,1)] transition-all duration-400 ease-[cubic-bezier(0.25,1,0.5,1)]`}>
+                  <div className="w-10 h-10 bg-white/90 rounded-full flex items-center justify-center shrink-0 shadow-[0_4px_12px_rgba(20,30,70,0.08),inset_0_1px_2px_rgba(255,255,255,1)] group-hover:scale-110 transition-transform duration-400 ease-[cubic-bezier(0.25,1,0.5,1)] mb-2.5">
+                    <stat.icon size={18} strokeWidth={2.5} className={stat.color} />
+                  </div>
+                  <div>
+                    <p className={`text-[24px] leading-none font-black tracking-tighter drop-shadow-sm mb-1 ${stat.color}`}>{stat.val}</p>
+                    <span className="block text-[9px] font-black text-gray-500 uppercase tracking-[0.16em]">{stat.title}</span>
+                  </div>
                 </div>
-                <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center shrink-0">
-                  <Database size={20} />
-                </div>
-              </div>
-
-              {/* Funds Cleaned Card */}
-              <div className="bg-white rounded-3xl p-5 border border-gray-100 shadow-sm flex items-center justify-between">
-                <div>
-                  <span className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Cleaned Funds Loaded</span>
-                  <p className="text-3xl font-black text-emerald-600 mt-1.5">{result.stats.funds.final_count}</p>
-                </div>
-                <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center shrink-0">
-                  <CheckCircle2 size={20} />
-                </div>
-              </div>
-
-              {/* Tx Extracted Card */}
-              <div className="bg-white rounded-3xl p-5 border border-gray-100 shadow-sm flex items-center justify-between">
-                <div>
-                  <span className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Transactions Extracted</span>
-                  <p className="text-3xl font-black text-[#04152d] mt-1.5">{result.stats.transactions.initial_count}</p>
-                </div>
-                <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center shrink-0">
-                  <FileSpreadsheet size={20} />
-                </div>
-              </div>
-
-              {/* Cleaned Tx Loaded Card */}
-              <div className="bg-white rounded-3xl p-5 border border-gray-100 shadow-sm flex items-center justify-between">
-                <div>
-                  <span className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Cleaned Tx Loaded</span>
-                  <p className="text-3xl font-black text-emerald-600 mt-1.5">{result.stats.transactions.final_count}</p>
-                </div>
-                <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center shrink-0">
-                  <CheckCircle2 size={20} />
-                </div>
-              </div>
-
+              ))}
             </div>
 
-            {/* Cleaning Auditing Report Alert */}
+            {/* Error Drop Alert */}
             {(result.stats.funds.total_dropped > 0 || result.stats.transactions.total_dropped > 0) && (
-              <div className="bg-amber-50 border border-amber-200 text-amber-900 p-5 rounded-3xl flex gap-3">
-                <AlertTriangle className="text-amber-700 shrink-0 mt-0.5" size={20} />
-                <div>
-                  <h4 className="text-sm font-black">Data Validation Cleaning Alert: Malformed Records Dropped</h4>
-                  <p className="text-xs font-semibold mt-1 leading-relaxed">
-                    The validator identified and clean-filtered <span className="font-black text-amber-700">{result.stats.funds.total_dropped}</span> invalid fund record(s) and <span className="font-black text-amber-700">{result.stats.transactions.total_dropped}</span> invalid transaction record(s). 
+              <div className="glass-sheen bg-gradient-to-br from-amber-50/60 via-white/55 to-white/40 backdrop-blur-2xl backdrop-saturate-[190%] border border-amber-200/60 text-amber-900 p-5 rounded-[22px] flex flex-col md:flex-row gap-4 shadow-[0_8px_22px_rgba(217,155,15,0.12),inset_0_2px_3px_rgba(255,255,255,0.9)] hover:-translate-y-1 transition-all duration-400 ease-[cubic-bezier(0.25,1,0.5,1)]">
+                <div className="w-10 h-10 bg-amber-100/85 rounded-full flex items-center justify-center shrink-0 shadow-[inset_0_1px_2px_rgba(255,255,255,1)]">
+                  <AlertTriangle className="text-amber-600" size={20} />
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-[15px] font-black tracking-tight text-[#04152d]">Validation Cleaning Alert: Malformed Records Dropped</h4>
+                  <p className="text-[12.5px] font-bold mt-1.5 leading-relaxed opacity-80 max-w-3xl">
+                    The validator clean-filtered <span className="font-black text-amber-600">{result.stats.funds.total_dropped}</span> invalid fund(s) and <span className="font-black text-amber-600">{result.stats.transactions.total_dropped}</span> invalid transaction(s). 
                   </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3 pt-3 border-t border-amber-200/50">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-4 pt-4 border-t border-amber-200/50">
                     {result.stats.funds.total_dropped > 0 && (
-                      <div className="text-xs">
-                        <span className="font-bold text-amber-800">Fund drop reasons:</span>
-                        <ul className="list-disc pl-4 mt-1 space-y-1 font-semibold">
+                      <div className="text-[13px]">
+                        <span className="font-black text-[#04152d] tracking-tight">Fund drop reasons:</span>
+                        <ul className="list-disc pl-5 mt-2 space-y-1.5 font-bold opacity-80">
                           {Object.entries(result.stats.funds.drop_reasons).map(([reason, count]) => 
                             count > 0 ? <li key={reason}>{reason.replace(/_/g, ' ')}: {count} dropped</li> : null
                           )}
@@ -457,9 +433,9 @@ tx-107,GF,100,DEPOSIT,Invalid Date (Should Drop),REF-9999,bad-date-format`;
                       </div>
                     )}
                     {result.stats.transactions.total_dropped > 0 && (
-                      <div className="text-xs">
-                        <span className="font-bold text-amber-800">Transaction drop reasons:</span>
-                        <ul className="list-disc pl-4 mt-1 space-y-1 font-semibold">
+                      <div className="text-[13px]">
+                        <span className="font-black text-[#04152d] tracking-tight">Transaction drop reasons:</span>
+                        <ul className="list-disc pl-5 mt-2 space-y-1.5 font-bold opacity-80">
                           {Object.entries(result.stats.transactions.drop_reasons).map(([reason, count]) => 
                             count > 0 ? <li key={reason}>{reason.replace(/_/g, ' ')}: {count} dropped</li> : null
                           )}
@@ -471,43 +447,43 @@ tx-107,GF,100,DEPOSIT,Invalid Date (Should Drop),REF-9999,bad-date-format`;
               </div>
             )}
 
-            {/* DataFrame Preview Section */}
-            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
+            {/* DataFrame Preview */}
+            <div className={`!p-0 overflow-hidden flex flex-col !rounded-[22px] ${ultraGlassCard}`}>
               
-              {/* Preview Header & Tabs */}
-              <div className="p-6 border-b border-gray-50 flex flex-wrap gap-4 items-center justify-between">
-                <div className="flex gap-2">
+              {/* Header & Tabs */}
+              <div className="p-5 border-b border-white/50 flex flex-wrap gap-4 items-center justify-between bg-white/30 backdrop-blur-xl backdrop-saturate-[180%]">
+                <div className="glass-sheen flex gap-1 p-1 bg-white/45 backdrop-blur-2xl backdrop-saturate-[190%] rounded-full border border-white/70 shadow-[inset_0_2px_4px_rgba(255,255,255,0.9)]">
                   <button 
                     onClick={() => { setPreviewTab('funds'); setCurrentPage(1); }}
-                    className={`px-4 py-2 rounded-xl text-xs font-black transition-all ${
+                    className={`glass-sheen px-4 py-2 rounded-full text-[12.5px] font-black transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] active:scale-90 ${
                       previewTab === 'funds' 
-                        ? 'bg-[#04152d] text-white shadow-sm' 
-                        : 'text-gray-500 hover:bg-gray-50'
+                        ? 'bg-white/95 shadow-[0_4px_12px_rgba(20,30,70,0.12),inset_0_1px_2px_rgba(255,255,255,1)] text-[#04152d] scale-100 border border-white' 
+                        : 'text-gray-500 hover:bg-white/70 hover:text-[#04152d] border border-transparent hover:border-white/70'
                     }`}
                   >
-                    Cleaned Funds DataFrame ({result.data.funds.length})
+                    Cleaned Funds ({result.data.funds.length})
                   </button>
                   <button 
                     onClick={() => { setPreviewTab('transactions'); setCurrentPage(1); }}
-                    className={`px-4 py-2 rounded-xl text-xs font-black transition-all ${
+                    className={`glass-sheen px-4 py-2 rounded-full text-[12.5px] font-black transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] active:scale-90 ${
                       previewTab === 'transactions' 
-                        ? 'bg-[#04152d] text-white shadow-sm' 
-                        : 'text-gray-500 hover:bg-gray-50'
+                        ? 'bg-white/95 shadow-[0_4px_12px_rgba(20,30,70,0.12),inset_0_1px_2px_rgba(255,255,255,1)] text-[#04152d] scale-100 border border-white' 
+                        : 'text-gray-500 hover:bg-white/70 hover:text-[#04152d] border border-transparent hover:border-white/70'
                     }`}
                   >
-                    Cleaned Transactions DataFrame ({result.data.transactions.length})
+                    Cleaned Transactions ({result.data.transactions.length})
                   </button>
                 </div>
 
-                <div className="flex items-center gap-3 w-full sm:w-auto">
-                  <div className="relative w-full sm:w-60">
-                    <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <div className="flex items-center gap-2.5 w-full sm:w-auto">
+                  <div className="glass-sheen relative w-full sm:w-60 rounded-full">
+                    <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 z-10" />
                     <input 
                       type="text" 
-                      placeholder="Search preview data..." 
+                      placeholder="Search data..." 
                       value={searchTerm} 
                       onChange={e => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-                      className="w-full pl-9 pr-4 py-2 rounded-xl bg-gray-50 border border-gray-200 text-xs font-bold outline-none focus:bg-white focus:border-[#04152d] transition-colors" 
+                      className="relative w-full pl-9 pr-4 py-2 rounded-full bg-white/55 hover:bg-white/75 backdrop-blur-xl backdrop-saturate-[180%] border border-white/70 shadow-[inset_0_2px_6px_rgba(20,30,70,0.04)] text-[12.5px] font-bold outline-none focus:bg-white/85 focus:shadow-[0_4px_16px_rgba(20,30,70,0.1)] focus:scale-[1.01] transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] placeholder:text-gray-400 text-[#04152d]" 
                     />
                   </div>
                   
@@ -521,73 +497,66 @@ tx-107,GF,100,DEPOSIT,Invalid Date (Should Drop),REF-9999,bad-date-format`;
                       downloadAnchor.click();
                       downloadAnchor.remove();
                     }}
-                    className="bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1.5 shrink-0"
-                    title="Download Cleaned JSON"
+                    className={pillBtn}
                   >
-                    <Download size={14} /> JSON
+                    <Download size={15} /> JSON
                   </button>
                 </div>
               </div>
 
               {/* Data Table */}
               <div className="overflow-x-auto w-full">
-                <table className="w-full text-left whitespace-nowrap min-w-[700px]">
-                  <thead className="bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                <table className="w-full text-left whitespace-nowrap min-w-[700px] border-collapse">
+                  <thead className="bg-white/50 backdrop-blur-2xl backdrop-saturate-[190%] shadow-[0_1px_0_rgba(255,255,255,0.9)] text-[9.5px] font-black text-gray-400 uppercase tracking-[0.16em]">
                     {previewTab === 'funds' ? (
                       <tr>
-                        <th className="px-6 py-4">Fund ID</th>
-                        <th className="px-6 py-4">Name</th>
-                        <th className="px-6 py-4">Code</th>
-                        <th className="px-6 py-4">Balance</th>
+                        <th className="px-5 py-3">Fund ID</th>
+                        <th className="px-5 py-3">Name</th>
+                        <th className="px-5 py-3">Code</th>
+                        <th className="px-5 py-3">Balance</th>
                       </tr>
                     ) : (
                       <tr>
-                        <th className="px-6 py-4">Transaction ID</th>
-                        <th className="px-6 py-4">Fund ID</th>
-                        <th className="px-6 py-4">Amount</th>
-                        <th className="px-6 py-4">Type</th>
-                        <th className="px-6 py-4">Description</th>
-                        <th className="px-6 py-4">Reference</th>
-                        <th className="px-6 py-4">Timestamp</th>
+                        <th className="px-5 py-3">Tx ID</th>
+                        <th className="px-5 py-3">Fund</th>
+                        <th className="px-5 py-3">Amount</th>
+                        <th className="px-5 py-3">Type</th>
+                        <th className="px-5 py-3">Description</th>
+                        <th className="px-5 py-3">Timestamp</th>
                       </tr>
                     )}
                   </thead>
-                  <tbody className="divide-y divide-gray-50 text-sm font-semibold text-[#04152d]">
+                  <tbody className="divide-y divide-white/50 text-[12.5px] font-bold text-[#04152d] bg-white/25 backdrop-blur-xl backdrop-saturate-[180%]">
                     {paginatedPreviewData.length > 0 ? (
                       paginatedPreviewData.map((row: any, idx) => (
-                        <tr key={row.id || idx} className="hover:bg-gray-50 transition-colors">
+                        <tr key={row.id || idx} className="hover:bg-white/65 hover:backdrop-blur-xl hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)]">
                           {previewTab === 'funds' ? (
                             <>
-                              <td className="px-6 py-3.5 font-mono text-xs">{row.id}</td>
-                              <td className="px-6 py-3.5">{row.name}</td>
-                              <td className="px-6 py-3.5 font-mono text-xs">{row.code}</td>
-                              <td className="px-6 py-3.5 text-emerald-600 font-bold">
+                              <td className="px-5 py-3 font-mono text-[11px] opacity-60">{row.id}</td>
+                              <td className="px-5 py-3 tracking-tight">{row.name}</td>
+                              <td className="px-5 py-3">
+                                <span className="glass-sheen bg-white/70 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/80 text-[10.5px] shadow-[0_2px_6px_rgba(20,30,70,0.05)]">{row.code}</span>
+                              </td>
+                              <td className="px-5 py-3 text-[#04152d] font-black text-[15px]">
                                 ₱{Number(row.balance).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                               </td>
                             </>
                           ) : (
                             <>
-                              <td className="px-6 py-3.5 font-mono text-xs max-w-[120px] truncate" title={row.id}>{row.id}</td>
-                              <td className="px-6 py-3.5 font-mono text-xs">{row.fund_id}</td>
-                              <td className="px-6 py-3.5 font-bold">
+                              <td className="px-5 py-3 font-mono text-[11px] opacity-60 max-w-[100px] truncate" title={row.id}>{row.id}</td>
+                              <td className="px-5 py-3 font-mono text-[11px]"><span className="glass-sheen bg-white/70 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/80 shadow-[0_2px_6px_rgba(20,30,70,0.05)]">{row.fund_id}</span></td>
+                              <td className="px-5 py-3 font-black text-[15px]">
                                 ₱{Number(row.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                               </td>
-                              <td className="px-6 py-3.5">
-                                <span className={`inline-block px-2 py-0.5 text-[9px] font-black rounded uppercase tracking-wider border ${
-                                  row.type === 'DEPOSIT' 
-                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-100' 
-                                    : row.type === 'WITHDRAWAL' 
-                                      ? 'bg-rose-50 text-rose-700 border-rose-100' 
-                                      : 'bg-purple-50 text-purple-700 border-purple-100'
-                                }`}>
+                              <td className="px-5 py-3">
+                                <span className="glass-sheen inline-flex items-center justify-center px-2.5 py-1 text-[9px] font-black rounded-full uppercase tracking-widest border border-white/80 bg-white/75 backdrop-blur-md shadow-[0_2px_8px_rgba(20,30,70,0.06)]">
                                   {row.type}
                                 </span>
                               </td>
-                              <td className="px-6 py-3.5 text-xs text-gray-500 max-w-[200px] truncate" title={row.description}>
+                              <td className="px-5 py-3 text-[13px] text-gray-500 max-w-[200px] truncate" title={row.description}>
                                 {row.description}
                               </td>
-                              <td className="px-6 py-3.5 text-xs text-gray-500 font-mono">{row.reference_id}</td>
-                              <td className="px-6 py-3.5 text-xs font-mono text-gray-400">
+                              <td className="px-5 py-3 text-[11px] font-mono text-gray-400">
                                 {new Date(row.timestamp).toLocaleString()}
                               </td>
                             </>
@@ -596,8 +565,8 @@ tx-107,GF,100,DEPOSIT,Invalid Date (Should Drop),REF-9999,bad-date-format`;
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={previewTab === 'funds' ? 4 : 7} className="px-6 py-16 text-center text-gray-400">
-                          No preview records found matching the search criteria.
+                        <td colSpan={previewTab === 'funds' ? 4 : 6} className="px-5 py-20 text-center text-gray-400 font-bold">
+                          No preview records found.
                         </td>
                       </tr>
                     )}
@@ -607,21 +576,21 @@ tx-107,GF,100,DEPOSIT,Invalid Date (Should Drop),REF-9999,bad-date-format`;
 
               {/* Table Pagination */}
               {totalPages > 1 && (
-                <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-gray-50/50">
+                <div className="flex items-center justify-between px-5 py-3.5 border-t border-white/50 bg-white/35 backdrop-blur-2xl backdrop-saturate-[190%]">
                   <button 
                     onClick={() => handlePageChange(currentPage - 1)} 
                     disabled={currentPage === 1}
-                    className="inline-flex items-center gap-1 bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 font-bold py-2 px-4 rounded-xl text-xs disabled:opacity-50"
+                    className={pillBtn}
                   >
                     Previous
                   </button>
-                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                  <span className="glass-sheen text-[9.5px] font-black text-gray-400 uppercase tracking-[0.16em] bg-white/55 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/70">
                     Page {currentPage} of {totalPages}
                   </span>
                   <button 
                     onClick={() => handlePageChange(currentPage + 1)} 
                     disabled={currentPage === totalPages}
-                    className="inline-flex items-center gap-1 bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 font-bold py-2 px-4 rounded-xl text-xs disabled:opacity-50"
+                    className={pillBtn}
                   >
                     Next
                   </button>
@@ -637,21 +606,10 @@ tx-107,GF,100,DEPOSIT,Invalid Date (Should Drop),REF-9999,bad-date-format`;
   );
 }
 
-// Simple fallback icon wrapper
-function XCircleIcon({ className, size }: { className?: string; size?: number }) {
-  return (
-    <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10" />
-      <path d="m15 9-6 6" />
-      <path d="m9 9 6 6" />
-    </svg>
-  );
-}
-
 export default function ForecastingPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-[#f3f4f6] text-[#04152d]">
+      <div className="min-h-screen flex items-center justify-center bg-[#f4f5f7] text-[#04152d]">
         <Loader2 className="animate-spin w-8 h-8" />
       </div>
     }>
