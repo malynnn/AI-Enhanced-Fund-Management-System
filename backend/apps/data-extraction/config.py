@@ -19,6 +19,9 @@ ANALYTICS_DB_PATH = os.getenv("ANALYTICS_DB_PATH", "analytics.db")
 # Extraction Log path (AFMS-008)
 EXTRACTION_LOG_PATH = os.getenv("EXTRACTION_LOG_PATH", "extraction_log.json")
 
+# Analytics Report path (AFMS-015)
+ANALYTICS_REPORT_PATH = os.getenv("ANALYTICS_REPORT_PATH", "analytics_report.json")
+
 # Helper function to generate connection strings
 def get_connection_string(user, password):
     return f"postgresql://{user}:{password}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
