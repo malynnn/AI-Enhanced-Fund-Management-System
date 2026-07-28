@@ -1,20 +1,20 @@
 {
-  "generated_at": "2026-07-26T23:54:29Z",
+  "generated_at": "2026-07-29T01:36:26Z",
   "summary": {
     "total_balance": 11151250.0,
     "total_tx_count": 455,
-    "total_deposits": 580654.29,
-    "total_withdrawals": 486500.0,
+    "total_deposits": 515004.49,
+    "total_withdrawals": 66500.0,
     "total_loans": 0.0,
     "total_correcting": 0.0,
-    "deposit_count": 441,
-    "withdrawal_count": 14,
+    "deposit_count": 451,
+    "withdrawal_count": 4,
     "loan_count": 0,
     "correcting_count": 0,
-    "avg_deposit": 1316.6763945578232,
-    "avg_withdrawal": 34750.0,
+    "avg_deposit": 1141.9168292682928,
+    "avg_withdrawal": 16625.0,
     "avg_loan": 0.0,
-    "net_flow": 94154.29000000004,
+    "net_flow": 448504.49,
     "fund_balances": {
       "GF": 1812350.0,
       "UF": 4520900.0,
@@ -68,8 +68,8 @@
         "tx_count": 112
       },
       "LN": {
-        "deposits": 65650.24,
-        "withdrawals": 450000.0,
+        "deposits": 0.44000000000000006,
+        "withdrawals": 30000.0,
         "loans": 0.0,
         "tx_count": 45
       },
@@ -91,167 +91,55 @@
     "monthly_trends": [
       {
         "period": "2026-01",
-        "deposits": 4.289999999999999,
-        "withdrawals": 25000.0,
+        "deposits": 4.49,
+        "withdrawals": 0.0,
         "loans": 0.0,
-        "net_flow": -24995.71,
-        "tx_count": 430
-      },
-      {
-        "period": "2026-02",
-        "deposits": 0.0,
-        "withdrawals": 12000.0,
-        "loans": 0.0,
-        "net_flow": -12000.0,
-        "tx_count": 1
-      },
-      {
-        "period": "2026-03",
-        "deposits": 0.0,
-        "withdrawals": 8000.0,
-        "loans": 0.0,
-        "net_flow": -8000.0,
-        "tx_count": 1
+        "net_flow": 4.49,
+        "tx_count": 449
       },
       {
         "period": "2026-04",
         "deposits": 515000.0,
-        "withdrawals": 116500.0,
+        "withdrawals": 66500.0,
         "loans": 0.0,
-        "net_flow": 398500.0,
-        "tx_count": 7
-      },
-      {
-        "period": "2026-05",
-        "deposits": 16600.0,
-        "withdrawals": 205000.0,
-        "loans": 0.0,
-        "net_flow": -188400.0,
-        "tx_count": 9
-      },
-      {
-        "period": "2026-06",
-        "deposits": 49050.0,
-        "withdrawals": 120000.0,
-        "loans": 0.0,
-        "net_flow": -70950.0,
-        "tx_count": 7
+        "net_flow": 448500.0,
+        "tx_count": 6
       }
     ],
     "daily_flow": [
       {
         "date": "2026-01-01",
-        "net_change": 4.29,
-        "cumulative": 11057100.0
-      },
-      {
-        "date": "2026-01-15",
-        "net_change": -25000.0,
-        "cumulative": 11032100.0
-      },
-      {
-        "date": "2026-02-10",
-        "net_change": -12000.0,
-        "cumulative": 11020100.0
-      },
-      {
-        "date": "2026-03-05",
-        "net_change": -8000.0,
-        "cumulative": 11012100.0
-      },
-      {
-        "date": "2026-04-01",
-        "net_change": -50000.0,
-        "cumulative": 10962100.0
+        "net_change": 4.49,
+        "cumulative": 10702750.0
       },
       {
         "date": "2026-04-10",
         "net_change": -20000.0,
-        "cumulative": 10942100.0
+        "cumulative": 10682750.0
       },
       {
         "date": "2026-04-15",
         "net_change": 500000.0,
-        "cumulative": 11442100.0
+        "cumulative": 11182750.0
       },
       {
         "date": "2026-04-18",
         "net_change": -12000.0,
-        "cumulative": 11430100.0
+        "cumulative": 11170750.0
       },
       {
         "date": "2026-04-20",
         "net_change": -4500.0,
-        "cumulative": 11425600.0
+        "cumulative": 11166250.0
       },
       {
         "date": "2026-04-22",
         "net_change": 15000.0,
-        "cumulative": 11440600.0
+        "cumulative": 11181250.0
       },
       {
         "date": "2026-04-26",
         "net_change": -30000.0,
-        "cumulative": 11410600.0
-      },
-      {
-        "date": "2026-05-01",
-        "net_change": 5500.0,
-        "cumulative": 11416100.0
-      },
-      {
-        "date": "2026-05-03",
-        "net_change": -25000.0,
-        "cumulative": 11391100.0
-      },
-      {
-        "date": "2026-05-05",
-        "net_change": 5500.0,
-        "cumulative": 11396600.0
-      },
-      {
-        "date": "2026-05-10",
-        "net_change": -80000.0,
-        "cumulative": 11316600.0
-      },
-      {
-        "date": "2026-05-15",
-        "net_change": -12400.0,
-        "cumulative": 11304200.0
-      },
-      {
-        "date": "2026-05-20",
-        "net_change": -47000.0,
-        "cumulative": 11257200.0
-      },
-      {
-        "date": "2026-05-28",
-        "net_change": -35000.0,
-        "cumulative": 11222200.0
-      },
-      {
-        "date": "2026-06-01",
-        "net_change": 5500.0,
-        "cumulative": 11227700.0
-      },
-      {
-        "date": "2026-06-02",
-        "net_change": -114450.0,
-        "cumulative": 11113250.0
-      },
-      {
-        "date": "2026-06-05",
-        "net_change": 14300.0,
-        "cumulative": 11127550.0
-      },
-      {
-        "date": "2026-06-06",
-        "net_change": 10500.0,
-        "cumulative": 11138050.0
-      },
-      {
-        "date": "2026-06-10",
-        "net_change": 13200.0,
         "cumulative": 11151250.0
       }
     ]

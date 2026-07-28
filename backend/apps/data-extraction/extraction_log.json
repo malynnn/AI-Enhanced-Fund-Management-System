@@ -592,5 +592,313 @@
         "invalid_timestamp": 0
       }
     }
+  },
+  {
+    "timestamp": "2026-07-28T15:24:47Z",
+    "source": "db",
+    "success": true,
+    "message": "Data extraction, validation, and storage completed successfully.",
+    "security_verified": true,
+    "funds": {
+      "initial_count": 5,
+      "final_count": 5,
+      "dropped": 0,
+      "drop_reasons": {
+        "missing_id_code": 0,
+        "invalid_balance": 0
+      }
+    },
+    "transactions": {
+      "initial_count": 455,
+      "final_count": 455,
+      "dropped": 0,
+      "drop_reasons": {
+        "missing_required_fields": 0,
+        "invalid_amount": 0,
+        "invalid_type": 0,
+        "invalid_timestamp": 0
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-28T15:36:39Z",
+    "source": "db",
+    "success": true,
+    "message": "Data extraction, validation, and storage completed successfully.",
+    "security_verified": true,
+    "funds": {
+      "initial_count": 5,
+      "final_count": 5,
+      "dropped": 0,
+      "drop_reasons": {
+        "missing_id_code": 0,
+        "invalid_balance": 0
+      }
+    },
+    "transactions": {
+      "initial_count": 455,
+      "final_count": 455,
+      "dropped": 0,
+      "drop_reasons": {
+        "missing_required_fields": 0,
+        "invalid_amount": 0,
+        "invalid_type": 0,
+        "invalid_timestamp": 0
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-28T15:39:06Z",
+    "source": "db",
+    "success": true,
+    "message": "Data extraction, validation, and storage completed successfully.",
+    "security_verified": true,
+    "funds": {
+      "initial_count": 5,
+      "final_count": 5,
+      "dropped": 0,
+      "drop_reasons": {
+        "missing_id_code": 0,
+        "invalid_balance": 0
+      }
+    },
+    "transactions": {
+      "initial_count": 455,
+      "final_count": 455,
+      "dropped": 0,
+      "drop_reasons": {
+        "missing_required_fields": 0,
+        "invalid_amount": 0,
+        "invalid_type": 0,
+        "invalid_timestamp": 0
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-28T15:44:24Z",
+    "source": "db",
+    "success": true,
+    "message": "Data extraction, validation, and storage completed successfully.",
+    "security_verified": true,
+    "funds": {
+      "initial_count": 5,
+      "final_count": 5,
+      "dropped": 0,
+      "drop_reasons": {
+        "missing_id_code": 0,
+        "invalid_balance": 0
+      }
+    },
+    "transactions": {
+      "initial_count": 455,
+      "final_count": 455,
+      "dropped": 0,
+      "drop_reasons": {
+        "missing_required_fields": 0,
+        "invalid_amount": 0,
+        "invalid_type": 0,
+        "invalid_timestamp": 0
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-28T15:45:40Z",
+    "source": "db",
+    "success": true,
+    "message": "Data extraction, validation, and storage completed successfully.",
+    "security_verified": true,
+    "funds": {
+      "initial_count": 5,
+      "final_count": 5,
+      "dropped": 0,
+      "drop_reasons": {
+        "missing_id_code": 0,
+        "invalid_balance": 0
+      }
+    },
+    "transactions": {
+      "initial_count": 455,
+      "final_count": 455,
+      "dropped": 0,
+      "drop_reasons": {
+        "missing_required_fields": 0,
+        "invalid_amount": 0,
+        "invalid_type": 0,
+        "invalid_timestamp": 0
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-28T15:51:56Z",
+    "source": "db",
+    "success": true,
+    "message": "Data extraction, validation, and storage completed successfully.",
+    "security_verified": true,
+    "funds": {
+      "initial_count": 5,
+      "final_count": 5,
+      "dropped": 0,
+      "drop_reasons": {
+        "missing_id_code": 0,
+        "invalid_balance": 0
+      }
+    },
+    "transactions": {
+      "initial_count": 455,
+      "final_count": 455,
+      "dropped": 0,
+      "drop_reasons": {
+        "missing_required_fields": 0,
+        "invalid_amount": 0,
+        "invalid_type": 0,
+        "invalid_timestamp": 0
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-28T16:07:38Z",
+    "source": "db",
+    "success": true,
+    "message": "Data extraction, validation, and storage completed successfully.",
+    "security_verified": true,
+    "funds": {
+      "initial_count": 5,
+      "final_count": 5,
+      "dropped": 0,
+      "drop_reasons": {
+        "missing_id_code": 0,
+        "invalid_balance": 0
+      }
+    },
+    "transactions": {
+      "initial_count": 455,
+      "final_count": 455,
+      "dropped": 0,
+      "drop_reasons": {
+        "missing_required_fields": 0,
+        "invalid_amount": 0,
+        "invalid_type": 0,
+        "invalid_timestamp": 0
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-28T16:22:25Z",
+    "source": "db",
+    "success": true,
+    "message": "Data extraction, validation, and storage completed successfully.",
+    "security_verified": true,
+    "funds": {
+      "initial_count": 5,
+      "final_count": 5,
+      "dropped": 0,
+      "drop_reasons": {
+        "missing_id_code": 0,
+        "invalid_balance": 0
+      }
+    },
+    "transactions": {
+      "initial_count": 455,
+      "final_count": 455,
+      "dropped": 0,
+      "drop_reasons": {
+        "missing_required_fields": 0,
+        "invalid_amount": 0,
+        "invalid_type": 0,
+        "invalid_timestamp": 0
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-28T16:53:57Z",
+    "source": "db",
+    "success": true,
+    "message": "Data extraction, validation, and storage completed successfully.",
+    "security_verified": true,
+    "funds": {
+      "initial_count": 5,
+      "final_count": 5,
+      "dropped": 0,
+      "drop_reasons": {
+        "missing_id_code": 0,
+        "invalid_balance": 0
+      }
+    },
+    "transactions": {
+      "initial_count": 455,
+      "final_count": 455,
+      "dropped": 0,
+      "drop_reasons": {
+        "missing_required_fields": 0,
+        "invalid_amount": 0,
+        "invalid_type": 0,
+        "invalid_timestamp": 0
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-28T17:25:15Z",
+    "source": "db",
+    "success": true,
+    "message": "Data extraction, validation, and storage completed successfully.",
+    "security_verified": true,
+    "funds": {
+      "initial_count": 5,
+      "final_count": 5,
+      "dropped": 0,
+      "drop_reasons": {
+        "missing_id_code": 0,
+        "invalid_balance": 0
+      }
+    },
+    "transactions": {
+      "initial_count": 455,
+      "final_count": 455,
+      "dropped": 0,
+      "drop_reasons": {
+        "missing_required_fields": 0,
+        "invalid_amount": 0,
+        "invalid_type": 0,
+        "invalid_timestamp": 0
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-28T18:06:26Z",
+    "source": "db",
+    "success": false,
+    "message": "Extraction failed: connection to server at \"localhost\" (::1), port 5432 failed: Connection refused (0x0000274D/10061)\n\tIs the server running on that host and accepting TCP/IP connections?\nconnection to server at \"localhost\" (127.0.0.1), port 5432 failed: Connection refused (0x0000274D/10061)\n\tIs the server running on that host and accepting TCP/IP connections?\n",
+    "security_verified": null,
+    "funds": {
+      "initial_count": 0,
+      "final_count": 0,
+      "dropped": 0,
+      "drop_reasons": {}
+    },
+    "transactions": {
+      "initial_count": 0,
+      "final_count": 0,
+      "dropped": 0,
+      "drop_reasons": {}
+    }
+  },
+  {
+    "timestamp": "2026-07-28T18:15:09Z",
+    "source": "db",
+    "success": false,
+    "message": "Extraction failed: connection to server at \"localhost\" (::1), port 5432 failed: Connection refused (0x0000274D/10061)\n\tIs the server running on that host and accepting TCP/IP connections?\nconnection to server at \"localhost\" (127.0.0.1), port 5432 failed: Connection refused (0x0000274D/10061)\n\tIs the server running on that host and accepting TCP/IP connections?\n",
+    "security_verified": null,
+    "funds": {
+      "initial_count": 0,
+      "final_count": 0,
+      "dropped": 0,
+      "drop_reasons": {}
+    },
+    "transactions": {
+      "initial_count": 0,
+      "final_count": 0,
+      "dropped": 0,
+      "drop_reasons": {}
+    }
   }
 ]

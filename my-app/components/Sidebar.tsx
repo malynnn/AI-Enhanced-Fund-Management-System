@@ -4,9 +4,9 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  Home, Calendar, CircleDollarSign, Book, LogOut, ChevronDown,
+  Home, Calendar, CreditCard, CircleDollarSign, Book, LogOut, ChevronDown,
   PanelLeftClose, PanelLeftOpen, LayoutDashboard, WalletCards, Send,
-  Briefcase, ClipboardList, PieChart, Users,
+  Briefcase, ClipboardList, PieChart, FileText, Users,
   Settings, Activity
 } from 'lucide-react';
 import { signOut, useSession } from "next-auth/react";
@@ -30,9 +30,6 @@ export default function Sidebar() {
   if (pathname === '/login') return null;
 
   const currentUserRole = (session?.user as any)?.role || 'User';
-  
-  // iOS 26/27-style liquid glass sidebar shell
-  const sidebarBgColor = "bg-gradient-to-b from-white/50 via-white/35 to-white/25 backdrop-blur-[54px] backdrop-saturate-[190%] border-r border-white/60 shadow-[8px_0_40px_rgba(20,30,70,0.08),inset_-1px_0_0_rgba(255,255,255,0.5)]";
 
   const generalNavItems = [
     { label: 'Dashboard', href: '/dashboard', icon: Home, roles: ['User', 'Officer/Admin', 'Superadmin', 'Treasurer', 'Auditor'] },
@@ -51,10 +48,7 @@ export default function Sidebar() {
         { label: 'User Management', href: '/admin/dashboard', icon: Users, roles: ['Officer/Admin'] },
         { label: 'Settings', href: '/admin/settings', icon: Settings, roles: ['Officer/Admin'] },
 
-        { label: 'Dashboard', href: '/treasurer/dashboard', icon: LayoutDashboard, roles: ['Treasurer'] },
-        { label: 'Collections', href: '/treasurer/collections', icon: WalletCards, roles: ['Treasurer'] },
-        { label: 'Disbursement', href: '/treasurer/disbursement', icon: Send, roles: ['Treasurer'] },
-        { label: 'Loan Ledger', href: '/treasurer/loans', icon: CircleDollarSign, roles: ['Treasurer'] },
+        { label: 'Dashboard', href: '/treasurer/dashboard', icon: LayoutDashboard, roles: ['Treasurer'] },,
         { label: 'Funds', href: '/treasurer/funds', icon: Briefcase, roles: ['Treasurer'] },
         { label: 'AI Forecasting', href: '/treasurer/forecasting', icon: Activity, roles: ['Treasurer'] },
         
@@ -94,62 +88,56 @@ export default function Sidebar() {
       const isDirectActive = !hasSubItems && (item.href === '/' ? pathname === '/' : pathname.startsWith(item.href!));
       const isOpen = openMenus[item.label] || isParentActive;
 
-      // Base classes for the tactile, springy feel
-      const baseClasses = `glass-sheen flex items-center transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] font-bold text-[13px] w-full relative group active:scale-[0.96] ${
-        isCollapsed ? 'justify-center aspect-square rounded-xl' : 'px-3.5 py-2.5 rounded-xl justify-between'
+      // Grouped item base
+      const baseClasses = `flex items-center transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] font-bold text-[13px] w-full relative active:scale-[0.98] group z-10 outline-none ${
+        isCollapsed ? 'justify-center w-11 h-11 rounded-[16px] mx-auto' : 'px-3.5 py-3 rounded-[16px] justify-between'
       }`;
 
-      // iOS-style liquid glass active/inactive states
+      // Inside a group container, active states shouldn't be fully opaque
       const activeClasses = isOpen || isParentActive || isDirectActive
-        ? 'bg-gradient-to-br from-white/90 via-white/80 to-blue-50/60 backdrop-blur-xl backdrop-saturate-[190%] text-[#04152d] shadow-[0_6px_16px_rgba(20,30,70,0.14),inset_0_1px_2px_rgba(255,255,255,1)] border border-white/90 scale-[1.02]'
-        : 'text-gray-500 bg-white/5 hover:bg-white/70 hover:backdrop-blur-xl hover:shadow-[0_4px_12px_rgba(20,30,70,0.07)] hover:text-[#04152d] border border-white/30 hover:border-white/70 hover:scale-[1.015]';
+        ? 'bg-white/[0.08] shadow-[0_4px_12px_rgba(0,0,0,0.2),inset_0_1px_1px_rgba(255,255,255,0.1)] text-white border border-white/[0.1] scale-[1.01]'
+        : 'text-white/60 hover:text-white hover:bg-white/[0.04] border border-transparent';
 
       return (
-        <div key={item.label} className="flex flex-col w-full" title={isCollapsed ? item.label : undefined}>
+        <div key={item.label} className="flex flex-col w-full relative" title={isCollapsed ? item.label : undefined}>
           {hasSubItems ? (
             <button onClick={() => toggleMenu(item.label)} className={`${baseClasses} ${activeClasses}`}>
-              <div className={`flex items-center relative z-10 ${isCollapsed ? 'justify-center' : 'gap-2.5'}`}>
-                <Icon size={isCollapsed ? 18 : 16} className={isOpen || isParentActive || isDirectActive ? "text-[#04152d]" : "text-gray-400 group-hover:text-[#04152d] transition-colors"} />
-                {!isCollapsed && <span className="whitespace-nowrap tracking-tight">{item.label}</span>}
+              <div className={`flex items-center relative z-10 ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
+                <Icon size={18} className={isOpen || isParentActive || isDirectActive ? "text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]" : "text-white/50 group-hover:text-amber-400 transition-colors"} />
+                {!isCollapsed && <span className="whitespace-nowrap tracking-wide">{item.label}</span>}
               </div>
-              {!isCollapsed && <ChevronDown size={14} className={`relative z-10 transition-transform duration-300 opacity-60 ${isOpen ? "rotate-180" : ""}`} />}
+              {!isCollapsed && <ChevronDown size={16} className={`relative z-10 transition-transform duration-300 opacity-50 ${isOpen ? "rotate-180" : ""}`} />}
             </button>
           ) : (
             <Link href={item.href!} className={`${baseClasses} ${activeClasses}`}>
-              <div className={`flex items-center relative z-10 ${isCollapsed ? 'justify-center w-full' : 'gap-2.5 w-full'}`}>
-                <Icon size={isCollapsed ? 18 : 16} className={isDirectActive ? "text-[#04152d]" : "text-gray-400 group-hover:text-[#04152d] transition-colors"} />
-                {!isCollapsed && <span className="whitespace-nowrap tracking-tight">{item.label}</span>}
+              <div className={`flex items-center relative z-10 ${isCollapsed ? 'justify-center w-full' : 'gap-3 w-full'}`}>
+                <Icon size={18} className={isDirectActive ? "text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]" : "text-white/50 group-hover:text-amber-400 transition-colors"} />
+                {!isCollapsed && <span className="whitespace-nowrap tracking-wide">{item.label}</span>}
               </div>
             </Link>
           )}
 
-          {hasSubItems && (
-            <div
-              className="grid w-full transition-[grid-template-rows,opacity] duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]"
-              style={{ gridTemplateRows: isOpen ? '1fr' : '0fr', opacity: isOpen ? 1 : 0 }}
-            >
-              <div className={`flex flex-col relative w-full overflow-hidden ${isCollapsed ? 'mt-1.5 gap-1.5 items-center' : 'mt-1.5 mb-2 space-y-1'}`}>
-                {visibleSubItems.map((sub: any, subIdx: number) => {
-                  const isSubActive = pathname === sub.href;
-                  const SubIcon = sub.icon;
+          {hasSubItems && isOpen && (
+            <div className={`flex flex-col relative w-full z-10 ${isCollapsed ? 'mt-2 gap-1 items-center' : 'mt-1 mb-2 space-y-1'}`}>
+              {visibleSubItems.map((sub: any) => {
+                const isSubActive = pathname === sub.href;
+                const SubIcon = sub.icon;
 
-                  return (
-                    <Link
-                      key={sub.label}
-                      href={sub.href}
-                      title={isCollapsed ? sub.label : undefined}
-                      style={{ transitionDelay: isOpen ? `${subIdx * 30}ms` : '0ms' }}
-                      className={`glass-sheen transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] ${isCollapsed
-                        ? `flex items-center justify-center w-full aspect-square rounded-xl active:scale-90 group ${isSubActive ? 'bg-gradient-to-br from-white/90 via-white/80 to-blue-50/60 backdrop-blur-xl shadow-[0_6px_14px_rgba(20,30,70,0.12),inset_0_1px_2px_rgba(255,255,255,1)] border border-white/90 text-[#04152d] scale-[1.02]' : 'text-gray-500 bg-white/5 hover:bg-white/70 hover:scale-[1.015] hover:shadow-[0_4px_12px_rgba(20,30,70,0.06)] border border-white/30 hover:border-white/70'}`
-                        : `flex items-center gap-2.5 pl-9 pr-3.5 py-2 text-[12px] font-bold rounded-xl active:scale-95 whitespace-nowrap group tracking-tight ${isSubActive ? 'bg-gradient-to-br from-white/90 via-white/80 to-blue-50/60 backdrop-blur-xl shadow-[0_6px_14px_rgba(20,30,70,0.12),inset_0_1px_2px_rgba(255,255,255,1)] border border-white/90 text-[#04152d] scale-[1.02]' : 'text-gray-500 bg-white/5 hover:text-[#04152d] hover:bg-white/70 hover:shadow-[0_4px_12px_rgba(20,30,70,0.06)] border border-white/30 hover:border-white/70 hover:scale-[1.015]'}`
-                      }`}
-                    >
-                      {SubIcon && <SubIcon size={isCollapsed ? 18 : 14} className={`transition-colors ${isSubActive ? "text-amber-500" : "group-hover:text-amber-500"}`} />}
-                      {!isCollapsed && <span>{sub.label}</span>}
-                    </Link>
-                  );
-                })}
-              </div>
+                return (
+                  <Link
+                    key={sub.label}
+                    href={sub.href}
+                    title={isCollapsed ? sub.label : undefined}
+                    className={isCollapsed
+                      ? `flex items-center justify-center w-11 h-11 mx-auto rounded-[16px] transition-all duration-300 ease-out active:scale-95 group ${isSubActive ? 'bg-white/[0.08] shadow-[0_4px_12px_rgba(0,0,0,0.2),inset_0_1px_1px_rgba(255,255,255,0.1)] border border-white/[0.1] text-white' : 'bg-transparent text-white/50 hover:bg-white/[0.04] hover:text-white border border-transparent'}`
+                      : `flex items-center gap-3 pl-11 pr-4 py-2 text-[12px] font-bold rounded-[14px] transition-all duration-300 ease-out active:scale-95 whitespace-nowrap group tracking-wide ${isSubActive ? 'bg-white/[0.08] shadow-[0_4px_12px_rgba(0,0,0,0.2),inset_0_1px_1px_rgba(255,255,255,0.1)] border border-white/[0.1] text-white' : 'bg-transparent text-white/50 hover:bg-white/[0.04] hover:text-white border border-transparent'}`
+                    }
+                  >
+                    {SubIcon && <SubIcon size={15} className={`transition-colors ${isSubActive ? "text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]" : "text-white/40 group-hover:text-amber-400"}`} />}
+                    {!isCollapsed && <span className="relative z-10">{sub.label}</span>}
+                  </Link>
+                );
+              })}
             </div>
           )}
         </div>
@@ -157,58 +145,15 @@ export default function Sidebar() {
     });
   };
 
+  const glassGroupContainer = "bg-white/[0.02] backdrop-blur-2xl border border-white/5 shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.05)] rounded-[24px] p-2 flex flex-col space-y-1 relative z-10";
+
   return (
     <>
       <style jsx global>{`
-        @keyframes liquid-drift {
+        @keyframes deep-liquid-drift {
           0%, 100% { transform: translate(0, 0) scale(1); }
-          50% { transform: translate(12px, -18px) scale(1.06); }
-        }
-        /* iOS 26/27-style liquid glass: standing specular highlight + refraction rim + hover bloom */
-        .glass-sheen { position: relative; overflow: hidden; isolation: isolate; }
-        .glass-sheen::before {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background:
-            linear-gradient(128deg, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0.14) 28%, rgba(255,255,255,0) 46%),
-            radial-gradient(130% 110% at 12% -18%, rgba(255,255,255,0.55), rgba(255,255,255,0) 58%);
-          opacity: 0.8;
-          transition: opacity 0.35s ease;
-          pointer-events: none;
-          z-index: 1;
-        }
-        .glass-sheen:hover::before {
-          opacity: 1;
-        }
-        .glass-sheen::after {
-          content: '';
-          position: absolute;
-          inset: 0;
-          box-shadow:
-            inset 0 1px 0 rgba(255,255,255,0.85),
-            inset 0 -8px 16px -12px rgba(80,110,220,0.2),
-            inset 1px 0 0 rgba(255,255,255,0.3),
-            inset -1px 0 0 rgba(255,255,255,0.1);
-          transition: box-shadow 0.35s ease;
-          pointer-events: none;
-          z-index: 1;
-          border-radius: inherit;
-        }
-        .glass-sheen:hover::after {
-          box-shadow:
-            inset 0 1px 0 rgba(255,255,255,1),
-            inset 0 -8px 18px -10px rgba(80,110,220,0.28),
-            inset 1px 0 0 rgba(255,255,255,0.45),
-            inset -1px 0 0 rgba(255,255,255,0.16),
-            inset 0 0 0 1px rgba(255,255,255,0.5);
-        }
-        .glass-blob {
-          position: absolute;
-          border-radius: 9999px;
-          filter: blur(75px);
-          pointer-events: none;
-          animation: liquid-drift 14s ease-in-out infinite;
+          33% { transform: translate(25px, -25px) scale(1.05); }
+          66% { transform: translate(-20px, 20px) scale(0.95); }
         }
       `}</style>
 
@@ -222,64 +167,74 @@ export default function Sidebar() {
         confirmText="Sign Out"
       />
 
-      <aside className={`relative h-full flex-shrink-0 z-20 flex flex-col transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] print:hidden ${isCollapsed ? 'w-[84px]' : 'w-[264px]'}`}>
+      <aside className={`relative h-full flex-shrink-0 z-50 flex flex-col bg-[#0a1224]/80 backdrop-blur-[50px] backdrop-saturate-[150%] border-r border-white/5 shadow-[4px_0_32px_rgba(0,0,0,0.3)] transition-all duration-400 ease-[cubic-bezier(0.25,1,0.5,1)] print:hidden ${isCollapsed ? 'w-[100px]' : 'w-[290px]'}`}>
+        
+        {/* Dynamic Dark Blue & Yellow Background Blobs */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0 mix-blend-screen opacity-50">
+          <div className="absolute w-[400px] h-[400px] bg-blue-600/30 rounded-full blur-[90px] -top-20 -left-20 animate-[deep-liquid-drift_15s_ease-in-out_infinite]" />
+          <div className="absolute w-[350px] h-[350px] bg-amber-500/20 rounded-full blur-[90px] top-1/4 -right-20 animate-[deep-liquid-drift_12s_ease-in-out_infinite]" style={{ animationDelay: '2s' }} />
+          <div className="absolute w-[300px] h-[300px] bg-blue-400/10 rounded-full blur-[80px] bottom-10 -left-10 animate-[deep-liquid-drift_18s_ease-in-out_infinite]" style={{ animationDelay: '4s' }} />
+        </div>
+
         {status === "loading" ? (
-          <div className={`w-full h-full ${sidebarBgColor}`} />
+          <div className="w-full h-full relative z-10" />
         ) : (
-          <div className={`relative flex flex-col h-full overflow-hidden py-6 transition-colors duration-500 ${sidebarBgColor} ${isCollapsed ? 'px-[14px]' : 'px-5'}`}>
+          <div className="flex flex-col h-full overflow-hidden py-8 relative z-10">
 
-            <div className="glass-blob w-40 h-40 bg-blue-400/40 -top-8 -left-10" />
-            <div className="glass-blob w-36 h-36 bg-amber-300/35 bottom-24 -right-14" style={{ animationDelay: '3s' }} />
-            <div className="glass-blob w-28 h-28 bg-emerald-300/30 top-1/2 -left-12" style={{ animationDelay: '6s' }} />
-
-            <div className={`relative z-10 mb-7 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
+            {/* Logo & Toggle Header */}
+            <div className={`mb-10 flex items-center shrink-0 ${isCollapsed ? 'justify-center px-3' : 'justify-between px-6'}`}>
               {!isCollapsed && (
-                <img src="/bdoea-logo-blue.png" alt="BDOEA Logo" className="w-[108px] h-auto object-contain pl-1 drop-shadow-sm" />
+                <img src="/bdoea-logo.png" alt="BDOEA Logo" className="w-[120px] h-auto object-contain drop-shadow-[0_2px_12px_rgba(0,0,0,0.4)]" />
               )}
               <button
                 onClick={() => setIsCollapsed(!isCollapsed)}
-                className={`glass-sheen flex items-center justify-center bg-white/65 backdrop-blur-md backdrop-saturate-[180%] border border-white/80 shadow-[0_4px_12px_rgba(20,30,70,0.08),inset_0_1px_2px_rgba(255,255,255,0.9)] text-[#04152d] hover:bg-white/90 hover:scale-105 active:scale-90 transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] ${isCollapsed ? 'w-full aspect-square rounded-xl' : 'h-9 w-9 rounded-xl'}`}
+                className={`flex items-center justify-center bg-white/[0.04] backdrop-blur-md border border-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.15)] text-white/70 hover:text-white hover:bg-white/[0.08] hover:border-white/20 hover:scale-105 active:scale-95 transition-all duration-300 outline-none ${isCollapsed ? 'w-12 h-12 rounded-[16px]' : 'h-10 w-10 rounded-full'}`}
                 title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
               >
-                {isCollapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
+                {isCollapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
               </button>
             </div>
 
-            <nav className="relative z-10 flex-1 overflow-y-auto overflow-x-hidden space-y-6 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-track]:transparent pr-2 -mr-2 pb-4">
+            {/* Navigation Lists - Padding applied to the scrolling container to prevent shadow clipping */}
+            <nav className={`flex-1 overflow-y-auto space-y-8 [&::-webkit-scrollbar]:hidden pb-4 pt-2 ${isCollapsed ? 'px-3' : 'px-6'}`}>
               
-              <div className="flex flex-col">
-                {!isCollapsed && <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.18em] mb-3 px-3.5 whitespace-nowrap">Main Menu</p>}
-                <div className={`glass-sheen flex flex-col space-y-1.5 bg-gradient-to-br from-white/45 via-white/30 to-white/20 backdrop-blur-2xl backdrop-saturate-[190%] border border-white/60 shadow-[inset_0_2px_4px_rgba(255,255,255,0.7),0_4px_14px_rgba(20,30,70,0.04)] rounded-[20px] ${isCollapsed ? 'p-2' : 'p-2.5'}`}>
+              <div className="flex flex-col space-y-2">
+                {!isCollapsed && <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.25em] mb-1 px-2 drop-shadow-sm">Main Menu</p>}
+                <div className={glassGroupContainer}>
                   {renderNavItems(visibleGeneralItems)}
                 </div>
               </div>
 
-              <div className="flex flex-col space-y-3 mt-3">
+              <div className="flex flex-col space-y-2 mt-4">
                 {!isCollapsed ? (
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.18em] mb-1.5 px-3.5 whitespace-nowrap">Financial System</p>
+                  <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.25em] mb-1 px-2 drop-shadow-sm">Financial System</p>
                 ) : (
-                  <div className="h-px bg-gray-300 w-8 mx-auto mt-3 mb-1.5" />
+                  <div className="h-px bg-white/10 w-8 mx-auto my-4" />
                 )}
-
-                {visibleSystemItems.map((item, idx) => (
-                  <div key={idx} className={`glass-sheen flex flex-col bg-gradient-to-br from-white/45 via-white/30 to-blue-50/20 backdrop-blur-2xl backdrop-saturate-[190%] border border-white/60 shadow-[inset_0_2px_4px_rgba(255,255,255,0.7),0_4px_14px_rgba(20,30,70,0.04)] rounded-[20px] ${isCollapsed ? 'p-2' : 'p-2.5'}`}>
-                    {renderNavItems([item])}
-                  </div>
-                ))}
+                
+                {/* Wrap all system items inside the grouped container */}
+                <div className={glassGroupContainer}>
+                  {visibleSystemItems.map((item, idx) => (
+                    <div key={idx} className="flex flex-col w-full">
+                      {renderNavItems([item])}
+                    </div>
+                  ))}
+                </div>
               </div>
             </nav>
 
-            <div className="relative z-10 mt-5 pt-5 border-t border-gray-300/50 flex flex-col gap-2.5">
-              <div className={`glass-sheen bg-gradient-to-br from-white/85 via-white/75 to-blue-50/40 backdrop-blur-2xl backdrop-saturate-[190%] border border-white/85 shadow-[0_6px_16px_rgba(20,30,70,0.1),inset_0_1px_2px_rgba(255,255,255,1)] flex items-center transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] hover:shadow-[0_10px_22px_rgba(20,30,70,0.14),inset_0_1px_2px_rgba(255,255,255,1)] hover:scale-[1.015] cursor-pointer ${isCollapsed ? 'p-2 rounded-xl justify-center w-full aspect-square' : 'p-2.5 rounded-[18px] justify-between'}`}>
-                <div className={`flex items-center gap-2.5 overflow-hidden ${isCollapsed ? 'justify-center w-full h-full' : ''}`}>
-                  <div className={`rounded-full bg-gradient-to-tr from-[#04152d] to-blue-700 shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] flex-shrink-0 ${isCollapsed ? 'w-full h-full' : 'w-9 h-9'}`} title={session?.user?.email?.split('@')[0] || "VEN"} />
+            {/* Footer Profile */}
+            <div className={`mt-2 pt-6 border-t border-white/10 flex flex-col gap-3 shrink-0 ${isCollapsed ? 'px-3' : 'px-6'}`}>
+              <div className={`bg-gradient-to-br from-white/[0.08] to-white/[0.02] backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.2)] flex items-center transition-all duration-400 hover:shadow-[0_12px_40px_rgba(0,0,0,0.4)] hover:bg-white/[0.1] hover:-translate-y-0.5 active:scale-95 active:translate-y-0 cursor-pointer ${isCollapsed ? 'p-2 rounded-[20px] justify-center w-[52px] h-[52px] mx-auto' : 'p-3 rounded-[24px] justify-between'}`}>
+                <div className={`flex items-center gap-3 overflow-hidden ${isCollapsed ? 'justify-center w-full h-full' : ''}`}>
+                  <div className={`rounded-full bg-gradient-to-tr from-[#04152d] to-blue-600 shadow-[inset_0_2px_6px_rgba(255,255,255,0.4),0_2px_8px_rgba(0,0,0,0.5)] border border-white/20 flex-shrink-0 ${isCollapsed ? 'w-full h-full' : 'w-10 h-10'}`} title={session?.user?.email?.split('@')[0] || "VEN"} />
 
                   {!isCollapsed && (
-                    <div className="overflow-hidden pl-0.5">
-                      <p className="text-[8.5px] tracking-[0.18em] uppercase m-0 leading-tight font-black text-gray-500">
+                    <div className="overflow-hidden">
+                      <p className="text-[9px] tracking-[0.2em] uppercase m-0 leading-tight font-black text-amber-400/90 drop-shadow-[0_0_4px_rgba(251,191,36,0.3)]">
                         {currentUserRole}
                       </p>
-                      <p className="text-[13px] font-black text-[#04152d] truncate leading-tight mt-0.5 whitespace-nowrap tracking-tight">{session?.user?.email?.split('@')[0] || "VEN"}</p>
+                      <p className="text-[14px] font-black text-white truncate leading-tight mt-0.5 whitespace-nowrap">{session?.user?.email?.split('@')[0] || "VEN"}</p>
                     </div>
                   )}
                 </div>
@@ -287,22 +242,22 @@ export default function Sidebar() {
                 {!isCollapsed && (
                   <button 
                     onClick={triggerLogout}
-                    className="glass-sheen p-2 bg-white/60 hover:bg-white/90 border border-white/80 shadow-[inset_0_1px_2px_rgba(255,255,255,0.9)] rounded-lg transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] text-gray-500 hover:text-red-500 hover:scale-110 active:scale-90 flex-shrink-0"
+                    className="p-2.5 bg-white/[0.05] hover:bg-red-500/20 border border-white/10 hover:border-red-400/50 shadow-[inset_0_1px_2px_rgba(255,255,255,0.1)] rounded-xl transition-all duration-300 text-white/50 hover:text-red-400 hover:scale-110 active:scale-90 flex-shrink-0 outline-none"
                     title="Sign Out"
                   >
-                    <LogOut size={15} strokeWidth={2.5} />
+                    <LogOut size={18} strokeWidth={2.5} />
                   </button>
                 )}
               </div>
 
               {isCollapsed && (
-                <div className="flex justify-center">
+                <div className="flex justify-center mt-2">
                   <button
                     onClick={triggerLogout}
-                    className="glass-sheen transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] flex items-center justify-center bg-white/65 hover:bg-white/90 border border-white/80 shadow-[0_4px_12px_rgba(20,30,70,0.08),inset_0_1px_2px_rgba(255,255,255,0.9)] text-gray-500 hover:text-red-500 hover:scale-105 active:scale-90 w-full aspect-square rounded-xl"
+                    className="transition-all duration-300 flex items-center justify-center bg-white/[0.05] hover:bg-red-500/20 border border-white/10 hover:border-red-400/50 shadow-[0_4px_16px_rgba(0,0,0,0.2),inset_0_1px_2px_rgba(255,255,255,0.1)] text-white/50 hover:text-red-400 hover:-translate-y-0.5 active:scale-95 w-[52px] h-[52px] rounded-[20px] mx-auto"
                     title="Sign Out"
                   >
-                    <LogOut size={17} strokeWidth={2.5} className="flex-shrink-0" />
+                    <LogOut size={18} strokeWidth={2.5} className="flex-shrink-0" />
                   </button>
                 </div>
               )}
