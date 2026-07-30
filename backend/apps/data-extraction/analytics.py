@@ -314,15 +314,54 @@ def main():
         # AFMS-014: Generate trend analysis
         trends = analyze_trends(tx_clean, total_current_balance=summary["total_balance"])
 
+        # AFMS-017 to AFMS-021: AI Forecasting & Decision Support Pipeline
+        try:
+            import forecasting
+            ai_results = forecasting.run_forecasting_pipeline(funds_clean, tx_clean)
+            trends["forecast_timeline"] = ai_results.get("forecast_timeline", [])
+            forecasts = ai_results.get("forecasts", [])
+            shortage_alerts = ai_results.get("shortage_alerts", [])
+            recommendations = ai_results.get("recommendations", [])
+            reallocation_report = ai_results.get("reallocation_report", {})
+            audit_logs = ai_results.get("audit_logs", [])
+            model_config = ai_results.get("model_config", {})
+        except Exception as fc_err:
+            forecasts, shortage_alerts, recommendations = [], [], []
+            reallocation_report, audit_logs, model_config = {}, [], {}
+
         # AFMS-015: Save aggregated reports
         saved_file = save_reports(summary, trends, output_path)
 
+        # AFMS-024, AFMS-025, AFMS-026: Store Sprint 4 storage module assets into SQLite
+        storage_stats = {}
+        try:
+            import analytics_store
+            fc_count = analytics_store.store_forecast_results(forecasts, db_path=db_path)
+            rep_count, rec_count = analytics_store.store_recommendation_reports(reallocation_report, recommendations, db_path=db_path)
+            audit_count = analytics_store.store_audit_logs(audit_logs, db_path=db_path)
+
+            storage_stats = {
+                "forecasts_stored": fc_count,
+                "reports_stored": rep_count,
+                "recommendations_stored": rec_count,
+                "audit_logs_stored": audit_count
+            }
+        except Exception as st_err:
+            storage_stats = {"error": f"Sprint 4 storage failed: {str(st_err)}"}
+
         result["success"] = True
-        result["message"] = "Financial analytics compiled and saved successfully."
+        result["message"] = "Financial analytics compiled, saved, and stored into SQLite successfully."
         result["report_saved_at"] = saved_file
+        result["storage_stats"] = storage_stats
         result["data"] = {
             "summary": summary,
-            "trends": trends
+            "trends": trends,
+            "forecasts": forecasts,
+            "shortage_alerts": shortage_alerts,
+            "recommendations": recommendations,
+            "reallocation_report": reallocation_report,
+            "audit_logs": audit_logs,
+            "model_config": model_config
         }
         
         # Output JSON result to stdout

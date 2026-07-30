@@ -430,14 +430,17 @@ function ForecastingContent() {
               </tr>
             </thead>
             <tbody>
-              {analyticsResult.forecasts.map((f, i) => (
-                <tr key={i}>
-                  <td className="p-3 border border-gray-200 font-bold">{f.fund}</td>
-                  <td className="p-3 border border-gray-200">₱{f.projected_balance.toLocaleString()}</td>
-                  <td className="p-3 border border-gray-200 uppercase">{f.trend}</td>
-                  <td className="p-3 border border-gray-200">{f.confidence}%</td>
-                </tr>
-              ))}
+              {analyticsResult.forecasts.map((f: any, i: number) => {
+                const projBal = f.projected_balance ?? f.projected_balance_60d ?? 0;
+                return (
+                  <tr key={i}>
+                    <td className="p-3 border border-gray-200 font-bold">{f.fund || f.fund_name || f.code}</td>
+                    <td className="p-3 border border-gray-200">₱{projBal.toLocaleString()}</td>
+                    <td className="p-3 border border-gray-200 uppercase">{f.trend}</td>
+                    <td className="p-3 border border-gray-200">{f.confidence}%</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         ) : (
@@ -447,9 +450,9 @@ function ForecastingContent() {
         <h2 className="text-lg font-black text-[#04152d] mb-3 border-b border-gray-200 pb-2">Projected Shortage Alerts</h2>
         {analyticsResult?.shortage_alerts?.length ? (
           <ul className="list-disc pl-5 mb-8 text-sm">
-            {analyticsResult.shortage_alerts.map(a => (
+            {analyticsResult.shortage_alerts.map((a: any) => (
               <li key={a.id} className="mb-2">
-                <strong>{a.fund}:</strong> Estimated deficit of ₱{a.shortfall_amount.toLocaleString()} predicted by {new Date(a.predicted_date).toLocaleDateString()}.
+                <strong>{a.fund || a.code}:</strong> Estimated deficit of ₱{(a.shortfall_amount ?? 0).toLocaleString()} predicted by {a.predicted_date ? new Date(a.predicted_date).toLocaleDateString() : 'N/A'}.
               </li>
             ))}
           </ul>
@@ -802,15 +805,15 @@ function ForecastingContent() {
                         <BellRing size={18} className="text-yellow-600" /> Projected Shortage Alerts
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
-                        {analyticsResult.shortage_alerts.map(alert => (
+                        {analyticsResult.shortage_alerts.map((alert: any) => (
                           <div key={alert.id} className="bg-white/70 backdrop-blur-md border border-white rounded-[16px] p-4 shadow-sm flex items-start gap-4">
                             <div className="w-10 h-10 rounded-full bg-yellow-100/80 flex items-center justify-center shrink-0 border border-yellow-200">
                               <AlertTriangle size={18} className="text-yellow-600" />
                             </div>
                             <div>
-                              <h4 className="text-[14px] font-black text-[#04152d] tracking-tight">{alert.fund} Shortfall Predicted</h4>
+                              <h4 className="text-[14px] font-black text-[#04152d] tracking-tight">{alert.fund || alert.code} Shortfall Predicted</h4>
                               <p className="text-[12px] font-bold text-[#04152d]/70 mt-1">
-                                Estimated deficit of <span className="text-yellow-600 font-black">₱{alert.shortfall_amount.toLocaleString()}</span> by <span className="font-mono bg-white/60 px-1 rounded">{new Date(alert.predicted_date).toLocaleDateString()}</span>
+                                Estimated deficit of <span className="text-yellow-600 font-black">₱{(alert.shortfall_amount ?? 0).toLocaleString()}</span> by <span className="font-mono bg-white/60 px-1 rounded">{alert.predicted_date ? new Date(alert.predicted_date).toLocaleDateString() : 'N/A'}</span>
                               </p>
                             </div>
                           </div>
@@ -826,36 +829,39 @@ function ForecastingContent() {
                         <LineChart size={18} className="text-blue-500" /> AI Fund Forecast Insights
                       </h3>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                        {analyticsResult.forecasts.map((forecast, i) => (
-                          <div key={i} className="bg-white/40 backdrop-blur-md border border-white rounded-[20px] p-5 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)] hover:shadow-md transition-shadow">
-                            <div className="flex items-center justify-between mb-3">
-                              <span className="text-[13px] font-black text-[#04152d]">{forecast.fund}</span>
-                              <div className={`w-8 h-8 rounded-full flex items-center justify-center border shadow-sm ${
-                                forecast.trend === 'up' ? 'bg-blue-50 text-blue-600 border-blue-200' :
-                                forecast.trend === 'down' ? 'bg-yellow-50 text-yellow-600 border-yellow-200' :
-                                'bg-gray-50 text-gray-600 border-gray-200'
-                              }`}>
-                                {forecast.trend === 'up' ? <TrendingUp size={14} /> : forecast.trend === 'down' ? <TrendingDown size={14} /> : <Minus size={14} />}
+                        {analyticsResult.forecasts.map((forecast: any, i: number) => {
+                          const projBal = forecast.projected_balance ?? forecast.projected_balance_60d ?? 0;
+                          return (
+                            <div key={i} className="bg-white/40 backdrop-blur-md border border-white rounded-[20px] p-5 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)] hover:shadow-md transition-shadow">
+                              <div className="flex items-center justify-between mb-3">
+                                <span className="text-[13px] font-black text-[#04152d]">{forecast.fund || forecast.fund_name || forecast.code}</span>
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center border shadow-sm ${
+                                  forecast.trend === 'up' ? 'bg-blue-50 text-blue-600 border-blue-200' :
+                                  forecast.trend === 'down' ? 'bg-yellow-50 text-yellow-600 border-yellow-200' :
+                                  'bg-gray-50 text-gray-600 border-gray-200'
+                                }`}>
+                                  {forecast.trend === 'up' ? <TrendingUp size={14} /> : forecast.trend === 'down' ? <TrendingDown size={14} /> : <Minus size={14} />}
+                                </div>
+                              </div>
+                              <span className="block text-[10px] font-bold text-[#04152d]/50 uppercase tracking-widest mb-1">Projected Balance</span>
+                              <p className={`text-2xl font-black tracking-tighter ${
+                                  forecast.trend === 'up' ? 'text-blue-600' :
+                                  forecast.trend === 'down' ? 'text-yellow-600' :
+                                  'text-[#04152d]'
+                                }`}
+                                title={`₱${projBal.toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
+                              >
+                                ₱{formatCurrency(projBal)}
+                              </p>
+                              <div className="mt-4 flex items-center gap-2 text-[11px] font-bold text-[#04152d]/50">
+                                <div className="h-1.5 flex-1 bg-white/50 rounded-full overflow-hidden border border-white/60">
+                                  <div className="h-full bg-blue-500 rounded-full" style={{ width: `${forecast.confidence}%` }} />
+                                </div>
+                                <span className="shrink-0">{forecast.confidence}% Confidence</span>
                               </div>
                             </div>
-                            <span className="block text-[10px] font-bold text-[#04152d]/50 uppercase tracking-widest mb-1">Projected Balance</span>
-                            <p className={`text-2xl font-black tracking-tighter ${
-                                forecast.trend === 'up' ? 'text-blue-600' :
-                                forecast.trend === 'down' ? 'text-yellow-600' :
-                                'text-[#04152d]'
-                              }`}
-                              title={`₱${forecast.projected_balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
-                            >
-                              ₱{formatCurrency(forecast.projected_balance)}
-                            </p>
-                            <div className="mt-4 flex items-center gap-2 text-[11px] font-bold text-[#04152d]/50">
-                              <div className="h-1.5 flex-1 bg-white/50 rounded-full overflow-hidden border border-white/60">
-                                <div className="h-full bg-blue-500 rounded-full" style={{ width: `${forecast.confidence}%` }} />
-                              </div>
-                              <span className="shrink-0">{forecast.confidence}% Confidence</span>
-                            </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   )}

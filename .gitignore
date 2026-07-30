@@ -1,5 +1,10 @@
 node_modules
 
+# Python cache & bytecode
+__pycache__/
+*.pyc
+*.pyo
+
 # NestJS / TS Compiled Outputs (except config)
 backend/apps/**/src/**/*.js
 backend/apps/**/src/**/*.js.map
@@ -8,6 +13,16 @@ backend/libs/**/src/**/*.js
 backend/libs/**/src/**/*.js.map
 backend/libs/**/src/**/*.d.ts
 dist/
+
+# Environment Secrets (NEVER push API keys)
+.env
+.env.*
+*.env
+
+# Runtime Log & Output Data (DO NOT push generated logs/reports)
+analytics_report.json
+extraction_log.json
+*.json.log
 
 # NX Cache & Metadata
 .nx/
@@ -23,7 +38,7 @@ daemon.log
 f175c72c-*
 [0-9]*
 
-# Logs & Scripts
+# Logs & Scratch Scripts
 *.log
 search_pattern.js
 test_port3002.js
@@ -34,3 +49,4 @@ scratch_query.js
 test_post.js
 check_dues_mapping.js
 update_db.js
+test_sprint4_db.js
