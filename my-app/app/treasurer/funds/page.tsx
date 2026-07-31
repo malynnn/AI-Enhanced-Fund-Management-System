@@ -3,11 +3,14 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useMemo, useEffect } from 'react';
-import { Search, ArrowRightLeft, TrendingUp, TrendingDown, Wallet, Calendar, X } from 'lucide-react';
-import { PieChart, Pie, Tooltip, ResponsiveContainer } from 'recharts';
+import { Search, ArrowRightLeft, TrendingUp, TrendingDown, Wallet, Calendar, X, Layers, Loader2 } from 'lucide-react';
+import { PieChart, Pie, Tooltip, ResponsiveContainer, Cell, Legend } from 'recharts';
 import Header from '@/components/Header'; 
 import ActionModal from '@/components/ActionModal';
 import FundTransferModal from '@/components/FundTransferModal';
+
+// Strictly BDOEA Palette
+const CHART_COLORS = ['#04152d', '#2563eb', '#eab308', '#60a5fa', '#fef08a'];
 
 export default function FundPage() {
   const [funds, setFunds] = useState<any[]>([]);
@@ -22,7 +25,6 @@ export default function FundPage() {
       setIsLoading(true);
       const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
       
-      // Pass the selected month to the backend to get historical balances if applicable
       const url = month ? `${gatewayUrl}/api/finance/funds?month=${month}` : `${gatewayUrl}/api/finance/funds`;
       
       const res = await fetch(url);
@@ -45,7 +47,6 @@ export default function FundPage() {
     }
   };
 
-  // Re-fetch data whenever the month filter changes
   useEffect(() => {
     fetchRealFundsData(filterMonth);
   }, [filterMonth]);
@@ -67,7 +68,6 @@ export default function FundPage() {
   const totalCashIn = funds.filter(f => f.status === 'Active').reduce((sum, f) => sum + f.totalIn, 0);
   const totalCashOut = funds.filter(f => f.status === 'Active').reduce((sum, f) => sum + f.totalOut, 0);
 
-  const CHART_COLORS = ['#04152d', '#3b82f6', '#facc15', '#10b981', '#ef4444', '#8b5cf6'];
   const chartData = useMemo(() => {
     let colorIndex = 0; 
     return funds
@@ -101,8 +101,45 @@ export default function FundPage() {
     }
   };
 
+  // StudioSeven Liquid Glass Primitives
+  const ultraGlassCard = "glass-sheen bg-gradient-to-br from-white/60 via-white/40 to-white/30 backdrop-blur-[40px] backdrop-saturate-[200%] border border-white/80 shadow-[0_10px_30px_rgba(4,21,45,0.06),0_1px_1px_rgba(255,255,255,0.6),inset_0_2px_3px_rgba(255,255,255,0.9)] rounded-[24px] p-5 md:p-6 transition-all duration-400 ease-[cubic-bezier(0.25,1,0.5,1)]";
+  const pillBtn = "glass-sheen px-5 py-2.5 bg-white/70 hover:bg-white/90 backdrop-blur-xl backdrop-saturate-[180%] border border-white/80 shadow-[0_4px_14px_rgba(4,21,45,0.06),inset_0_1px_2px_rgba(255,255,255,1)] hover:shadow-[0_8px_20px_rgba(4,21,45,0.1),inset_0_1px_2px_rgba(255,255,255,1)] hover:-translate-y-0.5 active:scale-95 active:translate-y-0 rounded-full text-[13px] font-black text-[#04152d] transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] flex items-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:hover:translate-y-0";
+
   return (
-    <div className="flex flex-col min-h-screen bg-transparent relative">
+    <div className="relative flex flex-col min-h-screen bg-[#f4f5f7]">
+      
+      <style jsx global>{`
+        @keyframes liquid-drift {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          33% { transform: translate(30px, -40px) scale(1.08); }
+          66% { transform: translate(-20px, 20px) scale(0.95); }
+        }
+        .glass-sheen { position: relative; overflow: hidden; isolation: isolate; }
+        .glass-sheen::before {
+          content: ''; position: absolute; inset: 0;
+          background: linear-gradient(128deg, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0.14) 28%, rgba(255,255,255,0) 46%), radial-gradient(130% 110% at 12% -18%, rgba(255,255,255,0.55), rgba(255,255,255,0) 58%);
+          opacity: 0.85; transition: opacity 0.35s ease; pointer-events: none; z-index: 1;
+        }
+        .glass-sheen:hover::before { opacity: 1; }
+        .glass-sheen::after {
+          content: ''; position: absolute; inset: 0;
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), inset 0 -10px 18px -14px rgba(4,21,45,0.15), inset 1px 0 0 rgba(255,255,255,0.4), inset -1px 0 0 rgba(255,255,255,0.1), inset 0 0 0 1px rgba(255,255,255,0.1);
+          transition: box-shadow 0.35s ease; pointer-events: none; z-index: 1; border-radius: inherit;
+        }
+        .glass-sheen:hover::after {
+          box-shadow: inset 0 1px 0 rgba(255,255,255,1), inset 0 -10px 20px -12px rgba(4,21,45,0.2), inset 1px 0 0 rgba(255,255,255,0.6), inset -1px 0 0 rgba(255,255,255,0.2), inset 0 0 0 1px rgba(255,255,255,0.4);
+        }
+        .glass-blob {
+          position: absolute; border-radius: 9999px; filter: blur(100px); pointer-events: none; animation: liquid-drift 20s ease-in-out infinite;
+        }
+      `}</style>
+
+      {/* Isolated Liquid Background Layer */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="glass-blob w-[480px] h-[480px] bg-blue-400/30 -top-32 -left-20" />
+        <div className="glass-blob w-[440px] h-[440px] bg-yellow-300/30 top-1/3 -right-32" style={{ animationDelay: '4s' }} />
+        <div className="glass-blob w-[360px] h-[360px] bg-white/60 bottom-0 left-1/3" style={{ animationDelay: '8s' }} />
+      </div>
       
       <ActionModal 
         isOpen={actionModal.isOpen} title={actionModal.title} message={actionModal.message} status={actionModal.status} resultMsg={actionModal.resultMsg}
@@ -113,163 +150,174 @@ export default function FundPage() {
         isOpen={isTransferModalOpen} onClose={() => setIsTransferModalOpen(false)} funds={funds.filter(f => f.status === 'Active')} onSubmit={handleExecuteTransfer}
       />
 
-      <Header />
+      {/* Sticky Header - Properly confined, no 'fixed' overlap */}
+      <div className="sticky top-0 z-40 w-full backdrop-blur-2xl bg-white/30 border-b border-white/50 shadow-[0_4px_30px_rgba(0,0,0,0.03)]">
+        <Header />
+      </div>
 
-      <main className="p-4 md:p-8 max-w-[1600px] w-full mx-auto space-y-6 flex-1 animate-fade-in">
+      {/* Main Content Area - Removed pt-[100px] because header is sticky now */}
+      <main className="p-4 md:p-6 max-w-[1600px] w-full mx-auto space-y-6 flex-1 animate-fade-in relative z-10">
 
         {/* Analytics Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-[#04152d] rounded-2xl p-6 shadow-xl flex flex-col justify-center relative overflow-hidden animate-slide-up" style={{ animationDelay: '0.05s' }}>
-            <Wallet size={120} strokeWidth={1} className="absolute -right-6 -bottom-6 text-white/10" />
+          
+          <div className={`${ultraGlassCard} flex flex-col justify-center relative overflow-hidden group hover:-translate-y-1 hover:shadow-[0_14px_30px_rgba(4,21,45,0.08),inset_0_2px_3px_rgba(255,255,255,1)]`}>
+            <Wallet size={120} strokeWidth={1} className="absolute -right-6 -bottom-6 text-blue-600/10 group-hover:scale-110 transition-transform duration-500" />
             <div className="relative z-10">
-              <p className="block text-[10px] font-black text-blue-300 uppercase tracking-[0.12em] mb-1 text-left">Total Running Balance</p>
-              <p className="text-4xl font-black text-white tracking-tight text-left">
+              <p className="block text-[10px] font-black text-[#04152d]/50 uppercase tracking-[0.16em] mb-1 text-left">Total Running Balance</p>
+              <p className="text-3xl lg:text-4xl font-black text-[#04152d] tracking-tighter text-left truncate" title={`₱${totalAssets.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}>
                 {isLoading ? '...' : `₱${totalAssets.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
               </p>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-emerald-100 flex flex-col justify-center animate-slide-up" style={{ animationDelay: '0.1s' }}>
-            <div className="flex items-center gap-2 mb-1 text-left">
-              <TrendingUp size={14} className="text-emerald-500" />
-              <p className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.12em]">Total Collections (Cash In)</p>
+          <div className={`${ultraGlassCard} flex flex-col justify-center group hover:-translate-y-1 hover:shadow-[0_14px_30px_rgba(4,21,45,0.08),inset_0_2px_3px_rgba(255,255,255,1)]`}>
+            <div className="flex items-center gap-3 mb-2 text-left">
+              <div className="w-10 h-10 rounded-2xl bg-white/90 flex items-center justify-center border border-white shadow-[0_4px_10px_rgba(4,21,45,0.06)] shrink-0">
+                <TrendingUp size={20} className="text-blue-600" />
+              </div>
+              <p className="block text-[10px] font-black text-[#04152d]/50 uppercase tracking-[0.16em] leading-tight">Total Collections<br/>(Cash In)</p>
             </div>
-            <p className="text-2xl font-black text-emerald-600 text-left">
+            <p className="text-2xl lg:text-[26px] font-black text-blue-600 tracking-tighter text-left mt-1 truncate" title={`+ ₱${totalCashIn.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}>
               {isLoading ? '...' : `+ ₱${totalCashIn.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
             </p>
           </div>
 
-          <div className="bg-white rounded-2xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-red-100 flex flex-col justify-center animate-slide-up" style={{ animationDelay: '0.15s' }}>
-            <div className="flex items-center gap-2 mb-1 text-left">
-              <TrendingDown size={14} className="text-red-500" />
-              <p className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.12em]">Total Disbursements (Cash Out)</p>
+          <div className={`${ultraGlassCard} flex flex-col justify-center group hover:-translate-y-1 hover:shadow-[0_14px_30px_rgba(4,21,45,0.08),inset_0_2px_3px_rgba(255,255,255,1)]`}>
+            <div className="flex items-center gap-3 mb-2 text-left">
+              <div className="w-10 h-10 rounded-2xl bg-white/90 flex items-center justify-center border border-white shadow-[0_4px_10px_rgba(4,21,45,0.06)] shrink-0">
+                <TrendingDown size={20} className="text-yellow-600" />
+              </div>
+              <p className="block text-[10px] font-black text-[#04152d]/50 uppercase tracking-[0.16em] leading-tight">Total Disbursements<br/>(Cash Out)</p>
             </div>
-            <p className="text-2xl font-black text-red-600 text-left">
+            <p className="text-2xl lg:text-[26px] font-black text-yellow-600 tracking-tighter text-left mt-1 truncate" title={`- ₱${totalCashOut.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}>
               {isLoading ? '...' : `- ₱${totalCashOut.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
             </p>
           </div>
 
           {/* Recharts Analytics */}
-          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 flex items-center justify-center animate-slide-up" style={{ animationDelay: '0.2s' }}>
+          <div className={`${ultraGlassCard} flex items-center justify-center group hover:-translate-y-1 hover:shadow-[0_14px_30px_rgba(4,21,45,0.08),inset_0_2px_3px_rgba(255,255,255,1)]`}>
             {chartData.length > 0 && !isLoading ? (
-              <div className="w-full h-[80px] flex items-center justify-between">
-                <div className="h-[80px] w-[80px]">
+              <div className="w-full h-full flex flex-col items-center justify-between">
+                <div className="h-[90px] w-full mt-2">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
-                      <Pie data={chartData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={25} outerRadius={38} paddingAngle={3} />
-                      <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', fontSize: '12px', fontWeight: 'bold' }} itemStyle={{ color: '#04152d' }} formatter={(value: any) => `₱${Number(value).toLocaleString(undefined, { minimumFractionDigits: 2 })}`} />
+                      <Pie data={chartData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={30} outerRadius={45} paddingAngle={4}>
+                        {chartData.map((entry: any, index: number) => (
+                          <Cell key={`cell-${index}`} fill={entry.fill} />
+                        ))}
+                      </Pie>
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(20px)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.9)', boxShadow: '0 8px 30px rgba(4,21,45,0.08)', fontSize: '11px', fontWeight: '900' }} 
+                        itemStyle={{ color: '#04152d' }} 
+                        formatter={(value: any) => `₱${Number(value).toLocaleString(undefined, { minimumFractionDigits: 2 })}`} 
+                      />
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
-                <div className="flex flex-col gap-1.5 w-1/2">
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 text-left">Asset Distribution</p>
-                  <div className="grid grid-cols-1 gap-y-1">
-                    {chartData.slice(0, 3).map((d, idx) => (
-                      <div key={d.name} className="flex items-center gap-1.5 text-[10px] font-bold text-gray-600 truncate text-left" title={d.name}>
-                        <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: CHART_COLORS[idx % CHART_COLORS.length] }}></div>
-                        {d.name}
-                      </div>
-                    ))}
-                  </div>
+                <div className="w-full flex items-center justify-center mt-3 border-t border-white/60 pt-3">
+                  <p className="text-[10px] font-black text-[#04152d]/60 uppercase tracking-widest text-center">Asset Distribution</p>
                 </div>
               </div>
             ) : (
-              <p className="text-xs font-bold text-gray-400 text-left">{isLoading ? 'Analyzing Data...' : 'No Asset Data'}</p>
+              <p className="text-xs font-bold text-[#04152d]/40 text-center uppercase tracking-widest">{isLoading ? 'Syncing...' : 'No Asset Data'}</p>
             )}
           </div>
         </div>
 
         {/* Filters Row */}
-        <div className="bg-white rounded-2xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 flex flex-wrap gap-4 items-center animate-slide-up" style={{ animationDelay: '0.25s' }}>
-          <div className="flex-1 min-w-[250px] relative">
-            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+        <div className={`${ultraGlassCard} !p-4 flex flex-wrap gap-4 items-center`}>
+          <div className="flex-1 min-w-[250px] relative glass-sheen rounded-full">
+            <Search size={16} className="absolute left-5 top-1/2 -translate-y-1/2 text-[#04152d]/40 z-10" />
             <input 
               type="text" placeholder="Search fund pot..." 
               value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full rounded-xl pl-11 pr-4 py-3 text-sm bg-white placeholder-gray-400 border-[1.5px] border-[#dde3ee] focus:border-[#04152d] outline-none font-bold text-[#04152d]"
+              className="relative w-full pl-12 pr-5 py-3 rounded-full bg-white/60 hover:bg-white/80 backdrop-blur-xl backdrop-saturate-[200%] border border-white/80 shadow-[inset_0_2px_6px_rgba(4,21,45,0.03)] text-[13px] font-bold outline-none focus:bg-white focus:shadow-[0_6px_20px_rgba(4,21,45,0.08)] transition-all duration-400 text-[#04152d] placeholder:text-[#04152d]/40"
             />
           </div>
           
           {/* Calendar / Month Picker Filter */}
-          <div className="relative inline-flex items-center w-full sm:w-auto min-w-[160px] bg-white border-[1.5px] border-[#dde3ee] rounded-xl overflow-hidden focus-within:border-[#04152d] transition-colors">
-            <div className="pl-4 pr-2 flex items-center pointer-events-none">
-              <Calendar size={14} className="text-gray-400" />
+          <div className="relative inline-flex items-center min-w-[180px] glass-sheen bg-white/60 hover:bg-white/80 backdrop-blur-xl rounded-full border border-white/80 shadow-[inset_0_2px_6px_rgba(4,21,45,0.03)] transition-all duration-400 group">
+            <div className="pl-5 pr-2 flex items-center pointer-events-none z-10">
+              <Calendar size={16} className="text-[#04152d]/40 group-focus-within:text-[#04152d]/70 transition-colors" />
             </div>
             <div className="relative flex-1">
               <input 
                 type="month" 
                 value={filterMonth} 
                 onChange={(e) => setFilterMonth(e.target.value)} 
-                className="w-full py-3 text-sm outline-none font-bold text-[#04152d] bg-transparent cursor-pointer opacity-0 absolute inset-0 z-10" 
+                className="w-full py-3 text-[13px] outline-none font-bold text-[#04152d] bg-transparent cursor-pointer opacity-0 absolute inset-0 z-20" 
               />
-              <div className="py-3 text-sm font-bold text-[#04152d] pointer-events-none truncate pr-2">
+              <div className="py-3 text-[13px] font-bold text-[#04152d] pointer-events-none truncate pr-3 relative z-10">
                 {filterMonth ? new Date(filterMonth + '-01').toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'All Time'}
               </div>
             </div>
-            {filterMonth ? (
+            {filterMonth && (
               <button 
                 onClick={() => setFilterMonth('')} 
-                className="pr-4 pl-2 text-gray-400 hover:text-red-500 z-20 transition-colors"
+                className="pr-5 pl-2 text-[#04152d]/40 hover:text-red-500 z-30 transition-colors"
               >
-                <X size={14} />
+                <X size={15} />
               </button>
-            ) : (
-              <div className="pr-4 pl-2 pointer-events-none">
-                <Calendar size={14} className="text-gray-400" />
-              </div>
             )}
           </div>
         </div>
 
         {/* Ledger Table Section */}
-        <div className="bg-white rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.06),0_16px_40px_rgba(0,0,0,0.07)] border border-white/80 flex-1 flex flex-col overflow-hidden animate-slide-up" style={{ animationDelay: '0.3s' }}>
+        <div className={`!p-0 overflow-hidden flex flex-col !rounded-[24px] ${ultraGlassCard}`}>
           
-          <div className="p-6 border-b border-gray-100 flex flex-wrap items-center justify-between gap-4 bg-white/50">
-            <div className="flex items-center gap-3">
-              <h2 className="text-xl font-black text-[#04152d] text-left">Fund Overview</h2>
-              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600 shadow-[inset_0_0_0_1.5px_rgba(107,114,128,0.2)] font-mono">{filteredFunds.length} Active Pots</span>
+          <div className="p-6 md:p-8 border-b border-white/60 flex flex-wrap items-center justify-between gap-5 bg-white/40 backdrop-blur-2xl backdrop-saturate-[190%]">
+            <div className="flex items-center gap-4">
+              <h2 className="text-[17px] font-black text-[#04152d] text-left flex items-center gap-2.5">
+                <Layers className="text-blue-600" size={20} /> Fund Matrix
+              </h2>
+              <span className="glass-sheen bg-white/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white shadow-[0_2px_6px_rgba(4,21,45,0.05)] text-[10px] font-black text-[#04152d]/60 uppercase tracking-[0.16em]">
+                {filteredFunds.length} Active Pots
+              </span>
             </div>
             
             <button 
               onClick={() => setIsTransferModalOpen(true)}
-              className="inline-flex items-center justify-center gap-2 bg-[#04152d] text-white font-bold py-2.5 px-5 rounded-xl text-sm shadow-[0_6px_0_rgba(2,6,15,0.55),0_4px_18px_rgba(4,21,45,0.35)] hover:-translate-y-[1px] active:translate-y-[4px] transition-all"
+              className={`${pillBtn} !bg-[#04152d] !text-white hover:!bg-[#04152d]/90 !shadow-[0_6px_16px_rgba(4,21,45,0.25)] border-white/20`}
             >
-              <ArrowRightLeft size={16} /> Inter-Fund Transfer
+              <ArrowRightLeft size={14} /> Inter-Fund Transfer
             </button>
           </div>
           
           <div className="overflow-x-auto w-full">
-            <table className="w-full text-left whitespace-nowrap min-w-[1000px]">
-              <thead className="bg-[#f8faff] shadow-[0_1px_0_rgba(229,231,235,1)] sticky top-0 z-10">
+            <table className="w-full text-left whitespace-nowrap min-w-[1000px] border-collapse">
+              <thead className="bg-white/60 backdrop-blur-2xl backdrop-saturate-[200%] shadow-[0_1px_0_rgba(255,255,255,1)] sticky top-0 z-10">
                 <tr>
-                  <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wide text-left">Fund Name</th>
-                  <th className="px-6 py-4 text-xs font-black text-emerald-600 uppercase tracking-wide text-right">Collections (In)</th>
-                  <th className="px-6 py-4 text-xs font-black text-red-600 uppercase tracking-wide text-right">Disbursements (Out)</th>
-                  <th className="px-6 py-4 text-xs font-black text-[#04152d] uppercase tracking-wide text-right pr-6">Running Balance</th>
+                  <th className="px-6 py-5 text-[10px] font-black text-[#04152d]/50 uppercase tracking-[0.2em] text-left">Fund Name</th>
+                  <th className="px-6 py-5 text-[10px] font-black text-[#04152d]/50 uppercase tracking-[0.2em] text-right">Collections (In)</th>
+                  <th className="px-6 py-5 text-[10px] font-black text-[#04152d]/50 uppercase tracking-[0.2em] text-right">Disbursements (Out)</th>
+                  <th className="px-6 py-5 text-[10px] font-black text-[#04152d]/50 uppercase tracking-[0.2em] text-right pr-8">Running Balance</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-white/60 text-[13.5px] font-bold text-[#04152d] bg-white/30 backdrop-blur-xl backdrop-saturate-[180%]">
                 {isLoading ? (
-                  <tr><td colSpan={4} className="px-6 py-16 text-center text-gray-400 font-medium text-sm text-left">Loading fund data from database...</td></tr>
-                ) : filteredFunds.map((fund) => (
-                  <tr key={fund.id} className="hover:bg-[#e8edf8]/60 transition-colors duration-100">
+                  <tr><td colSpan={4} className="px-6 py-24 text-center text-[#04152d]/40 font-black text-[11px] uppercase tracking-widest text-left">Syncing data stream...</td></tr>
+                ) : filteredFunds.length > 0 ? filteredFunds.map((fund) => (
+                  <tr key={fund.id} className="hover:bg-white/70 hover:backdrop-blur-xl hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)]">
                     <td className="px-6 py-5 text-left">
-                      <p className="font-bold text-[#04152d] text-sm">{fund.name}</p>
-                      <p className="font-mono text-xs text-gray-400 mt-0.5">{fund.id}</p>
+                      <p className="font-black text-[#04152d] text-[14px] tracking-tight">{fund.name}</p>
+                      <p className="font-mono text-[10.5px] text-[#04152d]/40 mt-1 uppercase tracking-widest">{fund.id}</p>
                     </td>
-                    <td className="px-6 py-5 text-right font-medium text-emerald-600 text-sm">
+                    <td className="px-6 py-5 text-right font-black text-blue-600 text-[14px] tracking-tighter">
                       + ₱{fund.totalIn.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                     </td>
-                    <td className="px-6 py-5 text-right font-medium text-red-600 text-sm">
+                    <td className="px-6 py-5 text-right font-black text-yellow-600 text-[14px] tracking-tighter">
                       - ₱{fund.totalOut.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                     </td>
-                    <td className="px-6 py-5 text-right pr-6">
-                      <span className="font-black text-lg text-[#04152d]">
+                    <td className="px-6 py-5 text-right pr-8">
+                      <span className="font-black text-[17px] text-[#04152d] tracking-tighter">
                         ₱{fund.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                       </span>
                     </td>
                   </tr>
-                ))}
+                )) : (
+                  <tr><td colSpan={4} className="px-6 py-24 text-center text-[#04152d]/40 font-black text-[11px] uppercase tracking-widest text-left">No funds matched your filter.</td></tr>
+                )}
               </tbody>
             </table>
           </div>

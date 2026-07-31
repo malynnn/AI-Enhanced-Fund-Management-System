@@ -130,9 +130,6 @@ function ForecastingContent() {
     tested: false, secure: false, message: 'Security connection audit not yet run.'
   });
 
-  // Client-side rendering fix for hydration
-  const [clientDate, setClientDate] = useState<string>('');
-
   // Analytics & Forecast States
   const [analyticsResult, setAnalyticsResult] = useState<AnalyticsPayload | null>(null);
   const [isAnalyticsLoading, setIsAnalyticsLoading] = useState(false);
@@ -216,7 +213,6 @@ function ForecastingContent() {
     try {
       const res = await fetch('/api/forecasting/analytics', { method: 'POST', headers: { 'Content-Type': 'application/json' } });
       const data = await res.json();
-      
       if (data.success) {
         const payload: AnalyticsPayload = {
           ...data.data,
@@ -278,13 +274,11 @@ function ForecastingContent() {
     }
   };
 
-  // Set initial client date and start auto-polling
+  // Sprint 3: Auto-update mechanism (Polling every 60s)
   useEffect(() => {
-    setClientDate(new Date().toLocaleString());
-    
     let interval: NodeJS.Timeout;
     if (result && result.success && sourceTab === 'db') {
-      interval = setInterval(() => { runAnalytics(true); setClientDate(new Date().toLocaleString()); }, 60000);
+      interval = setInterval(() => { runAnalytics(true); }, 60000);
     }
     return () => clearInterval(interval);
   }, [result, sourceTab]);
@@ -404,7 +398,7 @@ function ForecastingContent() {
       <div id="printable-pdf-report" style={{ display: 'none' }} className="absolute left-[-9999px] top-0 w-[850px] bg-white text-black p-10 font-sans shadow-none">
         <div className="border-b-2 border-[#04152d] pb-4 mb-6">
           <h1 className="text-3xl font-black text-[#04152d]">Financial Forecasting & Analytics Report</h1>
-          <p className="text-sm font-bold text-gray-500 mt-2">Generated on: {clientDate}</p>
+          <p className="text-sm font-bold text-gray-500 mt-2">Generated on: {new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila' })}</p>
         </div>
 
         <div className="grid grid-cols-2 gap-4 mb-8">
@@ -430,17 +424,14 @@ function ForecastingContent() {
               </tr>
             </thead>
             <tbody>
-              {analyticsResult.forecasts.map((f: any, i: number) => {
-                const projBal = f.projected_balance ?? f.projected_balance_60d ?? 0;
-                return (
-                  <tr key={i}>
-                    <td className="p-3 border border-gray-200 font-bold">{f.fund || f.fund_name || f.code}</td>
-                    <td className="p-3 border border-gray-200">₱{projBal.toLocaleString()}</td>
-                    <td className="p-3 border border-gray-200 uppercase">{f.trend}</td>
-                    <td className="p-3 border border-gray-200">{f.confidence}%</td>
-                  </tr>
-                );
-              })}
+              {analyticsResult.forecasts.map((f, i) => (
+                <tr key={i}>
+                  <td className="p-3 border border-gray-200 font-bold">{f.fund}</td>
+                  <td className="p-3 border border-gray-200">₱{f.projected_balance.toLocaleString()}</td>
+                  <td className="p-3 border border-gray-200 uppercase">{f.trend}</td>
+                  <td className="p-3 border border-gray-200">{f.confidence}%</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         ) : (
@@ -450,9 +441,9 @@ function ForecastingContent() {
         <h2 className="text-lg font-black text-[#04152d] mb-3 border-b border-gray-200 pb-2">Projected Shortage Alerts</h2>
         {analyticsResult?.shortage_alerts?.length ? (
           <ul className="list-disc pl-5 mb-8 text-sm">
-            {analyticsResult.shortage_alerts.map((a: any) => (
+            {analyticsResult.shortage_alerts.map(a => (
               <li key={a.id} className="mb-2">
-                <strong>{a.fund || a.code}:</strong> Estimated deficit of ₱{(a.shortfall_amount ?? 0).toLocaleString()} predicted by {a.predicted_date ? new Date(a.predicted_date).toLocaleDateString() : 'N/A'}.
+                <strong>{a.fund}:</strong> Estimated deficit of ₱{a.shortfall_amount.toLocaleString()} predicted by {new Date(a.predicted_date).toLocaleDateString('en-US', { timeZone: 'Asia/Manila' })}.
               </li>
             ))}
           </ul>
@@ -501,7 +492,7 @@ function ForecastingContent() {
                       {rec.type === 'critical' || rec.type === 'warning' ? <ShieldAlert size={16} className="text-yellow-600" /> : <ShieldCheck size={16} className="text-blue-600" />}
                       <span className="text-[14px] font-black text-[#04152d]">{rec.title}</span>
                       <span className="ml-auto text-[10.5px] font-bold text-[#04152d]/50 font-mono bg-white/60 px-2.5 py-1 rounded-md border border-white/80 shrink-0">
-                        {new Date(rec.timestamp).toLocaleString()}
+                        {new Date(rec.timestamp).toLocaleString('en-US', { timeZone: 'Asia/Manila', month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
                     <p className="text-[12.5px] font-bold text-[#04152d]/70 leading-relaxed">{rec.description}</p>
@@ -529,23 +520,31 @@ function ForecastingContent() {
               </button>
             </div>
             <div className="flex-1 overflow-y-auto hide-scrollbar rounded-[16px] border border-white/70 bg-white/30">
-              <table className="w-full text-left whitespace-nowrap">
+              <table className="w-full text-left">
                 <thead className="bg-white/60 backdrop-blur-md shadow-[0_1px_0_rgba(255,255,255,0.9)] text-[10px] font-black text-[#04152d]/60 uppercase tracking-[0.2em] sticky top-0 z-10">
                   <tr>
-                    <th className="px-6 py-4">Timestamp</th>
+                    <th className="px-6 py-4 whitespace-nowrap">Timestamp (PHT)</th>
                     <th className="px-6 py-4">Action Sequence</th>
-                    <th className="px-6 py-4">Actor</th>
-                    <th className="px-6 py-4 text-right">Status</th>
+                    <th className="px-6 py-4 whitespace-nowrap">Actor</th>
+                    <th className="px-6 py-4 text-right whitespace-nowrap">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/60 text-[12.5px] font-bold text-[#04152d]">
                   {analyticsResult?.audit_logs?.length ? (
                     analyticsResult.audit_logs.map(log => (
                       <tr key={log.id} className="hover:bg-white/60 transition-colors duration-300">
-                        <td className="px-6 py-3.5 font-mono text-[11px] opacity-70">{new Date(log.timestamp).toLocaleString()}</td>
-                        <td className="px-6 py-3.5 tracking-tight">{log.action}</td>
-                        <td className="px-6 py-3.5"><span className="bg-white/80 px-2.5 py-1 rounded-md border border-white shadow-sm">{log.actor}</span></td>
-                        <td className="px-6 py-3.5 text-right">
+                        <td className="px-6 py-3.5 font-mono text-[11px] opacity-70 whitespace-nowrap">
+                          {new Date(log.timestamp).toLocaleString('en-US', { timeZone: 'Asia/Manila', month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                        </td>
+                        {/* 
+                          Added whitespace-normal and break-words to strictly force multi-line wrapping, 
+                          preventing the action text from creating a horizontal single-line scroll barrier 
+                        */}
+                        <td className="px-6 py-3.5 tracking-tight whitespace-normal break-words min-w-[300px] leading-relaxed">
+                          {log.action}
+                        </td>
+                        <td className="px-6 py-3.5 whitespace-nowrap"><span className="bg-white/80 px-2.5 py-1 rounded-md border border-white shadow-sm">{log.actor}</span></td>
+                        <td className="px-6 py-3.5 text-right whitespace-nowrap">
                           <span className={`inline-flex px-2.5 py-1 text-[9px] font-black rounded-full uppercase tracking-widest border border-white/80 shadow-sm ${
                             log.status === 'success' ? 'bg-blue-50 text-blue-700' : 'bg-yellow-50 text-yellow-700'
                           }`}>
@@ -779,7 +778,7 @@ function ForecastingContent() {
                       <TrendingUp size={24} className="text-blue-600" /> Financial Forecasting & Analytics
                     </h2>
                     <p className="text-[12px] font-bold text-[#04152d]/60 mt-1">
-                      {lastRefreshed ? `Last synchronization: ${lastRefreshed.toLocaleTimeString()}` : 'Synthesized parameters derived from validated data.'}
+                      {lastRefreshed ? `Last synchronization: ${lastRefreshed.toLocaleTimeString('en-US', { timeZone: 'Asia/Manila' })} (PHT)` : 'Synthesized parameters derived from validated data.'}
                     </p>
                   </div>
                   <div className="flex gap-2">
@@ -793,7 +792,7 @@ function ForecastingContent() {
                 </div>
 
                 {/* Main Dashboard Container */}
-                <div id="analytics-dashboard-report" className="space-y-6 p-1">
+                <div className="space-y-6 p-1">
                   
                   {/* High-priority Shortage Alerts Widget */}
                   {analyticsResult.shortage_alerts && analyticsResult.shortage_alerts.length > 0 && (
@@ -805,15 +804,15 @@ function ForecastingContent() {
                         <BellRing size={18} className="text-yellow-600" /> Projected Shortage Alerts
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
-                        {analyticsResult.shortage_alerts.map((alert: any) => (
+                        {analyticsResult.shortage_alerts.map(alert => (
                           <div key={alert.id} className="bg-white/70 backdrop-blur-md border border-white rounded-[16px] p-4 shadow-sm flex items-start gap-4">
                             <div className="w-10 h-10 rounded-full bg-yellow-100/80 flex items-center justify-center shrink-0 border border-yellow-200">
                               <AlertTriangle size={18} className="text-yellow-600" />
                             </div>
                             <div>
-                              <h4 className="text-[14px] font-black text-[#04152d] tracking-tight">{alert.fund || alert.code} Shortfall Predicted</h4>
+                              <h4 className="text-[14px] font-black text-[#04152d] tracking-tight">{alert.fund} Shortfall Predicted</h4>
                               <p className="text-[12px] font-bold text-[#04152d]/70 mt-1">
-                                Estimated deficit of <span className="text-yellow-600 font-black">₱{(alert.shortfall_amount ?? 0).toLocaleString()}</span> by <span className="font-mono bg-white/60 px-1 rounded">{alert.predicted_date ? new Date(alert.predicted_date).toLocaleDateString() : 'N/A'}</span>
+                                Estimated deficit of <span className="text-yellow-600 font-black">₱{alert.shortfall_amount.toLocaleString()}</span> by <span className="font-mono bg-white/60 px-1 rounded">{new Date(alert.predicted_date).toLocaleDateString('en-US', { timeZone: 'Asia/Manila', month: 'short', day: 'numeric', year: 'numeric' })}</span>
                               </p>
                             </div>
                           </div>
@@ -829,39 +828,36 @@ function ForecastingContent() {
                         <LineChart size={18} className="text-blue-500" /> AI Fund Forecast Insights
                       </h3>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                        {analyticsResult.forecasts.map((forecast: any, i: number) => {
-                          const projBal = forecast.projected_balance ?? forecast.projected_balance_60d ?? 0;
-                          return (
-                            <div key={i} className="bg-white/40 backdrop-blur-md border border-white rounded-[20px] p-5 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)] hover:shadow-md transition-shadow">
-                              <div className="flex items-center justify-between mb-3">
-                                <span className="text-[13px] font-black text-[#04152d]">{forecast.fund || forecast.fund_name || forecast.code}</span>
-                                <div className={`w-8 h-8 rounded-full flex items-center justify-center border shadow-sm ${
-                                  forecast.trend === 'up' ? 'bg-blue-50 text-blue-600 border-blue-200' :
-                                  forecast.trend === 'down' ? 'bg-yellow-50 text-yellow-600 border-yellow-200' :
-                                  'bg-gray-50 text-gray-600 border-gray-200'
-                                }`}>
-                                  {forecast.trend === 'up' ? <TrendingUp size={14} /> : forecast.trend === 'down' ? <TrendingDown size={14} /> : <Minus size={14} />}
-                                </div>
-                              </div>
-                              <span className="block text-[10px] font-bold text-[#04152d]/50 uppercase tracking-widest mb-1">Projected Balance</span>
-                              <p className={`text-2xl font-black tracking-tighter ${
-                                  forecast.trend === 'up' ? 'text-blue-600' :
-                                  forecast.trend === 'down' ? 'text-yellow-600' :
-                                  'text-[#04152d]'
-                                }`}
-                                title={`₱${projBal.toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
-                              >
-                                ₱{formatCurrency(projBal)}
-                              </p>
-                              <div className="mt-4 flex items-center gap-2 text-[11px] font-bold text-[#04152d]/50">
-                                <div className="h-1.5 flex-1 bg-white/50 rounded-full overflow-hidden border border-white/60">
-                                  <div className="h-full bg-blue-500 rounded-full" style={{ width: `${forecast.confidence}%` }} />
-                                </div>
-                                <span className="shrink-0">{forecast.confidence}% Confidence</span>
+                        {analyticsResult.forecasts.map((forecast, i) => (
+                          <div key={i} className="bg-white/40 backdrop-blur-md border border-white rounded-[20px] p-5 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)] hover:shadow-md transition-shadow">
+                            <div className="flex items-center justify-between mb-3">
+                              <span className="text-[13px] font-black text-[#04152d]">{forecast.fund}</span>
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center border shadow-sm ${
+                                forecast.trend === 'up' ? 'bg-blue-50 text-blue-600 border-blue-200' :
+                                forecast.trend === 'down' ? 'bg-yellow-50 text-yellow-600 border-yellow-200' :
+                                'bg-gray-50 text-gray-600 border-gray-200'
+                              }`}>
+                                {forecast.trend === 'up' ? <TrendingUp size={14} /> : forecast.trend === 'down' ? <TrendingDown size={14} /> : <Minus size={14} />}
                               </div>
                             </div>
-                          );
-                        })}
+                            <span className="block text-[10px] font-bold text-[#04152d]/50 uppercase tracking-widest mb-1">Projected Balance</span>
+                            <p className={`text-2xl font-black tracking-tighter ${
+                                forecast.trend === 'up' ? 'text-blue-600' :
+                                forecast.trend === 'down' ? 'text-yellow-600' :
+                                'text-[#04152d]'
+                              }`}
+                              title={`₱${forecast.projected_balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
+                            >
+                              {formatCurrency(forecast.projected_balance)}
+                            </p>
+                            <div className="mt-4 flex items-center gap-2 text-[11px] font-bold text-[#04152d]/50">
+                              <div className="h-1.5 flex-1 bg-white/50 rounded-full overflow-hidden border border-white/60">
+                                <div className="h-full bg-blue-500 rounded-full" style={{ width: `${forecast.confidence}%` }} />
+                              </div>
+                              <span className="shrink-0">{forecast.confidence}% Confidence</span>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   )}
@@ -1020,7 +1016,7 @@ function ForecastingContent() {
                               <div className="flex items-center gap-2.5 mb-2">
                                 {rec.type === 'critical' || rec.type === 'warning' ? <ShieldAlert size={16} className="text-yellow-600" /> : <ShieldCheck size={16} className="text-blue-600" />}
                                 <span className="text-[13.5px] font-black text-[#04152d] truncate">{rec.title}</span>
-                                <span className="ml-auto text-[10px] font-bold text-[#04152d]/40 font-mono shrink-0">{new Date(rec.timestamp).toLocaleDateString()}</span>
+                                <span className="ml-auto text-[10px] font-bold text-[#04152d]/40 font-mono shrink-0">{new Date(rec.timestamp).toLocaleDateString('en-US', { timeZone: 'Asia/Manila', month: 'short', day: 'numeric', year: 'numeric' })}</span>
                               </div>
                               <p className="text-[12.5px] font-bold text-[#04152d]/70 leading-relaxed line-clamp-2">{rec.description}</p>
                             </div>
@@ -1059,7 +1055,7 @@ function ForecastingContent() {
                                 }`}>
                                   {log.status}
                                 </span>
-                                <p className="text-[10px] font-mono font-bold text-[#04152d]/40 mt-1.5">{new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                                <p className="text-[10px] font-mono font-bold text-[#04152d]/40 mt-1.5">{new Date(log.timestamp).toLocaleTimeString('en-US', { timeZone: 'Asia/Manila', hour: '2-digit', minute: '2-digit' })}</p>
                               </div>
                             </div>
                           ))
@@ -1126,7 +1122,7 @@ function ForecastingContent() {
                           </>
                         ) : (
                           <>
-                            <td className="px-6 py-4 font-mono text-[11.5px] opacity-60 max-w-[120px] truncate" title={row.id}>{row.id}</td><td className="px-6 py-4 font-mono text-[11.5px]"><span className="glass-sheen bg-white/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white shadow-sm">{row.fund_id}</span></td><td className="px-6 py-4 font-black text-[16px]">₱{Number(row.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}</td><td className="px-6 py-4"><span className="glass-sheen inline-flex items-center justify-center px-3 py-1.5 text-[9.5px] font-black rounded-full uppercase tracking-widest border border-white bg-white/80 backdrop-blur-md shadow-[0_2px_8px_rgba(4,21,45,0.05)]">{row.type}</span></td><td className="px-6 py-4 text-[13.5px] text-[#04152d]/70 max-w-[220px] truncate" title={row.description}>{row.description}</td><td className="px-6 py-4 text-[11.5px] font-mono text-[#04152d]/50">{new Date(row.timestamp).toLocaleString()}</td>
+                            <td className="px-6 py-4 font-mono text-[11.5px] opacity-60 max-w-[120px] truncate" title={row.id}>{row.id}</td><td className="px-6 py-4 font-mono text-[11.5px]"><span className="glass-sheen bg-white/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white shadow-sm">{row.fund_id}</span></td><td className="px-6 py-4 font-black text-[16px]">₱{Number(row.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}</td><td className="px-6 py-4"><span className="glass-sheen inline-flex items-center justify-center px-3 py-1.5 text-[9.5px] font-black rounded-full uppercase tracking-widest border border-white bg-white/80 backdrop-blur-md shadow-[0_2px_8px_rgba(4,21,45,0.05)]">{row.type}</span></td><td className="px-6 py-4 text-[13.5px] text-[#04152d]/70 max-w-[220px] truncate" title={row.description}>{row.description}</td><td className="px-6 py-4 text-[11.5px] font-mono text-[#04152d]/50">{new Date(row.timestamp).toLocaleString('en-US', { timeZone: 'Asia/Manila' })}</td>
                           </>
                         )}
                       </tr>
