@@ -124,18 +124,62 @@ function ForecastingContent() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [isVerifyingSecurity, setIsVerifyingSecurity] = useState(false);
-  const [result, setResult] = useState<ExtractionResult | null>(null);
+
+  // --- Persistent state: restored from sessionStorage on mount ---
+  const [result, setResult] = useState<ExtractionResult | null>(() => {
+    try {
+      const saved = sessionStorage.getItem('forecasting_result');
+      return saved ? JSON.parse(saved) : null;
+    } catch { return null; }
+  });
+
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [securityStatus, setSecurityStatus] = useState({
-    tested: false, secure: false, message: 'Security connection audit not yet run.'
+
+  const [securityStatus, setSecurityStatus] = useState(() => {
+    try {
+      const saved = sessionStorage.getItem('forecasting_security');
+      return saved ? JSON.parse(saved) : { tested: false, secure: false, message: 'Security connection audit not yet run.' };
+    } catch { return { tested: false, secure: false, message: 'Security connection audit not yet run.' }; }
   });
 
   // Analytics & Forecast States
-  const [analyticsResult, setAnalyticsResult] = useState<AnalyticsPayload | null>(null);
+  const [analyticsResult, setAnalyticsResult] = useState<AnalyticsPayload | null>(() => {
+    try {
+      const saved = sessionStorage.getItem('forecasting_analytics');
+      return saved ? JSON.parse(saved) : null;
+    } catch { return null; }
+  });
+
   const [isAnalyticsLoading, setIsAnalyticsLoading] = useState(false);
   const [analyticsError, setAnalyticsError] = useState<string | null>(null);
   const [isExportingPDF, setIsExportingPDF] = useState(false);
-  const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
+
+  const [lastRefreshed, setLastRefreshed] = useState<Date | null>(() => {
+    try {
+      const saved = sessionStorage.getItem('forecasting_last_refreshed');
+      return saved ? new Date(saved) : null;
+    } catch { return null; }
+  });
+
+  // --- Persist state to sessionStorage whenever it changes ---
+  useEffect(() => {
+    if (result) sessionStorage.setItem('forecasting_result', JSON.stringify(result));
+    else sessionStorage.removeItem('forecasting_result');
+  }, [result]);
+
+  useEffect(() => {
+    sessionStorage.setItem('forecasting_security', JSON.stringify(securityStatus));
+  }, [securityStatus]);
+
+  useEffect(() => {
+    if (analyticsResult) sessionStorage.setItem('forecasting_analytics', JSON.stringify(analyticsResult));
+    else sessionStorage.removeItem('forecasting_analytics');
+  }, [analyticsResult]);
+
+  useEffect(() => {
+    if (lastRefreshed) sessionStorage.setItem('forecasting_last_refreshed', lastRefreshed.toISOString());
+  }, [lastRefreshed]);
+  // ---------------------------------------------------------------
 
   // Smooth Modal States
   const [recModalState, setRecModalState] = useState<'closed' | 'open' | 'closing'>('closed');
