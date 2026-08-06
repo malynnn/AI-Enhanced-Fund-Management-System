@@ -48,7 +48,7 @@ export default function Sidebar() {
         { label: 'User Management', href: '/admin/dashboard', icon: Users, roles: ['Officer/Admin'] },
         { label: 'Settings', href: '/admin/settings', icon: Settings, roles: ['Officer/Admin'] },
 
-        { label: 'Dashboard', href: '/treasurer/dashboard', icon: LayoutDashboard, roles: ['Treasurer'] },,
+        { label: 'Dashboard', href: '/treasurer/dashboard', icon: LayoutDashboard, roles: ['Treasurer'] },
         { label: 'Funds', href: '/treasurer/funds', icon: Briefcase, roles: ['Treasurer'] },
         { label: 'AI Forecasting', href: '/treasurer/forecasting', icon: Activity, roles: ['Treasurer'] },
         
@@ -198,12 +198,14 @@ export default function Sidebar() {
             {/* Navigation Lists - Padding applied to the scrolling container to prevent shadow clipping */}
             <nav className={`flex-1 overflow-y-auto space-y-8 [&::-webkit-scrollbar]:hidden pb-4 pt-2 ${isCollapsed ? 'px-3' : 'px-6'}`}>
               
+              {/* Temporarily Hidden Main Menu 
               <div className="flex flex-col space-y-2">
                 {!isCollapsed && <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.25em] mb-1 px-2 drop-shadow-sm">Main Menu</p>}
                 <div className={glassGroupContainer}>
                   {renderNavItems(visibleGeneralItems)}
                 </div>
               </div>
+              */}
 
               <div className="flex flex-col space-y-2 mt-4">
                 {!isCollapsed ? (
