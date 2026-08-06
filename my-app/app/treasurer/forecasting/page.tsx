@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useMemo, Suspense, useEffect } from 'react';
+export const dynamic = 'force-dynamic';
+
+import React, { useState, useMemo, Suspense, useEffect } from 'react';
 import { 
   Database, FileSpreadsheet, Play, CheckCircle2, 
   AlertTriangle, Loader2, Search, Download, RefreshCw, Layers,
-  Wallet, ArrowRightLeft, TrendingUp, TrendingDown, FileText, ChevronRight,
-  Sparkles, History, ShieldCheck, ShieldAlert, X, Maximize2, BellRing, LineChart,
-  Minus
+  Wallet, ArrowRightLeft, TrendingUp, TrendingDown, FileText, ChevronDown,
+  PieChart as PieChartIcon, Sparkles, History, ShieldCheck, ShieldAlert, X, 
+  Maximize2, BellRing, LineChart, Minus
 } from 'lucide-react';
 import Header from '@/components/Header';
 import { 
@@ -34,83 +36,21 @@ interface ExtractionResult {
   error_details?: string;
 }
 
-interface FundDetail {
-  id: string;
-  name: string;
-  code: string;
-  balance: number;
-}
-
-interface FundTxStats {
-  deposits: number;
-  withdrawals: number;
-  loans: number;
-  tx_count: number;
-}
-
-interface Recommendation {
-  id: string;
-  type: 'critical' | 'warning' | 'insight' | 'success';
-  title: string;
-  description: string;
-  timestamp: string;
-}
-
-interface AuditLog {
-  id: string;
-  action: string;
-  actor: string;
-  status: 'success' | 'failed';
-  timestamp: string;
-}
-
-interface ForecastData {
-  fund: string;
-  projected_balance: number;
-  trend: 'up' | 'down' | 'stable';
-  confidence: number;
-}
-
-interface ShortageAlert {
-  id: string;
-  fund: string;
-  predicted_date: string;
-  shortfall_amount: number;
-  severity: 'high' | 'medium';
-}
-
-interface AnalyticsResult {
-  total_balance: number;
-  total_tx_count: number;
-  total_deposits: number;
-  total_withdrawals: number;
-  total_loans: number;
-  total_correcting: number;
-  deposit_count: number;
-  withdrawal_count: number;
-  loan_count: number;
-  correcting_count: number;
-  avg_deposit: number;
-  avg_withdrawal: number;
-  avg_loan: number;
-  net_flow: number;
-  fund_balances: Record<string, number>;
-  fund_details: FundDetail[];
-  fund_tx_stats: Record<string, FundTxStats>;
-}
-
 interface AnalyticsPayload {
-  summary: AnalyticsResult;
+  summary: any;
   trends: {
-    monthly_trends: Array<{ period: string; deposits: number; withdrawals: number; loans: number; net_flow: number; tx_count: number; }>;
+    monthly_trends: any[];
     daily_flow: Array<{ date: string; net_change: number; cumulative: number; }>;
     forecast_timeline: Array<{ month: string; projected_assets: number; lower_bound: number; upper_bound: number; }>;
   };
-  forecasts?: ForecastData[];
-  shortage_alerts?: ShortageAlert[];
-  recommendations?: Recommendation[];
-  audit_logs?: AuditLog[];
+  forecasts?: any[];
+  shortage_alerts?: any[];
+  recommendations?: any[];
+  audit_logs?: any[];
 }
+
+// Strictly BDOEA Palette
+const CHART_COLORS = ['#04152d', '#2563eb', '#eab308', '#60a5fa', '#fef08a', '#1e3a8a'];
 
 function ForecastingContent() {
   const [sourceTab, setSourceTab] = useState<'db' | 'csv'>('db');
@@ -124,44 +64,39 @@ function ForecastingContent() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [isVerifyingSecurity, setIsVerifyingSecurity] = useState(false);
-
-  // --- Persistent state: restored from sessionStorage on mount ---
-  const [result, setResult] = useState<ExtractionResult | null>(() => {
-    try {
-      const saved = sessionStorage.getItem('forecasting_result');
-      return saved ? JSON.parse(saved) : null;
-    } catch { return null; }
-  });
-
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const [securityStatus, setSecurityStatus] = useState(() => {
-    try {
-      const saved = sessionStorage.getItem('forecasting_security');
-      return saved ? JSON.parse(saved) : { tested: false, secure: false, message: 'Security connection audit not yet run.' };
-    } catch { return { tested: false, secure: false, message: 'Security connection audit not yet run.' }; }
-  });
-
-  // Analytics & Forecast States
-  const [analyticsResult, setAnalyticsResult] = useState<AnalyticsPayload | null>(() => {
-    try {
-      const saved = sessionStorage.getItem('forecasting_analytics');
-      return saved ? JSON.parse(saved) : null;
-    } catch { return null; }
-  });
+  // Safe Client-Side State Loading (Bypasses SSR Hydration crashes)
+  const [result, setResult] = useState<ExtractionResult | null>(null);
+  const [securityStatus, setSecurityStatus] = useState({ tested: false, secure: false, message: 'Security connection audit not yet run.' });
+  const [analyticsResult, setAnalyticsResult] = useState<AnalyticsPayload | null>(null);
+  const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
+  const [printDate, setPrintDate] = useState<string>('');
 
   const [isAnalyticsLoading, setIsAnalyticsLoading] = useState(false);
   const [analyticsError, setAnalyticsError] = useState<string | null>(null);
   const [isExportingPDF, setIsExportingPDF] = useState(false);
+  const [selectedForecastFund, setSelectedForecastFund] = useState('All');
 
-  const [lastRefreshed, setLastRefreshed] = useState<Date | null>(() => {
+  useEffect(() => {
+    setPrintDate(new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
+    
     try {
-      const saved = sessionStorage.getItem('forecasting_last_refreshed');
-      return saved ? new Date(saved) : null;
-    } catch { return null; }
-  });
+      const savedResult = sessionStorage.getItem('forecasting_result');
+      if (savedResult) setResult(JSON.parse(savedResult));
 
-  // --- Persist state to sessionStorage whenever it changes ---
+      const savedSecurity = sessionStorage.getItem('forecasting_security');
+      if (savedSecurity) setSecurityStatus(JSON.parse(savedSecurity));
+
+      const savedAnalytics = sessionStorage.getItem('forecasting_analytics');
+      if (savedAnalytics) setAnalyticsResult(JSON.parse(savedAnalytics));
+
+      const savedRefreshed = sessionStorage.getItem('forecasting_last_refreshed');
+      if (savedRefreshed) setLastRefreshed(new Date(savedRefreshed));
+    } catch { /* Silent fail on load */ }
+  }, []);
+
+  // --- Persist state dynamically ---
   useEffect(() => {
     if (result) sessionStorage.setItem('forecasting_result', JSON.stringify(result));
     else sessionStorage.removeItem('forecasting_result');
@@ -196,6 +131,49 @@ function ForecastingContent() {
     if (Math.abs(value) >= 1e6) return `₱${(value / 1e6).toFixed(1)}M`;
     if (Math.abs(value) >= 1e3) return `₱${(value / 1e3).toFixed(0)}K`;
     return `₱${value}`;
+  };
+
+  // Robust Markdown Parser for AI Recommendations
+  const formatAIRecommendation = (text: string) => {
+    if (!text) return null;
+    
+    // Safely parses and renders markdown bold **text**
+    const renderText = (str: string) => {
+      const parts = str.split(/(\*\*.*?\*\*)/g);
+      return parts.map((part, i) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+          return <strong key={i} className="font-black text-[#04152d]">{part.slice(2, -2)}</strong>;
+        }
+        return part;
+      });
+    };
+
+    const lines = text.split('\n').filter(line => line.trim().length > 0);
+    const elements: React.ReactNode[] = [];
+    let currentList: React.ReactNode[] = [];
+
+    lines.forEach((line, i) => {
+      const lineStr = line.trim();
+      const isBullet = lineStr.startsWith('- ') || lineStr.startsWith('* ') || lineStr.startsWith('• ');
+      const isNumbered = /^\d+\.\s/.test(lineStr);
+
+      if (isBullet || isNumbered) {
+        const cleanLine = lineStr.replace(/^[-*•]\s|^\d+\.\s/, '');
+        currentList.push(<li key={i} className="pl-1">{renderText(cleanLine)}</li>);
+      } else {
+        if (currentList.length > 0) {
+          elements.push(<ul key={`ul-${i}`} className="list-disc pl-5 space-y-1.5 marker:text-blue-500 mb-3">{currentList}</ul>);
+          currentList = [];
+        }
+        elements.push(<p key={`p-${i}`} className="mb-3 last:mb-0">{renderText(lineStr)}</p>);
+      }
+    });
+
+    if (currentList.length > 0) {
+      elements.push(<ul key="ul-end" className="list-disc pl-5 space-y-1.5 marker:text-blue-500 mb-3 last:mb-0">{currentList}</ul>);
+    }
+
+    return <div className="text-[12.5px] font-medium text-[#04152d]/80 leading-relaxed mt-2">{elements}</div>;
   };
 
   const closeRecModal = () => {
@@ -343,16 +321,39 @@ function ForecastingContent() {
   const handlePageChange = (newPage: number) => { if (newPage >= 1 && newPage <= totalPages) setCurrentPage(newPage); };
 
   const balanceChartData = useMemo(() => analyticsResult?.trends.daily_flow || [], [analyticsResult]);
-  const forecastTimelineData = useMemo(() => analyticsResult?.trends.forecast_timeline || [], [analyticsResult]);
+  
+  // AFMS-FE-013: Dynamic Chart Filtering
+  const forecastTimelineData = useMemo(() => {
+    if (!analyticsResult?.trends?.forecast_timeline) return [];
+    const baseTimeline = analyticsResult.trends.forecast_timeline;
+    
+    if (selectedForecastFund === 'All') return baseTimeline;
+
+    const fundData = result?.data.funds.find((f: any) => f.name === selectedForecastFund);
+    if (!fundData) return baseTimeline;
+
+    const totalBalance = analyticsResult.summary?.total_balance || 1;
+    const fundShare = fundData.balance / totalBalance;
+
+    return baseTimeline.map((pt: any) => ({
+      month: pt.month,
+      projected_assets: pt.projected_assets * fundShare,
+      lower_bound: pt.lower_bound * fundShare,
+      upper_bound: pt.upper_bound * fundShare
+    }));
+  }, [analyticsResult, selectedForecastFund, result]);
+
   const pieChartData = useMemo(() => {
     if (!analyticsResult) return [];
-    const CHART_COLORS = ['#04152d', '#1d4ed8', '#eab308', '#60a5fa', '#fef08a', '#1e3a8a'];
     return analyticsResult.summary.fund_details
       .filter((f: any) => f.balance > 0)
-      .map((f: any, idx: number) => ({ name: f.name, value: f.balance, color: CHART_COLORS[idx % CHART_COLORS.length] }));
+      .map((f: any, idx: number) => ({ 
+        name: f.name, 
+        value: f.balance, 
+        fill: CHART_COLORS[idx % CHART_COLORS.length] 
+      }));
   }, [analyticsResult]);
 
-  // Clean, professional PDF Export using html2canvas on a hidden printable div
   const exportPDFReport = async () => {
     const element = document.getElementById('printable-pdf-report');
     if (!element) return;
@@ -442,7 +443,7 @@ function ForecastingContent() {
       <div id="printable-pdf-report" style={{ display: 'none' }} className="absolute left-[-9999px] top-0 w-[850px] bg-white text-black p-10 font-sans shadow-none">
         <div className="border-b-2 border-[#04152d] pb-4 mb-6">
           <h1 className="text-3xl font-black text-[#04152d]">Financial Forecasting & Analytics Report</h1>
-          <p className="text-sm font-bold text-gray-500 mt-2">Generated on: {new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila' })}</p>
+          <p className="text-sm font-bold text-gray-500 mt-2">Generated on: {printDate}</p>
         </div>
 
         <div className="grid grid-cols-2 gap-4 mb-8">
@@ -468,7 +469,7 @@ function ForecastingContent() {
               </tr>
             </thead>
             <tbody>
-              {analyticsResult.forecasts.map((f, i) => (
+              {analyticsResult.forecasts.map((f: any, i: number) => (
                 <tr key={i}>
                   <td className="p-3 border border-gray-200 font-bold">{f.fund}</td>
                   <td className="p-3 border border-gray-200">₱{f.projected_balance.toLocaleString()}</td>
@@ -485,7 +486,7 @@ function ForecastingContent() {
         <h2 className="text-lg font-black text-[#04152d] mb-3 border-b border-gray-200 pb-2">Projected Shortage Alerts</h2>
         {analyticsResult?.shortage_alerts?.length ? (
           <ul className="list-disc pl-5 mb-8 text-sm">
-            {analyticsResult.shortage_alerts.map(a => (
+            {analyticsResult.shortage_alerts.map((a: any) => (
               <li key={a.id} className="mb-2">
                 <strong>{a.fund}:</strong> Estimated deficit of ₱{a.shortfall_amount.toLocaleString()} predicted by {new Date(a.predicted_date).toLocaleDateString('en-US', { timeZone: 'Asia/Manila' })}.
               </li>
@@ -496,7 +497,7 @@ function ForecastingContent() {
         <h2 className="text-lg font-black text-[#04152d] mb-3 border-b border-gray-200 pb-2">AI Strategic Recommendations</h2>
         {analyticsResult?.recommendations?.length ? (
           <div className="space-y-4 mb-8 text-sm">
-            {analyticsResult.recommendations.map(r => (
+            {analyticsResult.recommendations.map((r: any) => (
               <div key={r.id} className="p-3 bg-gray-50 border border-gray-200 rounded">
                 <p className="font-black text-[#04152d] mb-1">{r.title} ({r.type.toUpperCase()})</p>
                 <p className="text-gray-700">{r.description}</p>
@@ -524,13 +525,15 @@ function ForecastingContent() {
               <h3 className="text-[17px] font-black text-[#04152d] tracking-tight flex items-center gap-2">
                 <Sparkles size={20} className="text-yellow-500" /> Full Recommendation History
               </h3>
-              <button onClick={closeRecModal} className={`${iconBtn} w-8 h-8`}>
-                <X size={16} />
-              </button>
+              <div className="absolute top-6 right-6 z-20">
+                <button onClick={closeRecModal} className={`${iconBtn} w-8 h-8`}>
+                  <X size={16} />
+                </button>
+              </div>
             </div>
             <div className="flex-1 overflow-y-auto hide-scrollbar space-y-4 pr-2">
               {analyticsResult?.recommendations?.length ? (
-                analyticsResult.recommendations.map(rec => (
+                analyticsResult.recommendations.map((rec: any) => (
                   <div key={rec.id} className="bg-white/50 backdrop-blur-md border border-white/80 p-5 rounded-[20px] shadow-[inset_0_1px_2px_rgba(255,255,255,0.9)] hover:bg-white/70 transition-colors duration-300">
                     <div className="flex items-center gap-2.5 mb-2">
                       {rec.type === 'critical' || rec.type === 'warning' ? <ShieldAlert size={16} className="text-yellow-600" /> : <ShieldCheck size={16} className="text-blue-600" />}
@@ -539,7 +542,8 @@ function ForecastingContent() {
                         {new Date(rec.timestamp).toLocaleString('en-US', { timeZone: 'Asia/Manila', month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
-                    <p className="text-[12.5px] font-bold text-[#04152d]/70 leading-relaxed">{rec.description}</p>
+                    {/* Render Formatted AI Recommendation */}
+                    {formatAIRecommendation(rec.description)}
                   </div>
                 ))
               ) : (
@@ -559,9 +563,11 @@ function ForecastingContent() {
               <h3 className="text-[17px] font-black text-[#04152d] tracking-tight flex items-center gap-2">
                 <History size={20} className="text-blue-600" /> System Audit Logs
               </h3>
-              <button onClick={closeAuditModal} className={`${iconBtn} w-8 h-8`}>
-                <X size={16} />
-              </button>
+              <div className="absolute top-6 right-6 z-20">
+                <button onClick={closeAuditModal} className={`${iconBtn} w-8 h-8`}>
+                  <X size={16} />
+                </button>
+              </div>
             </div>
             <div className="flex-1 overflow-y-auto hide-scrollbar rounded-[16px] border border-white/70 bg-white/30">
               <table className="w-full text-left">
@@ -575,15 +581,11 @@ function ForecastingContent() {
                 </thead>
                 <tbody className="divide-y divide-white/60 text-[12.5px] font-bold text-[#04152d]">
                   {analyticsResult?.audit_logs?.length ? (
-                    analyticsResult.audit_logs.map(log => (
+                    analyticsResult.audit_logs.map((log: any) => (
                       <tr key={log.id} className="hover:bg-white/60 transition-colors duration-300">
                         <td className="px-6 py-3.5 font-mono text-[11px] opacity-70 whitespace-nowrap">
                           {new Date(log.timestamp).toLocaleString('en-US', { timeZone: 'Asia/Manila', month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                         </td>
-                        {/* 
-                          Added whitespace-normal and break-words to strictly force multi-line wrapping, 
-                          preventing the action text from creating a horizontal single-line scroll barrier 
-                        */}
                         <td className="px-6 py-3.5 tracking-tight whitespace-normal break-words min-w-[300px] leading-relaxed">
                           {log.action}
                         </td>
@@ -609,8 +611,8 @@ function ForecastingContent() {
         </div>
       )}
 
-      {/* Fixed Sticky Header Container */}
-      <div className="sticky top-0 z-40 w-full backdrop-blur-xl bg-white/20 border-b border-white/30 shadow-[0_4px_30px_rgba(0,0,0,0.03)]">
+      {/* Sticky Header */}
+      <div className="sticky top-0 z-40 w-full backdrop-blur-2xl bg-white/30 border-b border-white/50 shadow-[0_4px_30px_rgba(0,0,0,0.03)]">
         <Header />
       </div>
 
@@ -848,7 +850,7 @@ function ForecastingContent() {
                         <BellRing size={18} className="text-yellow-600" /> Projected Shortage Alerts
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
-                        {analyticsResult.shortage_alerts.map(alert => (
+                        {analyticsResult.shortage_alerts.map((alert: any) => (
                           <div key={alert.id} className="bg-white/70 backdrop-blur-md border border-white rounded-[16px] p-4 shadow-sm flex items-start gap-4">
                             <div className="w-10 h-10 rounded-full bg-yellow-100/80 flex items-center justify-center shrink-0 border border-yellow-200">
                               <AlertTriangle size={18} className="text-yellow-600" />
@@ -872,7 +874,7 @@ function ForecastingContent() {
                         <LineChart size={18} className="text-blue-500" /> AI Fund Forecast Insights
                       </h3>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                        {analyticsResult.forecasts.map((forecast, i) => (
+                        {analyticsResult.forecasts.map((forecast: any, i: number) => (
                           <div key={i} className="bg-white/40 backdrop-blur-md border border-white rounded-[20px] p-5 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)] hover:shadow-md transition-shadow">
                             <div className="flex items-center justify-between mb-3">
                               <span className="text-[13px] font-black text-[#04152d]">{forecast.fund}</span>
@@ -957,11 +959,28 @@ function ForecastingContent() {
                     </div>
                   </div>
 
-                  {/* 6-Month Forecasting Timeline Chart */}
+                  {/* 6-Month Forecasting Timeline Chart w/ Filter */}
                   <div className={ultraGlassCard}>
-                    <h3 className="text-[14px] font-black text-[#04152d] tracking-tight uppercase tracking-widest border-b border-white/60 pb-3 mb-5 flex items-center gap-2">
-                      <LineChart size={18} className="text-blue-500" /> 6-Month Predictive Trajectory
-                    </h3>
+                    <div className="flex flex-col sm:flex-row justify-between sm:items-center border-b border-white/60 pb-3 mb-5 gap-3">
+                      <h3 className="text-[14px] font-black text-[#04152d] tracking-tight uppercase tracking-widest flex items-center gap-2">
+                        <LineChart size={18} className="text-blue-500" /> 6-Month Predictive Trajectory
+                      </h3>
+                      <div className="relative inline-block w-full sm:w-auto">
+                        <select
+                          value={selectedForecastFund}
+                          onChange={(e) => setSelectedForecastFund(e.target.value)}
+                          className="appearance-none bg-white/50 backdrop-blur-2xl rounded-full border border-white/80 shadow-[inset_0_2px_4px_rgba(255,255,255,0.95),0_4px_12px_rgba(4,21,45,0.05)] pl-5 pr-10 py-2 font-black text-[12px] tracking-tight text-[#04152d] cursor-pointer outline-none hover:bg-white/70 transition-all w-full sm:w-auto"
+                        >
+                          {['All', ...result.data.funds.map((f: any) => f.name)].map(opt => (
+                            <option key={opt} value={opt}>{opt} Forecast</option>
+                          ))}
+                        </select>
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#04152d]/50">
+                          <ChevronDown size={14} />
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="h-72 sm:h-96 w-full">
                       {forecastTimelineData.length > 0 ? (
                         <ResponsiveContainer width="100%" height="100%">
@@ -985,133 +1004,165 @@ function ForecastingContent() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Running balance area chart */}
-                    <div className={`lg:col-span-2 ${ultraGlassCard}`}>
-                      <h3 className="text-[13px] font-black text-[#04152d] tracking-tight uppercase tracking-widest border-b border-white/60 pb-3 mb-5">
-                        Historical Baseline (Running Cumulative)
-                      </h3>
-                      <div className="h-64 sm:h-80 w-full">
-                        {balanceChartData.length > 0 ? (
-                          <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={balanceChartData} margin={{ top: 10, right: 10, left: -5, bottom: 0 }}>
-                              <defs>
-                                <linearGradient id="colorCumulative" x1="0" y1="0" x2="0" y2="1">
-                                  <stop offset="5%" stopColor="#2563eb" stopOpacity={0.4}/>
-                                  <stop offset="95%" stopColor="#2563eb" stopOpacity={0.0}/>
-                                </linearGradient>
-                              </defs>
-                              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(4,21,45,0.06)" />
-                              <XAxis dataKey="date" stroke="#04152d" opacity={0.5} fontSize={10} tickLine={false} fontWeight="bold" />
-                              <YAxis stroke="#04152d" opacity={0.5} fontSize={10} tickLine={false} fontWeight="bold" tickFormatter={formatCurrency} />
-                              <ChartTooltip 
-                                formatter={(value: any) => [`₱${Number(value).toLocaleString('en-US', { minimumFractionDigits: 2 })}`, 'Assets Balance']}
-                                contentStyle={{ backgroundColor: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(20px)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.9)', boxShadow: '0 8px 30px rgba(4,21,45,0.08)', fontSize: '11.5px', fontWeight: '900' }}
-                              />
-                              <Area type="monotone" dataKey="cumulative" stroke="#2563eb" strokeWidth={3} fillOpacity={1} fill="url(#colorCumulative)" />
-                            </AreaChart>
-                          </ResponsiveContainer>
-                        ) : (
-                          <div className="flex items-center justify-center h-full text-[#04152d]/40 font-bold">Historical data unavailable</div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className={ultraGlassCard}>
-                      <h3 className="text-[13px] font-black text-[#04152d] tracking-tight uppercase tracking-widest border-b border-white/60 pb-3 mb-5">
-                        Current Asset Allocation
-                      </h3>
-                      <div className="h-64 sm:h-80 w-full flex items-center justify-center">
-                        {pieChartData.length > 0 ? (
-                          <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
-                              <Pie data={pieChartData} cx="50%" cy="45%" innerRadius={60} outerRadius={85} paddingAngle={4} dataKey="value">
-                                {pieChartData.map((entry: any, index: number) => <Cell key={`cell-${index}`} fill={entry.color} />)}
-                              </Pie>
-                              <ChartTooltip 
-                                formatter={(value: any) => [`₱${Number(value).toLocaleString('en-US', { minimumFractionDigits: 0 })}`, 'Balance']}
-                                contentStyle={{ backgroundColor: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(20px)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.9)', fontSize: '11.5px', fontWeight: '900' }}
-                              />
-                              <Legend verticalAlign="bottom" align="center" iconType="circle" wrapperStyle={{ fontSize: '11px', fontWeight: '900', color: '#04152d' }} />
-                            </PieChart>
-                          </ResponsiveContainer>
-                        ) : (
-                          <div className="text-[#04152d]/40 font-bold">Allocation data unavailable</div>
-                        )}
-                      </div>
+                  {/* Running cumulative chart */}
+                  <div className={ultraGlassCard}>
+                    <h3 className="text-[13px] font-black text-[#04152d] tracking-tight uppercase tracking-widest border-b border-white/60 pb-3 mb-5">
+                      Historical Baseline (Running Cumulative)
+                    </h3>
+                    <div className="h-64 sm:h-80 w-full">
+                      {balanceChartData.length > 0 ? (
+                        <ResponsiveContainer width="100%" height="100%">
+                          <AreaChart data={balanceChartData} margin={{ top: 10, right: 10, left: -5, bottom: 0 }}>
+                            <defs>
+                              <linearGradient id="colorCumulative" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="#2563eb" stopOpacity={0.4}/>
+                                <stop offset="95%" stopColor="#2563eb" stopOpacity={0.0}/>
+                              </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(4,21,45,0.06)" />
+                            <XAxis dataKey="date" stroke="#04152d" opacity={0.5} fontSize={10} tickLine={false} fontWeight="bold" />
+                            <YAxis stroke="#04152d" opacity={0.5} fontSize={10} tickLine={false} fontWeight="bold" tickFormatter={formatCurrency} />
+                            <ChartTooltip 
+                              formatter={(value: any) => [`₱${Number(value).toLocaleString('en-US', { minimumFractionDigits: 2 })}`, 'Assets Balance']}
+                              contentStyle={{ backgroundColor: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(20px)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.9)', boxShadow: '0 8px 30px rgba(4,21,45,0.08)', fontSize: '11.5px', fontWeight: '900' }}
+                            />
+                            <Area type="monotone" dataKey="cumulative" stroke="#2563eb" strokeWidth={3} fillOpacity={1} fill="url(#colorCumulative)" />
+                          </AreaChart>
+                        </ResponsiveContainer>
+                      ) : (
+                        <div className="flex items-center justify-center h-full text-[#04152d]/40 font-bold">Historical data unavailable</div>
+                      )}
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {/* Recommendation Reports Widget */}
-                    <div className={`${ultraGlassCard} flex flex-col`}>
-                      <div className="flex items-center justify-between border-b border-white/60 pb-4 mb-5">
-                        <h3 className="text-[14px] font-black text-[#04152d] tracking-tight uppercase tracking-widest flex items-center gap-2">
-                          <Sparkles size={18} className="text-yellow-500" /> AI Recommendations
-                        </h3>
-                        <button onClick={() => setRecModalState('open')} className={`${iconBtn} w-8 h-8`} title="Expand Reports">
-                          <Maximize2 size={14} />
-                        </button>
-                      </div>
-                      <div className="space-y-4 flex-1 overflow-hidden relative">
-                        {analyticsResult.recommendations?.length ? (
-                          analyticsResult.recommendations.slice(0, 3).map(rec => (
-                            <div key={rec.id} className="bg-white/60 backdrop-blur-md border border-white/90 p-5 rounded-[20px] shadow-[inset_0_1px_2px_rgba(255,255,255,1)]">
-                              <div className="flex items-center gap-2.5 mb-2">
-                                {rec.type === 'critical' || rec.type === 'warning' ? <ShieldAlert size={16} className="text-yellow-600" /> : <ShieldCheck size={16} className="text-blue-600" />}
-                                <span className="text-[13.5px] font-black text-[#04152d] truncate">{rec.title}</span>
-                                <span className="ml-auto text-[10px] font-bold text-[#04152d]/40 font-mono shrink-0">{new Date(rec.timestamp).toLocaleDateString('en-US', { timeZone: 'Asia/Manila', month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                              </div>
-                              <p className="text-[12.5px] font-bold text-[#04152d]/70 leading-relaxed line-clamp-2">{rec.description}</p>
-                            </div>
-                          ))
-                        ) : (
-                          <div className="text-center py-10 text-gray-500 font-bold text-sm">No recommendations available.</div>
-                        )}
-                        <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-white/40 to-transparent pointer-events-none" />
-                      </div>
-                      <button onClick={() => setRecModalState('open')} className="w-full mt-4 py-2.5 text-[11px] font-black text-[#04152d]/50 uppercase tracking-widest hover:text-[#04152d] transition-colors">
-                        View All Reports
-                      </button>
-                    </div>
+                </div>
 
-                    {/* Audit Logs Widget */}
-                    <div className={`${ultraGlassCard} flex flex-col`}>
-                      <div className="flex items-center justify-between border-b border-white/60 pb-4 mb-5">
-                        <h3 className="text-[14px] font-black text-[#04152d] tracking-tight uppercase tracking-widest flex items-center gap-2">
-                          <History size={18} className="text-blue-600" /> System Audit Logs
-                        </h3>
-                        <button onClick={() => setAuditModalState('open')} className={`${iconBtn} w-8 h-8`} title="Expand Logs">
-                          <Maximize2 size={14} />
-                        </button>
-                      </div>
-                      <div className="space-y-2 flex-1 overflow-hidden relative">
-                        {analyticsResult.audit_logs?.length ? (
-                          analyticsResult.audit_logs.slice(0, 5).map(log => (
-                            <div key={log.id} className="flex items-center justify-between py-2.5 border-b border-white/50 last:border-0">
-                              <div className="overflow-hidden pr-3">
-                                <p className="text-[13px] font-black text-[#04152d] truncate">{log.action}</p>
-                                <p className="text-[11px] font-bold text-[#04152d]/50 mt-0.5 truncate">Actor: {log.actor}</p>
-                              </div>
-                              <div className="text-right shrink-0">
-                                <span className={`px-2.5 py-1 rounded border text-[9.5px] font-black uppercase tracking-widest shadow-sm ${
-                                  log.status === 'success' ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-yellow-50 border-yellow-200 text-yellow-700'
-                                }`}>
-                                  {log.status}
-                                </span>
-                                <p className="text-[10px] font-mono font-bold text-[#04152d]/40 mt-1.5">{new Date(log.timestamp).toLocaleTimeString('en-US', { timeZone: 'Asia/Manila', hour: '2-digit', minute: '2-digit' })}</p>
-                              </div>
-                            </div>
-                          ))
-                        ) : (
-                          <div className="text-center py-10 text-gray-500 font-bold text-sm">No system logs recorded.</div>
-                        )}
-                        <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white/40 to-transparent pointer-events-none" />
-                      </div>
-                      <button onClick={() => setAuditModalState('open')} className="w-full mt-4 py-2.5 text-[11px] font-black text-[#04152d]/50 uppercase tracking-widest hover:text-[#04152d] transition-colors">
-                        View Entire Log
+                <div className="xl:col-span-1 space-y-6">
+                  
+                  {/* Current Asset Allocation Pie */}
+                  <div className={ultraGlassCard}>
+                    <h3 className="text-[14px] font-black text-[#04152d] tracking-tight uppercase tracking-widest border-b border-white/60 pb-3 mb-5 flex items-center gap-2">
+                      <PieChartIcon size={18} className="text-blue-500" /> Current Asset Allocation
+                    </h3>
+                    <div className="h-[300px] w-full flex items-center justify-center">
+                      {pieChartData.length > 0 ? (
+                        <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
+                          <PieChart>
+                            <Pie
+                              data={pieChartData}
+                              dataKey="value"
+                              nameKey="name"
+                              cx="50%"
+                              cy="45%"
+                              innerRadius={65}
+                              outerRadius={90}
+                              paddingAngle={4}
+                            >
+                              {pieChartData.map((entry: any, index: number) => (
+                                <Cell key={`cell-${index}`} fill={entry.fill} stroke="rgba(255,255,255,0.6)" strokeWidth={2} />
+                              ))}
+                            </Pie>
+                            <ChartTooltip 
+                              formatter={(value: any) => [`₱${Number(value).toLocaleString(undefined, { minimumFractionDigits: 0 })}`, 'Balance']}
+                              contentStyle={{ backgroundColor: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(20px)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.9)', boxShadow: '0 8px 30px rgba(4,21,45,0.08)', fontSize: '11.5px', fontWeight: '900' }}
+                            />
+                            <Legend 
+                              verticalAlign="bottom" 
+                              align="center"
+                              height={80}
+                              iconType="circle" 
+                              iconSize={10} 
+                              wrapperStyle={{ fontSize: '11px', fontWeight: '900', color: '#04152d', paddingTop: '20px' }}
+                            />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      ) : (
+                        <div className="text-[#04152d]/40 font-bold">Allocation data unavailable</div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Recommendation Reports Widget - AI Formatting Added */}
+                  <div className={`${ultraGlassCard} flex flex-col`}>
+                    <div className="flex items-center justify-between border-b border-white/60 pb-4 mb-5">
+                      <h3 className="text-[14px] font-black text-[#04152d] tracking-tight uppercase tracking-widest flex items-center gap-2">
+                        <Sparkles size={18} className="text-yellow-500" /> AI Recommendations
+                      </h3>
+                      <button onClick={() => setRecModalState('open')} className={`${iconBtn} w-8 h-8`} title="Expand Reports">
+                        <Maximize2 size={14} />
                       </button>
                     </div>
+                    <div className="space-y-4 flex-1 overflow-hidden relative">
+                      {analyticsResult.recommendations?.length ? (
+                        analyticsResult.recommendations.slice(0, 3).map((rec: any) => (
+                          <div key={rec.id} className="bg-white/60 backdrop-blur-md border border-white/90 p-5 rounded-[20px] shadow-[inset_0_1px_2px_rgba(255,255,255,1)]">
+                            <div className="flex items-center gap-2.5 mb-2.5">
+                              {rec.type === 'critical' || rec.type === 'warning' ? <ShieldAlert size={16} className="text-yellow-600" /> : <ShieldCheck size={16} className="text-blue-600" />}
+                              <span className="text-[13.5px] font-black text-[#04152d] truncate">{rec.title}</span>
+                            </div>
+                            
+                            {/* Render Formatted AI Recommendation */}
+                            <div className="line-clamp-3 overflow-hidden">
+                              {formatAIRecommendation(rec.description)}
+                            </div>
+
+                            <div className="mt-3">
+                              <span className="text-[10px] font-bold text-[#04152d]/40 font-mono bg-white/50 px-2.5 py-1 rounded-md border border-white/60 inline-block">
+                                {new Date(rec.timestamp).toLocaleDateString('en-US', { timeZone: 'Asia/Manila', month: 'short', day: 'numeric', year: 'numeric' })}
+                              </span>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-center py-10 text-gray-500 font-bold text-sm">No recommendations available.</div>
+                      )}
+                      <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-white/40 to-transparent pointer-events-none" />
+                    </div>
+                    <button onClick={() => setRecModalState('open')} className="w-full mt-4 py-3 text-[11.5px] font-black text-[#04152d]/60 uppercase tracking-widest hover:text-[#04152d] hover:bg-white/40 rounded-xl transition-colors">
+                      View All
+                    </button>
+                  </div>
+
+                  {/* Audit Logs Widget - Clean Layout */}
+                  <div className={`${ultraGlassCard} flex flex-col`}>
+                    <div className="flex items-center justify-between border-b border-white/60 pb-4 mb-5">
+                      <h3 className="text-[14px] font-black text-[#04152d] tracking-tight uppercase tracking-widest flex items-center gap-2">
+                        <History size={18} className="text-blue-600" /> System Audit Logs
+                      </h3>
+                      <button onClick={() => setAuditModalState('open')} className={`${iconBtn} w-8 h-8`} title="Expand Logs">
+                        <Maximize2 size={14} />
+                      </button>
+                    </div>
+                    <div className="space-y-3 flex-1 overflow-hidden relative">
+                      {analyticsResult.audit_logs?.length ? (
+                        analyticsResult.audit_logs.slice(0, 5).map((log: any) => (
+                          <div key={log.id} className="flex items-start justify-between py-3 border-b border-white/50 last:border-0">
+                            <div className="overflow-hidden pr-3">
+                              <p className="text-[12.5px] font-black text-[#04152d] leading-snug line-clamp-2">{log.action}</p>
+                              <div className="flex items-center gap-2 mt-1.5">
+                                <span className="text-[10px] font-bold text-[#04152d]/60 bg-white/50 px-2 py-0.5 rounded border border-white/60 truncate max-w-[120px]">{log.actor}</span>
+                                <span className="text-[10px] font-mono font-bold text-[#04152d]/40">
+                                  {new Date(log.timestamp).toLocaleTimeString('en-US', { timeZone: 'Asia/Manila', hour: '2-digit', minute: '2-digit' })}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="text-right shrink-0">
+                              <span className={`px-2.5 py-1 rounded border text-[9px] font-black uppercase tracking-widest shadow-sm ${
+                                log.status === 'success' ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-yellow-50 border-yellow-200 text-yellow-700'
+                              }`}>
+                                {log.status}
+                              </span>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-center py-10 text-gray-500 font-bold text-sm">No system logs recorded.</div>
+                      )}
+                      <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white/40 to-transparent pointer-events-none" />
+                    </div>
+                    <button onClick={() => setAuditModalState('open')} className="w-full mt-4 py-3 text-[11.5px] font-black text-[#04152d]/60 uppercase tracking-widest hover:text-[#04152d] hover:bg-white/40 rounded-xl transition-colors">
+                      View All
+                    </button>
                   </div>
 
                 </div>
@@ -1151,11 +1202,17 @@ function ForecastingContent() {
               <div className="overflow-x-auto w-full">
                 <table className="w-full text-left whitespace-nowrap min-w-[700px] border-collapse">
                   <thead className="bg-white/60 backdrop-blur-2xl backdrop-saturate-[200%] shadow-[0_1px_0_rgba(255,255,255,1)] text-[10px] font-black text-[#04152d]/50 uppercase tracking-[0.2em]">
-                    {previewTab === 'funds' ? (
-                      <tr><th className="px-6 py-4">Fund ID</th><th className="px-6 py-4">Designation</th><th className="px-6 py-4">Code</th><th className="px-6 py-4">Balance</th></tr>
-                    ) : (
-                      <tr><th className="px-6 py-4">Tx ID</th><th className="px-6 py-4">Fund Code</th><th className="px-6 py-4">Volume</th><th className="px-6 py-4">Type</th><th className="px-6 py-4">Parameters</th><th className="px-6 py-4">Timestamp</th></tr>
-                    )}
+                    <tr>
+                      {previewTab === 'funds' ? (
+                        <>
+                          <th className="px-6 py-4">Fund ID</th><th className="px-6 py-4">Designation</th><th className="px-6 py-4">Code</th><th className="px-6 py-4">Balance</th>
+                        </>
+                      ) : (
+                        <>
+                          <th className="px-6 py-4">Tx ID</th><th className="px-6 py-4">Fund Code</th><th className="px-6 py-4">Volume</th><th className="px-6 py-4">Type</th><th className="px-6 py-4">Parameters</th><th className="px-6 py-4">Timestamp</th>
+                        </>
+                      )}
+                    </tr>
                   </thead>
                   <tbody className="divide-y divide-white/60 text-[13.5px] font-bold text-[#04152d] bg-white/30 backdrop-blur-xl backdrop-saturate-[180%]">
                     {paginatedPreviewData.length > 0 ? paginatedPreviewData.map((row: any, idx) => (
