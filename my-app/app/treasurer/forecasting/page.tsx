@@ -629,7 +629,7 @@ function ForecastingContent() {
           </div>
         </div>
 
-        {sourceTab === 'db' && !result && (
+        {sourceTab === 'db' && (
           <div className={`flex flex-col max-w-xl mx-auto ${ultraGlassCard}`}>
             <h3 className="text-base font-black text-[#04152d] mb-4 flex items-center gap-2 tracking-tighter">
               <Database size={17} className="text-blue-600" /> Data Source Configuration
