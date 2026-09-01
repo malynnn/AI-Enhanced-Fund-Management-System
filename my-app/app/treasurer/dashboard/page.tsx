@@ -223,11 +223,6 @@ function TreasurerDashboardContent() {
     <div className="relative flex flex-col min-h-screen bg-[#f4f5f7]">
       
       <style jsx global>{`
-        @keyframes liquid-drift {
-          0%, 100% { transform: translate(0, 0) scale(1); }
-          33% { transform: translate(30px, -40px) scale(1.08); }
-          66% { transform: translate(-20px, 20px) scale(0.95); }
-        }
         @keyframes modal-fade-in {
           from { opacity: 0; transform: scale(0.95) translateY(10px); }
           to { opacity: 1; transform: scale(1) translateY(0); }
@@ -253,9 +248,6 @@ function TreasurerDashboardContent() {
         }
         .glass-sheen:hover::after {
           box-shadow: inset 0 1px 0 rgba(255,255,255,1), inset 0 -10px 20px -12px rgba(4,21,45,0.2), inset 1px 0 0 rgba(255,255,255,0.6), inset -1px 0 0 rgba(255,255,255,0.2), inset 0 0 0 1px rgba(255,255,255,0.4);
-        }
-        .glass-blob {
-          position: absolute; border-radius: 9999px; filter: blur(100px); pointer-events: none; animation: liquid-drift 20s ease-in-out infinite;
         }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -329,13 +321,6 @@ function TreasurerDashboardContent() {
         ) : (
           <p className="mb-8 text-sm text-gray-600">No recommendations available.</p>
         )}
-      </div>
-
-      {/* Isolated Liquid Background Layer */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="glass-blob w-[480px] h-[480px] bg-blue-400/30 -top-32 -left-20" />
-        <div className="glass-blob w-[440px] h-[440px] bg-yellow-300/30 top-1/3 -right-32" style={{ animationDelay: '4s' }} />
-        <div className="glass-blob w-[360px] h-[360px] bg-white/60 bottom-0 left-1/3" style={{ animationDelay: '8s' }} />
       </div>
 
       {/* Recommendation Modal */}
@@ -439,8 +424,8 @@ function TreasurerDashboardContent() {
       </div>
 
       {/* Main Content Area */}
-      <div className="p-4 md:p-6 max-w-[1600px] w-full mx-auto space-y-8 flex-1 text-left relative z-10">
-
+      <div className="p-4 md:p-6 max-w-[1600px] w-full mx-auto space-y-6 animate-fade-in flex-1 relative z-10">
+        
         {isLoading || isAnalyticsLoading ? (
           <div className="flex flex-col items-center justify-center py-24 bg-white/50 backdrop-blur-[40px] border border-white/80 rounded-[28px] shadow-sm max-w-md mx-auto">
             <Loader2 className="w-12 h-12 text-blue-600 animate-spin mb-4" />
@@ -759,9 +744,11 @@ function TreasurerDashboardContent() {
                             </div>
                             
                             {/* Render Formatted AI Recommendation */}
-                            {formatAIRecommendation(rec.description)}
-                            
-                            <div className="mt-4">
+                            <div className="line-clamp-3 overflow-hidden">
+                              {formatAIRecommendation(rec.description)}
+                            </div>
+
+                            <div className="mt-3">
                               <span className="text-[10px] font-bold text-[#04152d]/40 font-mono bg-white/50 px-2.5 py-1 rounded-md border border-white/60 inline-block">
                                 {new Date(rec.timestamp).toLocaleDateString('en-US', { timeZone: 'Asia/Manila', month: 'short', day: 'numeric', year: 'numeric' })}
                               </span>

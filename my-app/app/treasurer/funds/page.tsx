@@ -69,10 +69,9 @@ export default function FundPage() {
   const totalCashOut = funds.filter(f => f.status === 'Active').reduce((sum, f) => sum + f.totalOut, 0);
 
   const chartData = useMemo(() => {
-    let colorIndex = 0; 
     return funds
       .filter(f => f.status === 'Active' && f.balance > 0)
-      .map(f => ({ name: f.name, value: f.balance, fill: CHART_COLORS[colorIndex++ % CHART_COLORS.length] }));
+      .map((f, index) => ({ name: f.name, value: f.balance, fill: CHART_COLORS[index % CHART_COLORS.length] }));
   }, [funds]);
 
   const handleExecuteTransfer = async (data: { sourceId: string; destId: string; amount: number; notes: string }) => {
@@ -109,11 +108,6 @@ export default function FundPage() {
     <div className="relative flex flex-col min-h-screen bg-[#f4f5f7]">
       
       <style jsx global>{`
-        @keyframes liquid-drift {
-          0%, 100% { transform: translate(0, 0) scale(1); }
-          33% { transform: translate(30px, -40px) scale(1.08); }
-          66% { transform: translate(-20px, 20px) scale(0.95); }
-        }
         .glass-sheen { position: relative; overflow: hidden; isolation: isolate; }
         .glass-sheen::before {
           content: ''; position: absolute; inset: 0;
@@ -129,17 +123,7 @@ export default function FundPage() {
         .glass-sheen:hover::after {
           box-shadow: inset 0 1px 0 rgba(255,255,255,1), inset 0 -10px 20px -12px rgba(4,21,45,0.2), inset 1px 0 0 rgba(255,255,255,0.6), inset -1px 0 0 rgba(255,255,255,0.2), inset 0 0 0 1px rgba(255,255,255,0.4);
         }
-        .glass-blob {
-          position: absolute; border-radius: 9999px; filter: blur(100px); pointer-events: none; animation: liquid-drift 20s ease-in-out infinite;
-        }
       `}</style>
-
-      {/* Isolated Liquid Background Layer */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="glass-blob w-[480px] h-[480px] bg-blue-400/30 -top-32 -left-20" />
-        <div className="glass-blob w-[440px] h-[440px] bg-yellow-300/30 top-1/3 -right-32" style={{ animationDelay: '4s' }} />
-        <div className="glass-blob w-[360px] h-[360px] bg-white/60 bottom-0 left-1/3" style={{ animationDelay: '8s' }} />
-      </div>
       
       <ActionModal 
         isOpen={actionModal.isOpen} title={actionModal.title} message={actionModal.message} status={actionModal.status} resultMsg={actionModal.resultMsg}
@@ -150,12 +134,12 @@ export default function FundPage() {
         isOpen={isTransferModalOpen} onClose={() => setIsTransferModalOpen(false)} funds={funds.filter(f => f.status === 'Active')} onSubmit={handleExecuteTransfer}
       />
 
-      {/* Sticky Header - Properly confined, no 'fixed' overlap */}
+      {/* Sticky Header */}
       <div className="sticky top-0 z-40 w-full backdrop-blur-2xl bg-white/30 border-b border-white/50 shadow-[0_4px_30px_rgba(0,0,0,0.03)]">
         <Header />
       </div>
 
-      {/* Main Content Area - Removed pt-[100px] because header is sticky now */}
+      {/* Main Content Area */}
       <main className="p-4 md:p-6 max-w-[1600px] w-full mx-auto space-y-6 flex-1 animate-fade-in relative z-10">
 
         {/* Analytics Row */}
@@ -204,7 +188,7 @@ export default function FundPage() {
                     <PieChart>
                       <Pie data={chartData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={30} outerRadius={45} paddingAngle={4}>
                         {chartData.map((entry: any, index: number) => (
-                          <Cell key={`cell-${index}`} fill={entry.fill} />
+                          <Cell key={`cell-${index}`} fill={entry.fill} stroke="rgba(255,255,255,0.6)" strokeWidth={2} />
                         ))}
                       </Pie>
                       <Tooltip 

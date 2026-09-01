@@ -1,14 +1,15 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { Loader2, CheckCircle2, AlertTriangle, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { Loader2, CheckCircle2, AlertTriangle, X, Info } from 'lucide-react';
 
 interface ActionModalProps {
   isOpen: boolean;
   title: string;
-  message: React.ReactNode;
+  message: string;
   status: 'idle' | 'loading' | 'success' | 'error';
-  resultMsg?: React.ReactNode;
+  resultMsg?: string;
   onConfirm: () => void;
   onClose: () => void;
   confirmText?: string;
@@ -22,121 +23,132 @@ export default function ActionModal({
   resultMsg,
   onConfirm,
   onClose,
-  confirmText = "Confirm"
+  confirmText = 'Confirm'
 }: ActionModalProps) {
-  const [isRendered, setIsRendered] = useState(isOpen);
-  const [show, setShow] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  // Handle smooth mount/unmount animations
+  // Handle mounting and scroll locking
   useEffect(() => {
+    setMounted(true);
     if (isOpen) {
-      setIsRendered(true);
-      const raf = requestAnimationFrame(() => {
-        requestAnimationFrame(() => setShow(true));
-      });
-      return () => cancelAnimationFrame(raf);
+      document.body.style.overflow = 'hidden';
     } else {
-      setShow(false);
-      const timer = setTimeout(() => setIsRendered(false), 400); 
-      return () => clearTimeout(timer);
+      document.body.style.overflow = 'unset';
     }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
   }, [isOpen]);
 
-  if (!isRendered) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
-      {/* Blurred Dark Overlay */}
+  // Liquid Glass CSS Variables
+  const ultraGlassCard = "glass-sheen bg-gradient-to-br from-white/60 via-white/40 to-white/30 backdrop-blur-[40px] backdrop-saturate-[200%] border border-white/80 shadow-[0_10px_30px_rgba(4,21,45,0.06),0_1px_1px_rgba(255,255,255,0.6),inset_0_2px_3px_rgba(255,255,255,0.9)] rounded-[24px] p-6";
+  const iconBtn = "glass-sheen flex items-center justify-center bg-white/70 hover:bg-white/90 backdrop-blur-md border border-white/80 shadow-[0_2px_8px_rgba(4,21,45,0.04),inset_0_1px_2px_rgba(255,255,255,0.8)] hover:shadow-[0_4px_12px_rgba(4,21,45,0.08),inset_0_1px_2px_rgba(255,255,255,1)] rounded-full transition-all duration-300 active:scale-90 text-[#04152d]/60 hover:text-[#04152d]";
+
+  // Map status to Header Icon
+  const getIcon = () => {
+    if (status === 'success') return <CheckCircle2 className="text-blue-600" size={20} />;
+    if (status === 'error') return <AlertTriangle className="text-red-600" size={20} />;
+    return <Info className="text-blue-600" size={20} />;
+  };
+
+  const modalContent = (
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 sm:p-6">
+      
+      {/* Inject animations strictly into the portal tree */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes modal-enter {
+          from { opacity: 0; transform: scale(0.95) translateY(10px); }
+          to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .animate-modal-enter { animation: modal-enter 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+        
+        .glass-sheen { position: relative; overflow: hidden; isolation: isolate; }
+        .glass-sheen::before {
+          content: ''; position: absolute; inset: 0;
+          background: linear-gradient(128deg, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0.14) 28%, rgba(255,255,255,0) 46%), radial-gradient(130% 110% at 12% -18%, rgba(255,255,255,0.55), rgba(255,255,255,0) 58%);
+          opacity: 0.85; transition: opacity 0.35s ease; pointer-events: none; z-index: 1;
+        }
+        .glass-sheen:hover::before { opacity: 1; }
+        .glass-sheen::after {
+          content: ''; position: absolute; inset: 0;
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), inset 0 -10px 18px -14px rgba(4,21,45,0.15), inset 1px 0 0 rgba(255,255,255,0.4), inset -1px 0 0 rgba(255,255,255,0.1), inset 0 0 0 1px rgba(255,255,255,0.1);
+          transition: box-shadow 0.35s ease; pointer-events: none; z-index: 1; border-radius: inherit;
+        }
+        .glass-sheen:hover::after {
+          box-shadow: inset 0 1px 0 rgba(255,255,255,1), inset 0 -10px 20px -12px rgba(4,21,45,0.2), inset 1px 0 0 rgba(255,255,255,0.6), inset -1px 0 0 rgba(255,255,255,0.2), inset 0 0 0 1px rgba(255,255,255,0.4);
+        }
+      `}} />
+
+      {/* Background Overlay */}
       <div 
-        className={`absolute inset-0 bg-[#04152d]/40 backdrop-blur-md transition-opacity duration-400 ease-[cubic-bezier(0.25,1,0.5,1)] ${show ? 'opacity-100' : 'opacity-0'}`} 
-        onClick={() => status !== 'loading' && onClose()} 
+        className="absolute inset-0 bg-[#04152d]/40 backdrop-blur-sm transition-opacity duration-300" 
+        onClick={status !== 'loading' ? onClose : undefined} 
       />
       
-      {/* Liquid Glass Card */}
-      <div className={`relative w-full max-w-md flex flex-col glass-sheen bg-gradient-to-br from-white/60 via-white/40 to-white/30 backdrop-blur-[40px] backdrop-saturate-[200%] border border-white/80 shadow-[0_10px_30px_rgba(4,21,45,0.06),0_1px_1px_rgba(255,255,255,0.6),inset_0_2px_3px_rgba(255,255,255,0.9)] rounded-[24px] p-6 text-center transition-all duration-400 ease-[cubic-bezier(0.25,1,0.5,1)] transform ${show ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-4'}`}>
+      {/* Modal Card */}
+      <div className={`relative w-full max-w-md ${ultraGlassCard} flex flex-col animate-modal-enter`}>
         
-        {/* Absolute wrapper protects the positioning from the glass-sheen relative override */}
-        {status !== 'loading' && status !== 'success' && (
-          <div className="absolute top-4 right-4 z-20">
-            <button 
-              onClick={onClose} 
-              className="glass-sheen flex items-center justify-center bg-white/70 hover:bg-white/90 backdrop-blur-md border border-white/80 shadow-[0_2px_8px_rgba(4,21,45,0.04),inset_0_1px_2px_rgba(255,255,255,0.8)] hover:shadow-[0_4px_12px_rgba(4,21,45,0.08),inset_0_1px_2px_rgba(255,255,255,1)] rounded-full transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] active:scale-90 text-[#04152d]/60 hover:text-[#04152d] w-8 h-8"
-            >
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-white/60 pb-4 mb-5">
+          <h3 className="text-[16px] font-black text-[#04152d] tracking-tight flex items-center gap-2.5">
+            {getIcon()} {title}
+          </h3>
+          {status !== 'loading' && (
+            <button onClick={onClose} className={`${iconBtn} w-8 h-8`} title="Close">
               <X size={16} />
+            </button>
+          )}
+        </div>
+
+        {/* Content Body */}
+        <div className="bg-white/50 backdrop-blur-md border border-white/80 p-6 rounded-[20px] shadow-[inset_0_1px_2px_rgba(255,255,255,0.9)] mb-6 flex flex-col items-center justify-center min-h-[100px] text-center">
+          {status === 'loading' ? (
+            <div className="flex flex-col items-center gap-3">
+              <Loader2 size={28} className="animate-spin text-blue-600" />
+              <p className="text-[13px] font-bold text-[#04152d]/70">{message}</p>
+            </div>
+          ) : (
+            <p className="text-[13.5px] font-bold text-[#04152d]/80 leading-relaxed">
+              {resultMsg || message}
+            </p>
+          )}
+        </div>
+
+        {/* Actions */}
+        {status === 'idle' && (
+          <div className="flex items-center gap-3 w-full mt-auto">
+            <button
+              onClick={onClose}
+              className="glass-sheen flex-1 px-5 py-3.5 bg-white/70 hover:bg-white/90 backdrop-blur-xl border border-white/80 shadow-[0_4px_14px_rgba(4,21,45,0.06),inset_0_1px_2px_rgba(255,255,255,1)] rounded-full text-[13px] font-black text-[#04152d] transition-all duration-300 active:scale-95 outline-none"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={onConfirm}
+              className="glass-sheen flex-1 px-5 py-3.5 bg-[#04152d] hover:bg-[#04152d]/90 text-white shadow-[0_6px_16px_rgba(4,21,45,0.25)] border border-white/20 rounded-full text-[13px] font-black transition-all duration-300 active:scale-95 outline-none"
+            >
+              {confirmText}
             </button>
           </div>
         )}
 
-        <div className="flex flex-col items-center justify-center py-2 relative z-0">
-          {status === 'loading' && (
-            <>
-              <Loader2 className="w-12 h-12 text-blue-600 animate-spin mb-4 mt-2" />
-              <h3 className="text-[18px] font-black text-[#04152d] tracking-tight">{title}</h3>
-              <div className="text-[13px] font-bold text-[#04152d]/60 mt-2 w-full">{message}</div>
-            </>
-          )}
-
-          {status === 'success' && (
-            <>
-              <div className="w-16 h-16 bg-blue-50 border border-blue-200 rounded-full flex items-center justify-center shadow-[0_4px_12px_rgba(37,99,235,0.1),inset_0_1px_2px_rgba(255,255,255,1)] mb-4 mt-2">
-                <CheckCircle2 className="w-8 h-8 text-blue-600" />
-              </div>
-              <h3 className="text-[18px] font-black text-[#04152d] tracking-tight">{title}</h3>
-              <div className="text-[13px] font-bold text-[#04152d]/60 mt-2 w-full">{resultMsg || 'Action completed successfully.'}</div>
-              <button 
-                onClick={onClose} 
-                className="mt-6 glass-sheen px-6 py-3 bg-white/70 hover:bg-white/90 backdrop-blur-xl border border-white/80 shadow-[0_4px_14px_rgba(4,21,45,0.06),inset_0_1px_2px_rgba(255,255,255,1)] hover:-translate-y-0.5 active:scale-95 rounded-full text-[13.5px] font-black text-[#04152d] transition-all duration-300 w-full"
-              >
-                Close Receipt
-              </button>
-            </>
-          )}
-
-          {status === 'error' && (
-            <>
-              <div className="w-16 h-16 bg-red-50 border border-red-200 rounded-full flex items-center justify-center shadow-[0_4px_12px_rgba(239,68,68,0.1),inset_0_1px_2px_rgba(255,255,255,1)] mb-4 mt-2">
-                <AlertTriangle className="w-8 h-8 text-red-500" />
-              </div>
-              <h3 className="text-[18px] font-black text-[#04152d] tracking-tight">{title}</h3>
-              <div className="text-[13px] font-bold text-red-500/80 mt-2 w-full">{resultMsg || 'An error occurred during the operation.'}</div>
-              <button 
-                onClick={onClose} 
-                className="mt-6 glass-sheen px-6 py-3 bg-white/70 hover:bg-white/90 backdrop-blur-xl border border-white/80 shadow-[0_4px_14px_rgba(4,21,45,0.06),inset_0_1px_2px_rgba(255,255,255,1)] hover:-translate-y-0.5 active:scale-95 rounded-full text-[13.5px] font-black text-[#04152d] transition-all duration-300 w-full"
-              >
-                Close
-              </button>
-            </>
-          )}
-
-          {status === 'idle' && (
-            <>
-              <div className="w-14 h-14 bg-yellow-50 border border-yellow-200 rounded-2xl flex items-center justify-center shadow-[0_4px_12px_rgba(234,179,8,0.1),inset_0_1px_2px_rgba(255,255,255,1)] mb-4 mx-auto">
-                <AlertTriangle className="w-7 h-7 text-yellow-600" />
-              </div>
-              <h3 className="text-[18px] font-black text-[#04152d] tracking-tight">{title}</h3>
-              
-              <div className="text-[13px] font-bold text-[#04152d]/70 mt-2 mb-6 leading-relaxed w-full">
-                {message}
-              </div>
-
-              <div className="flex w-full gap-3">
-                <button 
-                  onClick={onClose} 
-                  className="flex-1 glass-sheen py-3 bg-white/50 hover:bg-white/70 backdrop-blur-xl border border-white/80 shadow-[0_4px_14px_rgba(4,21,45,0.06),inset_0_1px_2px_rgba(255,255,255,1)] active:scale-95 rounded-full text-[13.5px] font-black text-[#04152d] transition-all duration-300"
-                >
-                  Cancel
-                </button>
-                <button 
-                  onClick={onConfirm} 
-                  className="flex-1 glass-sheen py-3 bg-[#04152d] hover:bg-[#04152d]/90 text-white border border-white/20 shadow-[0_6px_16px_rgba(4,21,45,0.25)] active:scale-95 rounded-full text-[13.5px] font-black transition-all duration-300"
-                >
-                  {confirmText}
-                </button>
-              </div>
-            </>
-          )}
-        </div>
+        {/* End States */}
+        {(status === 'success' || status === 'error') && (
+          <div className="flex w-full mt-auto">
+            <button
+              onClick={onClose}
+              className="glass-sheen w-full px-5 py-3.5 bg-[#04152d] hover:bg-[#04152d]/90 text-white shadow-[0_6px_16px_rgba(4,21,45,0.25)] border border-white/20 rounded-full text-[13px] font-black transition-all duration-300 active:scale-95 outline-none"
+            >
+              Close
+            </button>
+          </div>
+        )}
+        
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }

@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 import { useState, Suspense } from "react";
 import { signIn, getSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { AlertCircle, Loader2, CheckCircle2 } from "lucide-react";
+import { AlertCircle, Loader2, CheckCircle2, Lock, User } from "lucide-react";
 import Image from "next/image"; 
 
 function LoginForm() {
@@ -57,10 +57,21 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen w-full flex font-sans">
+    <div className="min-h-screen w-full flex font-sans relative overflow-hidden">
       
-      {/* Logo */}
-      <div className="hidden lg:flex w-1/2 bg-[#f8f9fa] items-center justify-center p-12">
+      <style jsx global>{`
+        @keyframes liquid-drift {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          33% { transform: translate(30px, -40px) scale(1.08); }
+          66% { transform: translate(-20px, 20px) scale(0.95); }
+        }
+        .glass-blob {
+          position: absolute; border-radius: 9999px; filter: blur(100px); pointer-events: none; animation: liquid-drift 20s ease-in-out infinite;
+        }
+      `}</style>
+
+      {/* Left Side: Solid Logo Container */}
+      <div className="hidden lg:flex w-1/2 bg-[#f8f9fa] items-center justify-center p-12 relative z-10 shadow-[20px_0_40px_rgba(0,0,0,0.15)]">
         <Image 
           src="/bdoea-logo-blue.png" 
           alt="BDOEA Logo" 
@@ -71,69 +82,86 @@ function LoginForm() {
         />
       </div>
 
-      {/* Login Form Area */}
-      <div className="w-full lg:w-1/2 bg-[#021124] flex items-center justify-center p-8">
-        <div className="bg-[#f8f9fa] w-full max-w-md rounded-md p-10 lg:p-12 shadow-xl">
+      {/* Right Side: Deep Navy Glass Environment */}
+      <div className="w-full lg:w-1/2 bg-[#04152d] relative flex items-center justify-center p-8 z-0">
+        
+        {/* Dynamic Background Blobs strictly contained within the right side */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+          <div className="glass-blob w-[500px] h-[500px] bg-blue-600/30 -top-32 -right-20" />
+          <div className="glass-blob w-[450px] h-[450px] bg-yellow-400/20 top-1/4 -left-32" style={{ animationDelay: '3s' }} />
+          <div className="glass-blob w-[400px] h-[400px] bg-blue-400/20 bottom-0 right-10" style={{ animationDelay: '6s' }} />
+        </div>
+
+        {/* Frosted Glass Login Card */}
+        <div className="relative z-10 bg-white/80 backdrop-blur-[50px] backdrop-saturate-[200%] border border-white w-full max-w-md rounded-[28px] p-10 lg:p-12 shadow-[0_24px_60px_rgba(0,0,0,0.4),inset_0_2px_4px_rgba(255,255,255,1)]">
           
-          <h2 className="text-[2.5rem] leading-none font-bold text-black mb-8 tracking-tight">
-            Log In (Mock)
+          <h2 className="text-[2.5rem] leading-none font-black text-[#04152d] mb-8 tracking-tight drop-shadow-sm">
+            Log In
           </h2>
 
-          {/* Error Display */}
+          {/* Error Display - Glassy */}
           {(errorMessage || errorUrl) && (
-            <div className="mb-6 bg-red-100 text-red-700 p-3 rounded flex items-start gap-2 text-sm font-bold">
-              <AlertCircle size={18} className="shrink-0 mt-0.5" />
-              <p>{errorMessage || "Authentication failed."}</p>
+            <div className="mb-6 bg-red-50/80 backdrop-blur-md border border-red-200 shadow-[inset_0_1px_2px_rgba(255,255,255,1)] text-red-700 p-4 rounded-[16px] flex items-start gap-3 text-[13px] font-bold">
+              <AlertCircle size={18} className="shrink-0 mt-0.5 text-red-500" />
+              <p className="leading-relaxed">{errorMessage || "Authentication failed."}</p>
             </div>
           )}
 
-          {/* Role Success Display */}
+          {/* Role Success Display - Glassy */}
           {detectedRole && (
-            <div className="mb-6 bg-green-100 text-green-800 p-4 rounded flex items-center gap-3 text-sm font-bold border border-green-200">
-              <CheckCircle2 size={24} className="text-green-600 shrink-0" />
+            <div className="mb-6 bg-emerald-50/80 backdrop-blur-md border border-emerald-200 shadow-[inset_0_1px_2px_rgba(255,255,255,1)] text-emerald-800 p-4 rounded-[16px] flex items-center gap-3 text-sm font-bold">
+              <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center shrink-0 border border-emerald-200">
+                <CheckCircle2 size={20} className="text-emerald-600" />
+              </div>
               <div>
-                <p>Authentication Successful!</p>
-                <p className="font-medium text-green-700 mt-0.5">Logging you in as: <span className="font-black uppercase">{detectedRole}</span></p>
+                <p className="text-[14px] font-black text-emerald-900 tracking-tight">Authentication Successful</p>
+                <p className="text-[12px] font-bold text-emerald-700/80 mt-0.5">Logging you in as: <span className="font-black uppercase text-emerald-600">{detectedRole}</span></p>
               </div>
             </div>
           )}
 
           <form onSubmit={handleLogin} className="space-y-5">
             <div>
-              <label className="block text-sm text-gray-700 mb-1.5">Employee ID</label>
-              <input
-                type="text"
-                required
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                disabled={!!detectedRole}
-                className="w-full p-3 bg-white border border-gray-200 rounded text-sm focus:ring-2 focus:ring-[#021124] outline-none transition-all disabled:opacity-50"
-                placeholder="Example: member, admin, treasurer, auditor"
-              />
+              <label className="block text-[11px] font-black text-[#04152d]/80 uppercase tracking-[0.15em] mb-2">Employee ID</label>
+              <div className="relative">
+                <User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#04152d]/60" />
+                <input
+                  type="text"
+                  required
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  disabled={!!detectedRole}
+                  className="w-full pl-11 pr-4 py-3.5 bg-white/90 hover:bg-white backdrop-blur-xl border border-white/90 shadow-[inset_0_2px_4px_rgba(4,21,45,0.03)] rounded-[14px] text-[13.5px] font-bold focus:bg-white focus:shadow-[0_4px_16px_rgba(4,21,45,0.08)] outline-none transition-all duration-300 disabled:opacity-50 text-[#04152d] placeholder:text-[#04152d]/50 placeholder:font-medium"
+                  placeholder="e.g., member, admin, treasurer, auditor"
+                />
+              </div>
             </div>
 
             <div>
-              <label className="block text-sm text-gray-700 mb-1.5">Password</label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={!!detectedRole}
-                className="w-full p-3 bg-white border border-gray-200 rounded text-sm focus:ring-2 focus:ring-[#021124] outline-none transition-all disabled:opacity-50"
-                placeholder="Enter any password"
-              />
+              <label className="block text-[11px] font-black text-[#04152d]/80 uppercase tracking-[0.15em] mb-2">Password</label>
+              <div className="relative">
+                <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#04152d]/60" />
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={!!detectedRole}
+                  className="w-full pl-11 pr-4 py-3.5 bg-white/90 hover:bg-white backdrop-blur-xl border border-white/90 shadow-[inset_0_2px_4px_rgba(4,21,45,0.03)] rounded-[14px] text-[13.5px] font-bold focus:bg-white focus:shadow-[0_4px_16px_rgba(4,21,45,0.08)] outline-none transition-all duration-300 disabled:opacity-50 text-[#04152d] placeholder:text-[#04152d]/50 placeholder:font-medium"
+                  placeholder="Enter any assigned password"
+                />
+              </div>
             </div>
 
             <button
               type="submit"
               disabled={isLoading || !!detectedRole}
-              className="w-full bg-[#021124] text-white p-3.5 mt-4 rounded font-semibold text-sm hover:bg-black transition-all active:scale-[0.99] flex justify-center items-center gap-2 disabled:opacity-70"
+              className="w-full bg-[#04152d] hover:bg-[#04152d]/90 text-white p-4 mt-6 rounded-[14px] font-black text-[14px] shadow-[0_8px_20px_rgba(4,21,45,0.3)] hover:-translate-y-[1px] active:translate-y-[2px] transition-all duration-300 flex justify-center items-center gap-2 disabled:opacity-70 border border-white/10 outline-none"
             >
               {isLoading && !detectedRole ? (
-                <><Loader2 size={18} className="animate-spin" /> Verifying...</>
+                <><Loader2 size={18} className="animate-spin" /> Verifying Credentials...</>
               ) : detectedRole ? (
-                "Redirecting..."
+                "Redirecting Matrix..."
               ) : (
                 "Login"
               )}
@@ -149,7 +177,7 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen w-full flex items-center justify-center bg-[#021124] text-white">
+      <div className="min-h-screen w-full flex items-center justify-center bg-[#04152d] text-white">
         <Loader2 className="animate-spin" size={32} />
       </div>
     }>

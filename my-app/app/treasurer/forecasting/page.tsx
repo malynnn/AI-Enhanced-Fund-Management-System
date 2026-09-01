@@ -401,11 +401,6 @@ function ForecastingContent() {
   return (
     <div className="relative flex flex-col min-h-screen bg-[#f4f5f7]">
       <style jsx global>{`
-        @keyframes liquid-drift {
-          0%, 100% { transform: translate(0, 0) scale(1); }
-          33% { transform: translate(30px, -40px) scale(1.08); }
-          66% { transform: translate(-20px, 20px) scale(0.95); }
-        }
         @keyframes modal-fade-in {
           from { opacity: 0; transform: scale(0.95) translateY(10px); }
           to { opacity: 1; transform: scale(1) translateY(0); }
@@ -431,9 +426,6 @@ function ForecastingContent() {
         }
         .glass-sheen:hover::after {
           box-shadow: inset 0 1px 0 rgba(255,255,255,1), inset 0 -10px 20px -12px rgba(4,21,45,0.2), inset 1px 0 0 rgba(255,255,255,0.6), inset -1px 0 0 rgba(255,255,255,0.2), inset 0 0 0 1px rgba(255,255,255,0.4);
-        }
-        .glass-blob {
-          position: absolute; border-radius: 9999px; filter: blur(100px); animation: liquid-drift 20s ease-in-out infinite;
         }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -507,13 +499,6 @@ function ForecastingContent() {
         ) : (
           <p className="mb-8 text-sm text-gray-600">No recommendations available.</p>
         )}
-      </div>
-
-      {/* Strictly Blue, Yellow, White spectrum isolated in background */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="glass-blob w-[480px] h-[480px] bg-blue-400/30 -top-32 -left-20" />
-        <div className="glass-blob w-[440px] h-[440px] bg-yellow-300/30 top-1/3 -right-32" style={{ animationDelay: '4s' }} />
-        <div className="glass-blob w-[360px] h-[360px] bg-white/60 bottom-0 left-1/3" style={{ animationDelay: '8s' }} />
       </div>
 
       {/* Expanded Recommendation Modal */}

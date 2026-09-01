@@ -4,13 +4,12 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  Home, Calendar, CreditCard, CircleDollarSign, Book, LogOut, ChevronDown,
+  Home, Calendar, CreditCard, CircleDollarSign, Book, ChevronDown,
   PanelLeftClose, PanelLeftOpen, LayoutDashboard, WalletCards, Send,
   Briefcase, ClipboardList, PieChart, FileText, Users,
   Settings, Activity
 } from 'lucide-react';
-import { signOut, useSession } from "next-auth/react";
-import ActionModal from '@/components/ActionModal';
+import { useSession } from "next-auth/react";
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -21,15 +20,16 @@ export default function Sidebar() {
   });
 
   const [isCollapsed, setIsCollapsed] = useState(false);
-  
-  const [logoutModal, setLogoutModal] = useState<{
-    isOpen: boolean;
-    status: 'idle' | 'loading' | 'success' | 'error';
-  }>({ isOpen: false, status: 'idle' });
 
   if (pathname === '/login') return null;
 
   const currentUserRole = (session?.user as any)?.role || 'User';
+
+  // Cleanly parse Name: Surname large, First name small (No hardcoded fallbacks)
+  const rawName = session?.user?.name || session?.user?.email?.split('@')[0] || currentUserRole;
+  const nameParts = rawName.trim().split(' ');
+  const lastName = nameParts.pop(); 
+  const firstName = nameParts.join(' '); 
 
   const generalNavItems = [
     { label: 'Dashboard', href: '/dashboard', icon: Home, roles: ['User', 'Officer/Admin', 'Superadmin', 'Treasurer', 'Auditor'] },
@@ -49,6 +49,9 @@ export default function Sidebar() {
         { label: 'Settings', href: '/admin/settings', icon: Settings, roles: ['Officer/Admin'] },
 
         { label: 'Dashboard', href: '/treasurer/dashboard', icon: LayoutDashboard, roles: ['Treasurer'] },
+        { label: 'Collections', href: '/treasurer/collections', icon: WalletCards, roles: ['Treasurer'] },
+        { label: 'Loan Ledger', href: '/treasurer/loans', icon: CircleDollarSign, roles: ['Treasurer'] },
+        { label: 'Disbursement', href: '/treasurer/disbursement', icon: Send, roles: ['Treasurer'] },
         { label: 'Funds', href: '/treasurer/funds', icon: Briefcase, roles: ['Treasurer'] },
         { label: 'AI Forecasting', href: '/treasurer/forecasting', icon: Activity, roles: ['Treasurer'] },
         
@@ -65,15 +68,6 @@ export default function Sidebar() {
 
   const toggleMenu = (label: string) => {
     setOpenMenus(prev => ({ ...prev, [label]: !prev[label] }));
-  };
-
-  const triggerLogout = () => {
-    setLogoutModal({ isOpen: true, status: 'idle' });
-  };
-
-  const executeLogout = async () => {
-    setLogoutModal(prev => ({ ...prev, status: 'loading' }));
-    await signOut({ callbackUrl: '/login' });
   };
 
   const renderNavItems = (items: any[]) => {
@@ -157,16 +151,6 @@ export default function Sidebar() {
         }
       `}</style>
 
-      <ActionModal
-        isOpen={logoutModal.isOpen}
-        title="Confirm Sign Out"
-        message="Are you sure you want to securely sign out of your BDOEA account?"
-        status={logoutModal.status}
-        onConfirm={executeLogout}
-        onClose={() => setLogoutModal({ isOpen: false, status: 'idle' })}
-        confirmText="Sign Out"
-      />
-
       <aside className={`relative h-full flex-shrink-0 z-50 flex flex-col bg-[#0a1224]/80 backdrop-blur-[50px] backdrop-saturate-[150%] border-r border-white/5 shadow-[4px_0_32px_rgba(0,0,0,0.3)] transition-all duration-400 ease-[cubic-bezier(0.25,1,0.5,1)] print:hidden ${isCollapsed ? 'w-[100px]' : 'w-[290px]'}`}>
         
         {/* Dynamic Dark Blue & Yellow Background Blobs */}
@@ -195,17 +179,18 @@ export default function Sidebar() {
               </button>
             </div>
 
-            {/* Navigation Lists - Padding applied to the scrolling container to prevent shadow clipping */}
+            {/* Navigation Lists */}
             <nav className={`flex-1 overflow-y-auto space-y-8 [&::-webkit-scrollbar]:hidden pb-4 pt-2 ${isCollapsed ? 'px-3' : 'px-6'}`}>
               
-              {/* Temporarily Hidden Main Menu 
-              <div className="flex flex-col space-y-2">
-                {!isCollapsed && <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.25em] mb-1 px-2 drop-shadow-sm">Main Menu</p>}
-                <div className={glassGroupContainer}>
-                  {renderNavItems(visibleGeneralItems)}
+              {/* Main Menu conditionally rendered based on role access */}
+              {visibleGeneralItems.length > 0 && (
+                <div className="flex flex-col space-y-2">
+                  {!isCollapsed && <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.25em] mb-1 px-2 drop-shadow-sm">Main Menu</p>}
+                  <div className={glassGroupContainer}>
+                    {renderNavItems(visibleGeneralItems)}
+                  </div>
                 </div>
-              </div>
-              */}
+              )}
 
               <div className="flex flex-col space-y-2 mt-4">
                 {!isCollapsed ? (
@@ -227,42 +212,27 @@ export default function Sidebar() {
 
             {/* Footer Profile */}
             <div className={`mt-2 pt-6 border-t border-white/10 flex flex-col gap-3 shrink-0 ${isCollapsed ? 'px-3' : 'px-6'}`}>
-              <div className={`bg-gradient-to-br from-white/[0.08] to-white/[0.02] backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.2)] flex items-center transition-all duration-400 hover:shadow-[0_12px_40px_rgba(0,0,0,0.4)] hover:bg-white/[0.1] hover:-translate-y-0.5 active:scale-95 active:translate-y-0 cursor-pointer ${isCollapsed ? 'p-2 rounded-[20px] justify-center w-[52px] h-[52px] mx-auto' : 'p-3 rounded-[24px] justify-between'}`}>
+              <div className={`bg-gradient-to-br from-white/[0.08] to-white/[0.02] backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.2)] flex items-center transition-all duration-400 ${isCollapsed ? 'p-2 rounded-[20px] justify-center w-[52px] h-[52px] mx-auto' : 'p-3 rounded-[24px] justify-between'}`}>
                 <div className={`flex items-center gap-3 overflow-hidden ${isCollapsed ? 'justify-center w-full h-full' : ''}`}>
-                  <div className={`rounded-full bg-gradient-to-tr from-[#04152d] to-blue-600 shadow-[inset_0_2px_6px_rgba(255,255,255,0.4),0_2px_8px_rgba(0,0,0,0.5)] border border-white/20 flex-shrink-0 ${isCollapsed ? 'w-full h-full' : 'w-10 h-10'}`} title={session?.user?.email?.split('@')[0] || "VEN"} />
+                  <div className={`rounded-full bg-gradient-to-tr from-[#04152d] to-blue-600 shadow-[inset_0_2px_6px_rgba(255,255,255,0.4),0_2px_8px_rgba(0,0,0,0.5)] border border-white/20 flex-shrink-0 ${isCollapsed ? 'w-full h-full' : 'w-10 h-10'}`} title={lastName} />
 
                   {!isCollapsed && (
-                    <div className="overflow-hidden">
-                      <p className="text-[9px] tracking-[0.2em] uppercase m-0 leading-tight font-black text-amber-400/90 drop-shadow-[0_0_4px_rgba(251,191,36,0.3)]">
+                    <div className="overflow-hidden pr-2 flex flex-col justify-center">
+                      <p className="text-[10px] tracking-[0.2em] uppercase leading-none font-black text-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.3)] mb-1">
                         {currentUserRole}
                       </p>
-                      <p className="text-[14px] font-black text-white truncate leading-tight mt-0.5 whitespace-nowrap">{session?.user?.email?.split('@')[0] || "VEN"}</p>
+                      <p className="text-[15px] font-black text-white uppercase tracking-wider truncate leading-tight drop-shadow-sm">
+                        {lastName}
+                      </p>
+                      {firstName && (
+                        <p className="text-[12px] font-bold text-white/60 truncate leading-tight mt-0.5 whitespace-nowrap">
+                          {firstName}
+                        </p>
+                      )}
                     </div>
                   )}
                 </div>
-
-                {!isCollapsed && (
-                  <button 
-                    onClick={triggerLogout}
-                    className="p-2.5 bg-white/[0.05] hover:bg-red-500/20 border border-white/10 hover:border-red-400/50 shadow-[inset_0_1px_2px_rgba(255,255,255,0.1)] rounded-xl transition-all duration-300 text-white/50 hover:text-red-400 hover:scale-110 active:scale-90 flex-shrink-0 outline-none"
-                    title="Sign Out"
-                  >
-                    <LogOut size={18} strokeWidth={2.5} />
-                  </button>
-                )}
               </div>
-
-              {isCollapsed && (
-                <div className="flex justify-center mt-2">
-                  <button
-                    onClick={triggerLogout}
-                    className="transition-all duration-300 flex items-center justify-center bg-white/[0.05] hover:bg-red-500/20 border border-white/10 hover:border-red-400/50 shadow-[0_4px_16px_rgba(0,0,0,0.2),inset_0_1px_2px_rgba(255,255,255,0.1)] text-white/50 hover:text-red-400 hover:-translate-y-0.5 active:scale-95 w-[52px] h-[52px] rounded-[20px] mx-auto"
-                    title="Sign Out"
-                  >
-                    <LogOut size={18} strokeWidth={2.5} className="flex-shrink-0" />
-                  </button>
-                </div>
-              )}
             </div>
           </div>
         )}
